@@ -234,7 +234,7 @@ Rollback:
 
 ---
 
-## 🏛️ Modelo cooperativo (ATLANTYDE / ATLANTYQA)
+## 🏛️ Modelo cooperativo ATLANTYQA
 
 Este proyecto **no es un producto**, es un **ecosistema cooperativo**.
 Contribuir aquí significa: aprender · enseñar · construir futuro compartido.
