@@ -1,4 +1,4 @@
-name: Gamification -> Add Issues/PRs to Project (v2)
+name: Gamification -> Add Issues/PRs to Org Project (v2)
 
 on:
   issues:
@@ -9,15 +9,37 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
+  repository-projects: write
 
 jobs:
   add-to-project:
     runs-on: ubuntu-latest
     steps:
-      - name: Add to Project (requires secret PROJECT_TOKEN)
+      - name: Determine PROJECT_URL (org project)
+        id: determine_project_url
+        run: |
+          if [ -n "${{ secrets.PROJECT_URL }}" ]; then
+            echo "project_url=${{ secrets.PROJECT_URL }}" >> $GITHUB_OUTPUT
+          else
+            echo "project_url=https://github.com/orgs/atlantyde-labs/projects/2" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for PROJECT_TOKEN presence
+        id: check_token
+        run: |
+          if [ -n "${{ secrets.PROJECT_TOKEN }}" ]; then
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_token=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add Issue/PR to Org Project (by labels)
+        if: ${{ steps.check_token.outputs.has_token == 'true' && steps.determine_project_url.outputs.project_url != '' }}
         uses: actions/add-to-project@v1.0.2
         with:
-          project-url: ${{ secrets.PROJECT_URL }}
+          project-url: ${{ steps.determine_project_url.outputs.project_url }}
           github-token: ${{ secrets.PROJECT_TOKEN }}
           labeled: |
             good first issue
@@ -26,30 +48,76 @@ jobs:
             automation
             ci-boott
 
-      - name: Optional: set gamification fields (Level/XP) via GitHub Script
-        if: ${{ secrets.PROJECT_TOKEN != '' }}
+      - name: Set Project fields (Level/XP) in Org Project v2 (GraphQL)
+        if: ${{ steps.check_token.outputs.has_token == 'true' && steps.determine_project_url.outputs.project_url != '' }}
         uses: actions/github-script@v7
         env:
-          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-          PROJECT_URL: ${{ secrets.PROJECT_URL }}
+          PROJECT_URL: ${{ steps.determine_project_url.outputs.project_url }}
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            /**
-             * This step is OPTIONAL. It is intentionally conservative:
-             * - It does NOT fail the workflow if it cannot update fields.
-             * - It shows where to extend mapping logic.
-             *
-             * Setup instructions in .github/project_v2/README.md
-             */
-            const core = require('@actions/core');
+            // NOTE: In actions/github-script@v7, `core`, `github`, and `context` are already available.
+            // Do NOT require('@actions/core') — it can trigger "Identifier 'core' has already been declared".
+
+            function parseProjectUrl(url) {
+              // https://github.com/orgs/<org>/projects/<number>
+              const m = url.match(/github\.com\/orgs\/([^/]+)\/projects\/(\d+)/i);
+              if (!m) throw new Error(`PROJECT_URL not recognized: ${url}`);
+              return { org: m[1], number: parseInt(m[2], 10) };
+            }
+
+            async function gql(query, variables) {
+              return await github.graphql(query, variables);
+            }
+
+            async function findProjectItemId(projectId, contentId) {
+              // paginate items to find the item with content.id === contentId
+              let cursor = null;
+              for (let i = 0; i < 20; i++) { // safety cap
+                const res = await gql(`
+                  query($projectId: ID!, $cursor: String) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        items(first: 100, after: $cursor) {
+                          pageInfo { hasNextPage endCursor }
+                          nodes {
+                            id
+                            content {
+                              ... on Issue { id }
+                              ... on PullRequest { id }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `, { projectId, cursor });
+
+                const items = res.node.items.nodes || [];
+                for (const it of items) {
+                  if (it.content?.id === contentId) return it.id;
+                }
+
+                const pi = res.node.items.pageInfo;
+                if (!pi.hasNextPage) return null;
+                cursor = pi.endCursor;
+              }
+              return null;
+            }
+
             try {
+              const { org, number } = parseProjectUrl(process.env.PROJECT_URL);
+
               const payload = context.payload;
               const isIssue = !!payload.issue;
               const item = isIssue ? payload.issue : payload.pull_request;
+              if (!item) {
+                core.info("No issue/pull_request in payload; skipping.");
+                return;
+              }
+
               const labels = (item.labels || []).map(l => (typeof l === 'string' ? l : l.name)).filter(Boolean);
 
-              // Simple mapping: Level by labels (extend as you wish)
               const level =
                 labels.includes('good first issue') ? '1' :
                 labels.includes('learning-task') ? '2' :
@@ -57,19 +125,101 @@ jobs:
                 labels.includes('automation') ? '3' :
                 labels.includes('ci-boott') ? '2' : '';
 
-              // XP mapping (very simple baseline)
               const xp = level === '1' ? 10 : level === '2' ? 25 : level === '3' ? 50 : level === '4' ? 100 : 0;
 
+              core.info(`Project URL: ${process.env.PROJECT_URL}`);
               core.info(`Detected labels: ${labels.join(', ')}`);
-              core.info(`Suggested Level=${level}, XP=${xp}`);
+              core.info(`Computed Level=${level || '(none)'}, XP=${xp}`);
 
-              // NOTE: Updating Project v2 fields requires:
-              // - Knowing the Project ID
-              // - Knowing the Item ID in the project
-              // - Knowing Field IDs (Level, XP) and option IDs for Level
-              //
-              // We keep this as a safe placeholder to avoid breaking CI.
-              // Use .github/project_v2/README.md to enable full sync with GraphQL.
+              if (!level || xp === 0) {
+                core.info("No Level/XP mapping for these labels. Skipping field updates.");
+                return;
+              }
+
+              // GraphQL contentId: use the issue/PR node_id from webhook payload
+              const contentId = item.node_id;
+              if (!contentId) throw new Error("Missing node_id in issue/PR payload; cannot update project fields.");
+
+              // 1) Get project id + fields (Level/XP)
+              const projData = await gql(`
+                query($org: String!, $number: Int!) {
+                  organization(login: $org) {
+                    projectV2(number: $number) {
+                      id
+                      fields(first: 50) {
+                        nodes {
+                          __typename
+                          ... on ProjectV2Field {
+                            id
+                            name
+                            dataType
+                          }
+                          ... on ProjectV2SingleSelectField {
+                            id
+                            name
+                            options { id name }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `, { org, number });
+
+              const project = projData.organization.projectV2;
+              const projectId = project.id;
+              const fields = project.fields.nodes;
+
+              const levelField = fields.find(f => f.__typename === "ProjectV2SingleSelectField" && f.name === "Level");
+              const xpField = fields.find(f => (f.__typename === "ProjectV2Field") && f.name === "XP");
+
+              if (!levelField) throw new Error(`Field "Level" (single select) not found in project.`);
+              if (!xpField) throw new Error(`Field "XP" (number) not found in project.`);
+
+              const levelOption = (levelField.options || []).find(o => o.name === level);
+              if (!levelOption) throw new Error(`Option "${level}" not found in field "Level".`);
+
+              // 2) Ensure item is in project (find or add)
+              let projectItemId = await findProjectItemId(projectId, contentId);
+
+              if (!projectItemId) {
+                core.info("Item not found in project; adding...");
+                const addRes = await gql(`
+                  mutation($projectId: ID!, $contentId: ID!) {
+                    addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                      item { id }
+                    }
+                  }
+                `, { projectId, contentId });
+                projectItemId = addRes.addProjectV2ItemById.item.id;
+              }
+
+              // 3) Update Level
+              await gql(`
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: { singleSelectOptionId: $optionId }
+                  }) { projectV2Item { id } }
+                }
+              `, { projectId, itemId: projectItemId, fieldId: levelField.id, optionId: levelOption.id });
+
+              // 4) Update XP
+              await gql(`
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $number: Float!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: { number: $number }
+                  }) { projectV2Item { id } }
+                }
+              `, { projectId, itemId: projectItemId, fieldId: xpField.id, number: xp });
+
+              core.info(`✅ Updated Project v2 fields: Level=${level}, XP=${xp}`);
+
             } catch (e) {
               core.warning(`Gamification field update skipped: ${e.message}`);
             }
