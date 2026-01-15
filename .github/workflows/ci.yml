@@ -38,7 +38,7 @@ jobs:
 
       - name: Archive analysis results
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
           name: analysis-results
           path: outputs/insights/analysis.json
