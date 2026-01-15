@@ -1,0 +1,31 @@
+# Local data
+/data/*
+!/data/input/
+
+# Output files
+/outputs/*
+!/outputs/insights/
+
+/qdrant_storage/
+/__pycache__/
+/*.zip
+*.env
+
+# Entorno virtual de Python creado por bootstrap-dev
+.venv/
+
+# Artefactos de construcción y empaquetado
+dist/
+build/
+*.deb
+*.snap
+*.AppImage
+AppDir/
+snap/
+flatpak/
+
+# Archivos temporales, logs y runtime local creado por bootstrap.sh
+logs/
+tmp/
+*.log
+local_runtime/
