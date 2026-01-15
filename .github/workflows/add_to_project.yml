@@ -81,7 +81,7 @@ jobs:
             automation
             ci-boott
 
-      - name: Optional: set gamification fields (Level/XP) via GitHub Script
+      - name: "Optional: set gamification fields (Level/XP) via GH-Script"
         if: ${{ secrets.PROJECT_TOKEN != '' }}
         uses: actions/github-script@v7
         env:
