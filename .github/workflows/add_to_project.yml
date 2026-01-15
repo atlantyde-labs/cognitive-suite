@@ -14,28 +14,34 @@ jobs:
   add-to-project:
     runs-on: ubuntu-latest
     steps:
-      - name: Create Project v2 if PROJECT_URL not set (requires PROJECT_TOKEN)
+      - name: Create Project v2 if needed (checks env inside script)
         id: create_project
-        if: ${{ secrets.PROJECT_TOKEN != '' && secrets.PROJECT_URL == '' }}
         uses: actions/github-script@v7
+        env:
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          PROJECT_URL: ${{ secrets.PROJECT_URL }}
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             const core = require('@actions/core');
             try {
+              // Skip creation unless token is provided and PROJECT_URL is not set
               if (!process.env.PROJECT_TOKEN) {
-                core.info('PROJECT_TOKEN not set; skipping project creation.');
+                core.info('PROJECT_TOKEN not provided; skipping project creation.');
+                core.setOutput('project_number', '');
+                core.setOutput('project_url', '');
                 return;
               }
               if (process.env.PROJECT_URL) {
-                core.info('PROJECT_URL already set; skipping project creation.');
+                core.info('PROJECT_URL already provided; skipping project creation.');
+                core.setOutput('project_number', '');
+                core.setOutput('project_url', '');
                 return;
               }
 
               const { owner, repo } = context.repo;
               core.info(`Repo: ${owner}/${repo} — fetching repository GraphQL id...`);
 
-              // Get repository GraphQL id
               const repoQuery = `query($owner:String!, $repo:String!){
                 repository(owner:$owner, name:$repo){ id }
               }`;
@@ -43,7 +49,6 @@ jobs:
               const ownerId = repoRes.repository.id;
               core.info(`Repository id: ${ownerId}`);
 
-              // Create Project v2
               const input = {
                 ownerId,
                 title: "Cognitive Suite Project",
@@ -61,18 +66,37 @@ jobs:
               core.info(`Created Project v2 number=${number}`);
               core.info(`Suggested PROJECT_URL: ${projectUrl}`);
 
-              // Expose as step output so subsequent steps can use it
-              core.setOutput('project_number', number);
+              core.setOutput('project_number', String(number));
               core.setOutput('project_url', projectUrl);
             } catch (e) {
               core.warning(`Project creation skipped: ${e.message}`);
+              core.setOutput('project_number', '');
+              core.setOutput('project_url', '');
             }
 
-      - name: Add to Project (requires secret PROJECT_TOKEN)
+      - name: Determine final PROJECT_URL (secret preferred)
+        id: determine_project_url
+        run: |
+          if [ -n "${{ secrets.PROJECT_URL }}" ]; then
+            echo "project_url=${{ secrets.PROJECT_URL }}" >> $GITHUB_OUTPUT
+          else
+            echo "project_url=${{ steps.create_project.outputs.project_url }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for PROJECT_TOKEN presence
+        id: check_token
+        run: |
+          if [ -n "${{ secrets.PROJECT_TOKEN }}" ]; then
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_token=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add to Project (requires PROJECT_TOKEN and project URL)
+        if: ${{ steps.check_token.outputs.has_token == 'true' }}
         uses: actions/add-to-project@v1.0.2
         with:
-          # Prefer the explicitly-provided secret PROJECT_URL, otherwise use the project_url output from the create_project step
-          project-url: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || steps.create_project.outputs.project_url }}
+          project-url: ${{ steps.determine_project_url.outputs.project_url }}
           github-token: ${{ secrets.PROJECT_TOKEN }}
           labeled: |
             good first issue
@@ -81,8 +105,8 @@ jobs:
             automation
             ci-boott
 
-      - name: "Optional: set gamification fields (Level/XP) via GH-Script"
-        if: ${{ secrets.PROJECT_TOKEN != '' }}
+      - name: Optional: set gamification fields (Level/XP) via GitHub Script
+        if: ${{ steps.check_token.outputs.has_token == 'true' }}
         uses: actions/github-script@v7
         env:
           PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
@@ -128,3 +152,4 @@ jobs:
             } catch (e) {
               core.warning(`Gamification field update skipped: ${e.message}`);
             }
+  
