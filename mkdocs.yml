@@ -1,17 +1,38 @@
 site_name: Cognitive GitOps Suite
-site_description: Learning by Doing · Cooperativismo · Soberanía Cognitiva
+site_description: Learning by Doing · Cooperativismo · Soberanía Cognitiva (ATLANTYDE / ATLANTYQA)
 repo_url: https://github.com/atlantyde-labs/cognitive-suite
 repo_name: atlantyde-labs/cognitive-suite
 
 theme:
   name: material
+  language: es
   features:
     - navigation.sections
     - navigation.expand
+    - navigation.top
+    - navigation.footer
     - content.code.copy
+    - content.action.edit
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+edit_uri: edit/main/docs/
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      type: date
 
 markdown_extensions:
   - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.tabbed:
+      alternate_style: true
   - toc:
       permalink: true
   - tables
@@ -19,14 +40,19 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+
   - Start Here:
       - Quickstart: portal/quickstart.md
       - Learning Path: portal/learning-path.md
       - Contributing: portal/contributing.md
+      - Metrics: portal/metrics.md
+      - Identity & Ecosystem: portal/identity-ecosystem.md
+
   - Guides:
       - Installation: installation.md
       - Adoption Plan: adoption-plan.md
       - Open Notebook: open_notebook_integration.md
+
   - Internal (Ops):
       - Compute Strategy: internal/compute-strategy.md
       - Execution Plan: internal/execution-plan.md
