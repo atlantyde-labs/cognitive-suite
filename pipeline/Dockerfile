@@ -6,11 +6,13 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
 
 WORKDIR /app
 
-# Force torch CPU (avoids huge nvidia-*cu12 wheels on GitHub runners)
+# Torch CPU explícito (EVITA nvidia-*cu12)
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu \
-      torch torchvision torchaudio && \
-    pip install --no-cache-dir \
+      torch torchvision torchaudio
+
+# NLP stack (solo lo que usa pipeline)
+RUN pip install --no-cache-dir \
       pyyaml \
       spacy \
       transformers \
@@ -19,3 +21,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY pipeline/analyze.py /app/analyze.py
 ENTRYPOINT ["python", "analyze.py"]
+
+
+
