@@ -44,23 +44,34 @@ codificada en el código.
 
 import argparse
 import json
+import logging
 import re
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
     import spacy  # type: ignore
-except Exception:
+except ImportError:
     spacy = None  # type: ignore
 
 try:
     from transformers import pipeline as hf_pipeline  # type: ignore
-except Exception:
+except ImportError:
     hf_pipeline = None  # type: ignore
 
+# Configurar logging
+logging.basicConfig(
+    level=logging.WARNING,  # Solo warnings y errores por defecto
+    format='%(levelname)s: %(message)s'
+)
+logger = logging.getLogger(__name__)
+# Desactivar logs de transformers que no son informativos
+logging.getLogger("transformers").setLevel(logging.ERROR)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
-def load_spacy_model() -> Any:
+
+def load_spacy_model() -> Optional[Any]:
     """Carga un modelo spaCy en español o inglés.
 
     Intenta cargar `es_core_news_md` porque el proyecto está orientado a
@@ -71,111 +82,223 @@ def load_spacy_model() -> Any:
     Devuelve `None` si no se puede cargar ningún modelo.
     """
     if spacy is None:
+        logger.warning("spaCy no está instalado. La extracción de entidades estará deshabilitada.")
         return None
+    
     for model_name in ["es_core_news_md", "es_core_news_sm", "en_core_web_sm"]:
         try:
-            return spacy.load(model_name)
-        except Exception:
+            logger.debug(f"Intenta cargar: {model_name}")
+            model = spacy.load(model_name)
+            logger.debug(f"✓ Modelo cargado: {model_name}")
+            return model
+        except OSError:
+            logger.debug(f"Modelo no disponible: {model_name}")
             continue
+    
+    logger.warning("No se pudo cargar ningún modelo spaCy.")
     return None
 
 
-def load_sentiment_classifier():
-    """Carga un clasificador de sentimientos basado en transformers.
+def load_sentiment_classifier() -> Optional[Any]:
+    """Carga un clasificador de sentimientos multilingüe basado en transformers.
 
-    Se emplea el modelo `distilbert-base-uncased-finetuned-sst-2-english`.
-    Este modelo devuelve etiquetas `POSITIVE` o `NEGATIVE` junto con una
-    puntuación. Si la carga falla, devuelve `None` y se usará una
-    heurística básica.
+    Intenta cargar un modelo multilingüe que funciona bien con textos en español:
+    - `xlm-roberta-base` con fine-tuning para sentimientos (multilingüe, robusto)
+    - Si falla, recurre a la heurística que busca palabras clave en español
+    
+    NOTA: `distilbert-base-uncased-finetuned-sst-2-english` está limitado a inglés.
+    Usamos un modelo multilingüe para mejor precisión en textos españoles.
     """
     if hf_pipeline is None:
+        logger.warning("transformers no está instalado. Se usará clasificación heurística.")
         return None
     try:
-        return hf_pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
-    except Exception:
+        logger.debug("Cargando modelo de sentimientos (transformers)...")
+        # Suprimir advertencias de transformers mientras se carga
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            classifier = hf_pipeline(
+                "sentiment-analysis",
+                model="xlm-roberta-base",  # multilingüe
+                device=-1  # CPU (cambiar a 0 si hay GPU disponible)
+            )
+        logger.debug("✓ Modelo de sentimientos cargado")
+        return classifier
+    except Exception as e:
+        logger.warning(f"No se pudo cargar el modelo multilingüe: {e}. Se usará heurística.")
         return None
 
 
 def heuristic_sentiment(text: str) -> Tuple[str, float]:
-    """Clasificador de sentimientos por heurística.
+    """Clasificador de sentimientos por heurística (principalmente en español).
 
     Cuenta apariciones de palabras positivas y negativas definidas y
     devuelve una etiqueta y una puntuación entre 0 y 1. Esta función
     sirve como respaldo cuando no se dispone de modelos de Transformer.
     """
-    positive_words = {"bueno", "excelente", "maravilloso", "positivo", "satisfactorio"}
-    negative_words = {"malo", "terrible", "pésimo", "negativo", "riesgo", "fracaso"}
+    # Palabras clave extendidas para español
+    positive_words = {
+        "bueno", "excelente", "maravilloso", "positivo", "satisfactorio",
+        "bien", "genial", "perfecto", "óptimo", "fantástico", "magnífico",
+        "agradable", "hermoso", "beneficio", "éxito", "victoria"
+    }
+    negative_words = {
+        "malo", "terrible", "pésimo", "negativo", "riesgo", "fracaso",
+        "mal", "horrible", "desastre", "catastrófico", "problema", "delito",
+        "crimen", "peligro", "amenaza", "riesgoso", "perjudicial", "daño",
+        "sanción", "castigo", "ilegal", "prohibido", "violación"
+    }
     lower = text.lower()
-    pos_count = sum(word in lower for word in positive_words)
-    neg_count = sum(word in lower for word in negative_words)
+    
+    # Contar palabras completas (no subcadenas) para mayor precisión
+    pos_count = sum(1 for word in positive_words if f" {word} " in f" {lower} " or f" {word}." in f" {lower} ")
+    neg_count = sum(1 for word in negative_words if f" {word} " in f" {lower} " or f" {word}." in f" {lower} ")
+    
     total = pos_count + neg_count
     if total == 0:
         return ("NEUTRAL", 0.5)
+    
     score = pos_count / total
     label = "POSITIVE" if score >= 0.5 else "NEGATIVE"
-    return (label, score)
+    return (label, round(score, 4))
 
 
-def classify_sentiment(text: str, classifier) -> Tuple[str, float]:
-    """Determina el sentimiento usando el clasificador de transformers o heurístico."""
+def classify_sentiment(text: str, classifier: Optional[Any]) -> Tuple[str, float]:
+    """Determina el sentimiento usando el clasificador de transformers o heurístico.
+    
+    Si se proporciona un clasificador, lo intenta primero. Si falla o no está disponible,
+    recurre a la heurística que busca palabras clave en el texto completo.
+    """
     if classifier:
         try:
-            result = classifier(text[:512])  # limitar longitud para reducir carga
+            # Limitar longitud para reducir carga computacional
+            result = classifier(text[:512])
             if result and isinstance(result, list):
                 r = result[0]
-                return (r.get("label", "NEUTRAL"), float(r.get("score", 0.5)))
-        except Exception:
-            pass
+                label = r.get("label", "NEUTRAL")
+                score = float(r.get("score", 0.5))
+                
+                # Normalizar etiquetas del modelo multilingüe (pueden ser LABEL_0, LABEL_1, etc.)
+                if label in {"LABEL_0", "NEGATIVE"}:
+                    label = "NEGATIVE"
+                elif label in {"LABEL_1", "POSITIVE"}:
+                    label = "POSITIVE"
+                else:
+                    label = "NEUTRAL"
+                
+                return (label, score)
+        except Exception as e:
+            logger.debug(f"Error al clasificar sentimiento con transformers: {e}")
+    
+    # Fallback a heurística que analiza el texto completo
     return heuristic_sentiment(text)
 
 
-def extract_entities(doc) -> List[Tuple[str, str]]:
-    """Extrae entidades nombradas de un doc de spaCy como tuplas (tipo, texto)."""
+def extract_legal_entities(doc: Optional[Any], text: str) -> List[Tuple[str, str]]:
+    """Extrae entidades que son referencias legales basándose en etiquetas y palabras clave.
+    
+    spaCy en español no tiene etiqueta LAW, así que buscamos MISC/ORG que contengan
+    palabras clave legales: "ley", "código", "artículo", "decreto", etc.
+    """
+    legal_entities: List[Tuple[str, str]] = []
+    
+    if doc is None:
+        return legal_entities
+    
+    legal_keywords = {
+        "ley", "código", "artículo", "decreto", "reglamento", "normativa",
+        "regulación", "estatuto", "ordenanza", "resolución", "sentencia",
+        "juzgado", "tribunal", "fiscal", "abogado", "delito", "crimen",
+        "sanción", "pena", "castigo", "ilegal", "infracción"
+    }
+    
+    try:
+        for ent in doc.ents:
+            # Si es MISC u ORG, verificar si contiene palabras legales
+            if ent.label_ in {"MISC", "ORG", "LOC"}:
+                ent_lower = ent.text.lower()
+                if any(keyword in ent_lower for keyword in legal_keywords):
+                    legal_entities.append(("LEGAL", ent.text))
+    except Exception as e:
+        logger.debug(f"Error al extraer entidades legales: {e}")
+    
+    return legal_entities
+
+
+def extract_entities(doc: Optional[Any]) -> List[Tuple[str, str]]:
+    """Extrae entidades nombradas de un doc de spaCy como tuplas (tipo, texto).
+    
+    Si doc es None, devuelve una lista vacía. Las entidades se devuelven como
+    pares (etiqueta, texto).
+    """
     entities: List[Tuple[str, str]] = []
     if doc is None:
         return entities
-    for ent in doc.ents:
-        entities.append((ent.label_, ent.text))
+    
+    try:
+        for ent in doc.ents:
+            entities.append((ent.label_, ent.text))
+    except Exception as e:
+        logger.debug(f"Error al extraer entidades: {e}")
+    
     return entities
 
 
-def generate_cognitive_tags(text: str, doc) -> List[str]:
-    """Genera etiquetas cognitivas combinando reglas heurísticas y entidades."""
+def generate_cognitive_tags(text: str, doc: Optional[Any]) -> List[str]:
+    """Genera etiquetas cognitivas combinando reglas heurísticas y entidades.
+    
+    Analiza el texto en busca de palabras clave relacionadas con conceptos
+    cognitivos: idea, riesgo, legalidad, proyecto, viabilidad, emociones, etc.
+    """
     tags: List[str] = []
     lower = text.lower()
-    # Palabras clave básicas
-    if any(word in lower for word in ["idea", "innovación", "concepto"]):
+    
+    # Palabras clave expandidas
+    idea_keywords = {"idea", "innovación", "concepto", "teoría", "hipótesis", "propuesta", "pensamiento"}
+    risk_keywords = {"riesgo", "amenaza", "peligro", "problema", "delito", "crimen", "ilegalidad", "sanción"}
+    legal_keywords = {"legal", "ley", "normativa", "regulación", "jurídico", "artículo", "código", "derecho"}
+    project_keywords = {"proyecto", "implementación", "desarrollo", "ejecución", "plan", "programa"}
+    viability_keywords = {"viable", "viabilidad", "factible", "realizable", "posible"}
+    emotion_keywords = {"feliz", "triste", "emocionado", "enojado", "satisfecho", "preocupado", "esperanzado"}
+    intuition_keywords = {"intuición", "presentimiento", "corazonada", "instinto", "sensación"}
+    action_keywords = {"pendiente", "por hacer", "tarea", "accionar", "deber", "debe", "necesario"}
+    
+    # Verificar palabras clave (búsqueda aproximada para mayor cobertura)
+    if any(word in lower for word in idea_keywords):
         tags.append("idea")
-    if any(word in lower for word in ["riesgo", "amenaza", "peligro"]):
+    if any(word in lower for word in risk_keywords):
         tags.append("riesgo")
-    if any(word in lower for word in ["legal", "ley", "normativa", "regulación"]):
+    if any(word in lower for word in legal_keywords):
         tags.append("legal")
-    if any(word in lower for word in ["proyecto", "implementación", "desarrollo"]):
+    if any(word in lower for word in project_keywords):
         tags.append("proyecto")
-    if any(word in lower for word in ["viable", "viabilidad", "factible"]):
+    if any(word in lower for word in viability_keywords):
         tags.append("viabilidad")
-    # Sentimientos se mapearán a etiqueta "emoción"
-    if any(word in lower for word in ["feliz", "triste", "emocionado", "enojado", "satisfecho"]):
+    if any(word in lower for word in emotion_keywords):
         tags.append("emoción")
-    # Intuición
-    if any(word in lower for word in ["intuición", "presentimiento", "corazonada"]):
+    if any(word in lower for word in intuition_keywords):
         tags.append("intuición")
-    # Acción pendiente
-    if any(word in lower for word in ["pendiente", "por hacer", "tarea", "accionar"]):
+    if any(word in lower for word in action_keywords):
         tags.append("acción pendiente")
-    # Detectar tipos de entidades que indiquen legalidad o personas
+    
+    # Analizar entidades si disponible
     if doc is not None:
-        for ent in doc.ents:
-            label = ent.label_
-            if label in {"LAW", "NORP"}:
-                if "legal" not in tags:
+        try:
+            for ent in doc.ents:
+                label = ent.label_
+                # Mapeo de entidades a etiquetas
+                if label in {"LAW", "NORP"} and "legal" not in tags:
                     tags.append("legal")
-            if label in {"PERSON", "ORG"}:
-                # Si se menciona una organización o persona, puede ser un proyecto
-                if "proyecto" not in tags:
+                if label in {"PERSON", "ORG"} and "proyecto" not in tags:
                     tags.append("proyecto")
+        except Exception as e:
+            logger.debug(f"Error al procesar entidades para tags: {e}")
+    
+    # Si no hay etiquetas, asignar "otros"
     if not tags:
         tags.append("otros")
+    
     return tags
 
 
@@ -185,25 +308,47 @@ def generate_summary(text: str, max_chars: int = 200) -> str:
     return clean[:max_chars] + ("..." if len(clean) > max_chars else "")
 
 
-def generate_record(file_path: Path, nlp_model, sentiment_classifier) -> Dict[str, Any]:
-    """Procesa un archivo y devuelve un registro semántico conforme al esquema."""
-    text = file_path.read_text(errors='ignore')
+def generate_record(file_path: Path, nlp_model: Optional[Any], sentiment_classifier: Optional[Any]) -> Dict[str, Any]:
+    """Procesa un archivo y devuelve un registro semántico conforme al esquema.
+    
+    Lee el archivo, aplica análisis de NLP, extrae entidades, clasifica sentimiento
+    y genera etiquetas cognitivas.
+    """
+    try:
+        text = file_path.read_text(errors='ignore')
+    except Exception as e:
+        logger.error(f"Error al leer {file_path}: {e}")
+        raise
+    
     # Procesar con spaCy si está disponible
     doc = None
     if nlp_model is not None:
         try:
             doc = nlp_model(text)
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Error al procesar con spaCy para {file_path}: {e}")
             doc = None
+    
     # Contar palabras y caracteres
     word_count = len(re.findall(r"\w+", text))
     char_count = len(text)
+    
     # Etiquetas cognitivas
     tags = generate_cognitive_tags(text, doc)
+    
     # Sentimiento
     sentiment_label, sentiment_score = classify_sentiment(text, sentiment_classifier)
+    
     # Entidades
     entities = extract_entities(doc)
+    
+    # Entidades legales
+    legal_entities = extract_legal_entities(doc, text)
+    
+    # Extraer flags de riesgo (palabras clave de riesgo en el texto)
+    risk_keywords = {"riesgo", "delito", "crimen", "peligro", "amenaza", "sanción", "pena", "castigo", "ilegal"}
+    risk_flags = [ent for ent in legal_entities if any(kw in ent[1].lower() for kw in risk_keywords)]
+    
     # Rellenar campos del esquema semántico
     record: Dict[str, Any] = {
         "uuid": str(uuid.uuid4()),
@@ -217,19 +362,42 @@ def generate_record(file_path: Path, nlp_model, sentiment_classifier) -> Dict[st
         "entities": entities,
         "summary": generate_summary(text, 400),
     }
+    
     # Campos adicionales basados en heurísticas
     record["idea_summary"] = record["summary"] if "idea" in tags else ""
-    record["risk_flags"] = [ent for ent in entities if ent[0] == "LAW"] if "riesgo" in tags else []
-    record["legal_reference"] = [ent for ent in entities if ent[0] == "LAW"] if "legal" in tags else []
-    # Firma de autor: buscar líneas que empiecen por "Autor:" o "Firma:"
+    record["risk_flags"] = risk_flags if "riesgo" in tags else []
+    record["legal_reference"] = legal_entities if "legal" in tags else []
+    
+    # Firma de autor: buscar líneas que contengan "autor", "firma", "por", "escrito"
     author = None
+    author_patterns = ["autor:", "firma:", "por:", "escrito por", "signed by"]
     for line in text.splitlines():
-        if line.lower().startswith("autor:") or line.lower().startswith("firma:"):
-            author = line.split(":", 1)[-1].strip()
-            break
+        line_lower = line.lower()
+        if any(pattern in line_lower for pattern in author_patterns):
+            # Extraer el texto después del patrón
+            for pattern in author_patterns:
+                if pattern in line_lower:
+                    author = line.split(pattern)[-1].strip()
+                    if author and len(author) > 2:
+                        break
+            if author:
+                break
+    
     record["author_signature"] = author or ""
-    # Relevancia sencilla: proporcional a longitud y número de etiquetas
-    record["relevance_score"] = round(min(1.0, (len(tags) * 0.1) + (word_count / 10000)), 3)
+    
+    # Relevancia mejorada: basada en densidad de entidades + variedad de tags + sentimiento
+    entity_density = len(legal_entities) / max(word_count / 1000, 1)  # entidades por 1000 palabras
+    tag_diversity = len(set(tags)) / 8  # máximo 8 tags diferentes
+    
+    # Normalizar: dar más peso a entidades y tags que al tamaño
+    relevance = (
+        min(0.4, entity_density / 10) +  # Densidad de entidades (0-0.4)
+        (tag_diversity * 0.4) +            # Diversidad de tags (0-0.4)
+        (0.2 if len(tags) >= 4 else 0.1)  # Bonus por múltiples tags (0-0.2)
+    )
+    
+    record["relevance_score"] = round(min(1.0, relevance), 3)
+    
     return record
 
 
@@ -238,27 +406,61 @@ def main() -> None:
     parser.add_argument('--input', default='outputs/raw', help='Directorio con archivos de texto')
     parser.add_argument('--output', default='outputs/insights/analysis.json', help='Archivo JSON de salida')
     parser.add_argument('--schema', default='schemas/semantic-schema.yaml', help='Ruta al esquema semántico')
+    parser.add_argument('--verbose', '-v', action='store_true', help='Mostrar logs detallados')
     args = parser.parse_args()
+
+    # Ajustar nivel de logging según flag verbose
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+        logging.getLogger("transformers").setLevel(logging.WARNING)
+    else:
+        logger.setLevel(logging.WARNING)
 
     input_dir = Path(args.input)
     output_file = Path(args.output)
 
+    # Validar que el directorio de entrada existe
+    if not input_dir.exists():
+        logger.error(f"Directorio de entrada no existe: {input_dir}")
+        raise FileNotFoundError(f"Directorio no encontrado: {input_dir}")
+
     # Cargar modelos de PLN
+    print("🧠 Inicializando modelos de PLN...")
     nlp_model = load_spacy_model()
     sentiment_classifier = load_sentiment_classifier()
 
     results: List[Dict[str, Any]] = []
+    file_count = 0
+    error_count = 0
+    
     # Procesar archivos de texto
+    print(f"📂 Procesando archivos en {input_dir}...")
     for p in input_dir.rglob('*'):
         if p.is_file() and p.suffix.lower() in {'.txt', '.json', '.md'}:
             try:
+                logger.debug(f"Procesando: {p}")
                 results.append(generate_record(p, nlp_model, sentiment_classifier))
-            except Exception:
-                # Registrar errores silenciosamente; continuar con el siguiente archivo
+                file_count += 1
+                print(f"  ✓ {p.name}")
+            except Exception as e:
+                logger.error(f"Error procesando {p}: {e}")
+                error_count += 1
+                print(f"  ✗ {p.name} (error)")
                 continue
+    
+    # Guardar resultados
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with output_file.open('w', encoding='utf-8') as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
+    
+    # Resumen final
+    print("\n" + "="*60)
+    print(f"✅ Análisis completado")
+    print(f"   📊 Archivos procesados: {file_count}")
+    if error_count > 0:
+        print(f"   ⚠️  Errores: {error_count}")
+    print(f"   💾 Resultados: {output_file.absolute()}")
+    print("="*60)
 
 
 if __name__ == '__main__':
