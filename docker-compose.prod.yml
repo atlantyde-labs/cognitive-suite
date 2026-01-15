@@ -1,5 +1,3 @@
-version: "3.9"
-
 # Configuración de despliegue para entornos de producción. Esta variante
 # utiliza las imágenes previamente construidas y aplica políticas de
 # reinicio para mayor resiliencia. Ajusta las variables de entorno

@@ -7,6 +7,8 @@ LABEL maintainer="cognitive-suite"
 # podrían optimizar estas instalaciones o usarse imágenes específicas.
 WORKDIR /app
 COPY ../requirements.txt /app/requirements.txt
+
+# (si quieres mantener subset install, ok; si prefieres -r, mejor)
 RUN pip install --no-cache-dir \
     pyyaml \
     spacy \
@@ -22,3 +24,5 @@ RUN pip install --no-cache-dir \
 COPY analyze.py /app/analyze.py
 
 ENTRYPOINT ["python", "analyze.py"]
+
+
