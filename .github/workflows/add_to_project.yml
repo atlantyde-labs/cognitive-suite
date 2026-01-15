@@ -1,4 +1,4 @@
-name: Gamification -> Add Issues/PRs to Project (v2)
+name: Gamification -> Add Issues/PRs to Org Project (v2)
 
 on:
   issues:
@@ -7,80 +7,25 @@ on:
     types: [opened, labeled, reopened, ready_for_review]
   workflow_dispatch:
 
+# Even if you use a PAT (PROJECT_TOKEN), these permissions are safe and future-proof.
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
+  repository-projects: write
 
 jobs:
   add-to-project:
     runs-on: ubuntu-latest
     steps:
-      - name: Create Project v2 if needed (checks env inside script)
-        id: create_project
-        uses: actions/github-script@v7
-        env:
-          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-          PROJECT_URL: ${{ secrets.PROJECT_URL }}
-        with:
-          github-token: ${{ secrets.PROJECT_TOKEN }}
-          script: |
-            const core = require('@actions/core');
-            try {
-              // Skip creation unless token is provided and PROJECT_URL is not set
-              if (!process.env.PROJECT_TOKEN) {
-                core.info('PROJECT_TOKEN not provided; skipping project creation.');
-                core.setOutput('project_number', '');
-                core.setOutput('project_url', '');
-                return;
-              }
-              if (process.env.PROJECT_URL) {
-                core.info('PROJECT_URL already provided; skipping project creation.');
-                core.setOutput('project_number', '');
-                core.setOutput('project_url', '');
-                return;
-              }
-
-              const { owner, repo } = context.repo;
-              core.info(`Repo: ${owner}/${repo} — fetching repository GraphQL id...`);
-
-              const repoQuery = `query($owner:String!, $repo:String!){
-                repository(owner:$owner, name:$repo){ id }
-              }`;
-              const repoRes = await github.graphql(repoQuery, { owner, repo });
-              const ownerId = repoRes.repository.id;
-              core.info(`Repository id: ${ownerId}`);
-
-              const input = {
-                ownerId,
-                title: "Cognitive Suite Project",
-                shortDescription: "Auto-created project by workflow"
-              };
-              const mutation = `mutation($input: CreateProjectV2Input!) {
-                createProjectV2(input: $input) {
-                  projectV2 { id number }
-                }
-              }`;
-              const createRes = await github.graphql(mutation, { input });
-              const number = createRes.createProjectV2.projectV2.number;
-              const projectUrl = `https://github.com/${owner}/${repo}/projects/${number}`;
-
-              core.info(`Created Project v2 number=${number}`);
-              core.info(`Suggested PROJECT_URL: ${projectUrl}`);
-
-              core.setOutput('project_number', String(number));
-              core.setOutput('project_url', projectUrl);
-            } catch (e) {
-              core.warning(`Project creation skipped: ${e.message}`);
-              core.setOutput('project_number', '');
-              core.setOutput('project_url', '');
-            }
-
-      - name: Determine final PROJECT_URL (secret preferred)
+      - name: Determine PROJECT_URL (org project)
         id: determine_project_url
         run: |
+          # Prefer secret, fallback to the known org project URL
           if [ -n "${{ secrets.PROJECT_URL }}" ]; then
             echo "project_url=${{ secrets.PROJECT_URL }}" >> $GITHUB_OUTPUT
           else
-            echo "project_url=${{ steps.create_project.outputs.project_url }}" >> $GITHUB_OUTPUT
+            echo "project_url=https://github.com/orgs/atlantyde-labs/projects/2" >> $GITHUB_OUTPUT
           fi
 
       - name: Check for PROJECT_TOKEN presence
@@ -92,8 +37,8 @@ jobs:
             echo "has_token=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Add to Project (requires PROJECT_TOKEN and project URL)
-        if: ${{ steps.check_token.outputs.has_token == 'true' }}
+      - name: Add Issue/PR to Org Project (by labels)
+        if: ${{ steps.check_token.outputs.has_token == 'true' && steps.determine_project_url.outputs.project_url != '' }}
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: ${{ steps.determine_project_url.outputs.project_url }}
@@ -105,27 +50,38 @@ jobs:
             automation
             ci-boott
 
-      - name: "Optional: set gamification fields (Level/XP) via GH-Script"
-        if: ${{ steps.check_token.outputs.has_token == 'true' }}
+      - name: "Optional: compute gamification fields (Level/XP) (safe)"
+        if: ${{ steps.check_token.outputs.has_token == 'true' && steps.determine_project_url.outputs.project_url != '' }}
         uses: actions/github-script@v7
+        env:
+          PROJECT_URL: ${{ steps.determine_project_url.outputs.project_url }}
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             /**
-             * This step is OPTIONAL. It is intentionally conservative:
-             * - It does NOT fail the workflow if it cannot update fields.
-             * - It shows where to extend mapping logic.
+             * OPTIONAL + SAFE:
+             * - Does NOT fail workflow
+             * - Computes Level/XP from labels
+             * - Logs suggested values
              *
-             * Setup instructions in .github/project_v2/README.md
+             * If you want to WRITE fields in the Org Project v2:
+             * - Add GraphQL mutations updateProjectV2ItemFieldValue(...)
+             * - Requires Project fields "Level" (single select) and "XP" (number)
              */
-            const core = require('@actions/core');
             try {
               const payload = context.payload;
               const isIssue = !!payload.issue;
               const item = isIssue ? payload.issue : payload.pull_request;
-              const labels = (item.labels || []).map(l => (typeof l === 'string' ? l : l.name)).filter(Boolean);
 
-              // Simple mapping: Level by labels (extend as you wish)
+              if (!item) {
+                core.info("No issue/pull_request in payload; skipping.");
+                return;
+              }
+
+              const labels = (item.labels || [])
+                .map(l => (typeof l === 'string' ? l : l.name))
+                .filter(Boolean);
+
               const level =
                 labels.includes('good first issue') ? '1' :
                 labels.includes('learning-task') ? '2' :
@@ -133,23 +89,11 @@ jobs:
                 labels.includes('automation') ? '3' :
                 labels.includes('ci-boott') ? '2' : '';
 
-              // XP mapping (very simple baseline)
               const xp = level === '1' ? 10 : level === '2' ? 25 : level === '3' ? 50 : level === '4' ? 100 : 0;
 
+              core.info(`Project URL: ${process.env.PROJECT_URL}`);
               core.info(`Detected labels: ${labels.join(', ')}`);
-              core.info(`Suggested Level=${level}, XP=${xp}`);
-
-              // NOTE: Updating Project v2 fields requires:
-              // - Knowing the Project ID
-              // - Knowing the Item ID in the project
-              // - Knowing Field IDs (Level, XP) and option IDs for Level
-              //
-              // We keep this as a safe placeholder to avoid breaking CI.
-              // Use .github/project_v2/README.md to enable full sync with GraphQL.
+              core.info(`Suggested Level=${level || '(none)'}, XP=${xp}`);
             } catch (e) {
-              core.warning(`Gamification field update skipped: ${e.message}`);
+              core.warning(`Gamification field compute skipped: ${e.message}`);
             }
-  
-
-
-  
