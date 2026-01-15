@@ -1,6 +1,6 @@
-# 🧠 Cognitive GitOps Suite
+# 🧠 Atlantyqa Cognitive Suite
 
-Bienvenido a la **Cognitive GitOps Suite**, un conjunto de herramientas local‑first
+Bienvenido a **Atlantyqa Cognitive Suite**, un conjunto de herramientas local‑first
 para ingestar, analizar y gobernar tus datos personales y profesionales de
 forma reproducible. Esta versión incluye automatización completa tanto
 para desarrollo local como para despliegues productivos y ejecución en
@@ -111,7 +111,7 @@ plan de ejecución, la guía de instalación y empaquetado y cualquier otra
 documentación adicional que añadas bajo `docs/`.
 ### Learning by Doing · Cooperativismo · Soberanía Cognitiva
 
-[![CI](https://github.com/atlantyde-labs/cognitive-suite/actions/workflows/ci.yml/badge.svg)](https://github.com/atlantyde-labs/cognitive-suite/actions)
+[![CI](https://github.com/atlantyqa/cognitive-suite/actions/workflows/ci.yml/badge.svg)](https://github.com/atlantyqa/cognitive-suite/actions)
 [![License: EUPL](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](LICENSE)
 [![Learning By Doing](https://img.shields.io/badge/learning-by_doing-orange)](#-ruta-de-aprendizaje-gamificada)
 [![Cooperative Ready](https://img.shields.io/badge/model-cooperative-green)](#-modelo-cooperativo)
@@ -121,16 +121,16 @@ documentación adicional que añadas bajo `docs/`.
 
 ---
 
-## 🌍 ¿Qué es Cognitive GitOps Suite?
+## 🌍 ¿Qué es Atlantyqa Cognitive Suite?
 
-**Cognitive GitOps Suite** es un **laboratorio open-source de aprendizaje práctico** para personas que quieren:
+**Atlantyqa Cognitive Suite** es un **laboratorio open-source de aprendizaje práctico** para personas que quieren:
 
 - Aprender a **pensar con IA**, no solo usarla
 - Construir **pipelines cognitivos reproducibles**
 - Cooperar en lugar de competir
 - Prepararse para el futuro tecnológico, legal y social que ya está aquí
 
-Este proyecto nace en el ecosistema **ATLANTYDE / ATLANTYQA** como infraestructura
+Este proyecto nace en el ecosistema **Atlantyqa** como infraestructura
 de **capital cognitivo compartido** para cooperativas, comunidades y talento técnico
 que quiere aprender haciendo.
 
@@ -154,7 +154,7 @@ Este repositorio es un **campo de entrenamiento cognitivo**.
 ## 🚀 Quick Start (primer aprendizaje real en 5 minutos)
 
 ```bash
-git clone https://github.com/atlantyde-labs/cognitive-suite.git
+git clone https://github.com/atlantyqa/cognitive-suite.git
 cd cognitive-suite
 python cogctl.py init
 ```
@@ -234,7 +234,7 @@ Rollback:
 
 ---
 
-## 🏛️ Modelo cooperativo (ATLANTYDE / ATLANTYQA)
+## 🏛️ Modelo cooperativo (Atlantyqa)
 
 Este proyecto **no es un producto**, es un **ecosistema cooperativo**.
 Contribuir aquí significa: aprender · enseñar · construir futuro compartido.

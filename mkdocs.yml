@@ -64,6 +64,12 @@ nav:
       - Installation: installation.md
       - Adoption Plan: adoption-plan.md
       - Open Notebook: open_notebook_integration.md
+  - Interfaz de Usuario:
+      - Visión General: user-interface/overview.md
+      - Dashboard Operativo: user-interface/dashboard.md
+      - Flujos de Ingesta: user-interface/flows.md
+      - Panel GitOps: user-interface/gitops.md
+      - Terminal CLI: user-interface/cli.md
   - Internal (Ops):
       - Compute Strategy: internal/compute-strategy.md
       - Execution Plan: internal/execution-plan.md

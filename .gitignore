@@ -29,3 +29,10 @@ logs/
 tmp/
 *.log
 local_runtime/
+
+# Web artifacts
+site/
+ui/
+dist/
+node_modules/
+.DS_Store
