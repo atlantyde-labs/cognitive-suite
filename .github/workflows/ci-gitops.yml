@@ -1,0 +1,33 @@
+name: CI GitOps
+
+on:
+  workflow_call:
+
+jobs:
+  yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: YAML parse sanity (cheap)
+        run: |
+          python - << 'PY'
+          import sys, glob
+          import yaml
+          files = []
+          files += glob.glob("gitops/**/*.yml", recursive=True)
+          files += glob.glob("gitops/**/*.yaml", recursive=True)
+          bad=[]
+          for f in files:
+            try:
+              with open(f,"r",encoding="utf-8") as fh:
+                yaml.safe_load(fh)
+            except Exception as e:
+              bad.append((f,str(e)))
+          if bad:
+            print("YAML errors:")
+            for f,e in bad:
+              print("-",f,e)
+            sys.exit(1)
+          print("YAML OK:", len(files))
+          PY

@@ -1,0 +1,108 @@
+name: Auto-label by paths (skills/domain/compute)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+concurrency:
+  group: auto-paths-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          # Adaptado a TU repo real
+          filters: |
+            docs:
+              - 'docs/**'
+              - 'mkdocs.yml'
+              - 'requirements-docs.txt'
+            frontend:
+              - 'frontend/**'
+            docker:
+              - 'docker-compose.yml'
+              - 'docker-compose.prod.yml'
+              - '.dockerignore'
+              - '**/Dockerfile'
+            gitops:
+              - 'gitops/**'
+              - '**/*.yaml'
+              - '**/*.yml'
+            corepy:
+              - 'cogctl.py'
+              - 'ingestor/**'
+              - 'pipeline/**'
+              - 'wrappers/**'
+              - 'vectorstore/**'
+              - 'schemas/**'
+              - 'scripts/**'
+              - 'ops/**'
+              - 'requirements.txt'
+
+      - name: Apply labels
+        uses: actions/github-script@v7
+        env:
+          DOCS: ${{ steps.filter.outputs.docs }}
+          FRONTEND: ${{ steps.filter.outputs.frontend }}
+          DOCKER: ${{ steps.filter.outputs.docker }}
+          GITOPS: ${{ steps.filter.outputs.gitops }}
+          COREPY: ${{ steps.filter.outputs.corepy }}
+        with:
+          script: |
+            const owner = context.repo.owner, repo = context.repo.repo;
+            const pr = context.payload.pull_request;
+            const labels = new Set();
+
+            // Domain + skill mapping
+            if (process.env.DOCS === "true") {
+              labels.add("domain-docs"); labels.add("skill-docs");
+              labels.add("compute-low");
+            }
+            if (process.env.FRONTEND === "true") {
+              labels.add("domain-ui"); labels.add("skill-frontend");
+              labels.add("compute-low"); // UI suele ser low/medium, mantenemos low por defecto
+              labels.add("role-ux-local");
+            }
+            if (process.env.COREPY === "true") {
+              labels.add("domain-core"); labels.add("skill-python");
+              labels.add("compute-medium");
+            }
+            if (process.env.GITOPS === "true") {
+              labels.add("domain-gitops"); labels.add("skill-devsecops");
+              labels.add("compute-low");
+              labels.add("role-gitops-engineer");
+            }
+            if (process.env.DOCKER === "true") {
+              labels.add("skill-docker");
+              labels.add("compute-medium"); // build docker = medio (según matriz)
+            }
+
+            // Si toca vectorstore / AI, subir a data-ai + compute-heavy
+            // (heurística barata por rutas)
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner, repo, pull_number: pr.number, per_page: 100
+            });
+            const touchesAI = files.some(f => f.filename.startsWith("vectorstore/") || f.filename.includes("embedd") || f.filename.includes("rag"));
+            if (touchesAI) {
+              labels.add("skill-data-ai");
+              labels.add("compute-heavy");
+              labels.add("role-ai-ops");
+            }
+
+            // Aplicar etiquetas
+            if (labels.size) {
+              await github.rest.issues.addLabels({
+                owner, repo, issue_number: pr.number, labels: Array.from(labels)
+              });
+            }

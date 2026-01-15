@@ -1,20 +1,158 @@
-# Labels for Learning-by-Doing gamification and delivery tracking
-- name: good first issue
+# Labels: Cooperativa digital (skills + dominio + contribución + nivel + compute)
+# Convención:
+# - skill-*        => skill técnico principal
+# - domain-*       => área de producto/operación
+# - contrib-*      => tipo de contribución cooperativa
+# - level-*        => madurez/riesgo/estado
+# - compute-*      => carga de cómputo (alineada con compute-strategy)
+# - role-*         => perfiles emergentes (IA + operaciones)
+
+# -------------------------
+# Nivel / estado
+# -------------------------
+- name: level-good-first
   color: "7057ff"
-  description: "Good first issue for new contributors"
+  description: "Good first issue (onboarding)"
 
-- name: learning-task
-  color: "f9d0c4"
-  description: "Learning by Doing task (guided challenge)"
-
-- name: ci-gitops
+- name: level-beta
   color: "1d76db"
-  description: "CI/CD, GitOps, automation and release engineering"
+  description: "Beta / WIP (rama no-main o trabajo en progreso)"
 
-- name: automation
+- name: level-stable
+  color: "0e8a16"
+  description: "Stable (validado / merge a main)"
+
+- name: level-critical
+  color: "b60205"
+  description: "Critical path / high risk / requiere revisión senior"
+
+# -------------------------
+# Skills técnicos
+# -------------------------
+- name: skill-python
+  color: "3572A5"
+  description: "Python: CLI, pipelines, data processing"
+
+- name: skill-frontend
+  color: "e34c26"
+  description: "UI/UX local-first: Streamlit/TUI (y futuro web UI)"
+
+- name: skill-devsecops
+  color: "1d76db"
+  description: "DevSecOps, GitOps, CI/CD, automation"
+
+- name: skill-docker
+  color: "0db7ed"
+  description: "Docker/Compose/Buildx"
+
+- name: skill-docs
+  color: "5319e7"
+  description: "Docs: MkDocs, guías, onboarding, documentación técnica"
+
+- name: skill-data-ai
+  color: "b07219"
+  description: "Vectorstore, RAG, embeddings, análisis semántico"
+
+# -------------------------
+# Dominios (tu repo real)
+# -------------------------
+- name: domain-docs
+  color: "cfd3d7"
+  description: "MkDocs / documentación"
+
+- name: domain-ui
+  color: "d4c5f9"
+  description: "Frontend / User View local"
+
+- name: domain-core
+  color: "bfdadc"
+  description: "Core Python/CLI/pipeline/ingestor"
+
+- name: domain-gitops
+  color: "1d76db"
+  description: "GitOps manifests, automation, release engineering"
+
+- name: domain-ops
+  color: "0e8a16"
+  description: "Operación, scripts, runbooks, mantenimiento"
+
+# -------------------------
+# Tipo de contribución (cooperativa)
+# -------------------------
+- name: contrib-learning-task
+  color: "f9d0c4"
+  description: "Learning-by-Doing guided task"
+
+- name: contrib-maintenance
+  color: "d4c5f9"
+  description: "Maintenance, cleanup, refactor, tech debt"
+
+- name: contrib-automation
   color: "0e8a16"
   description: "Automation scripts, workflows, bots"
 
+- name: contrib-review
+  color: "bfdadc"
+  description: "QA, testing, validation, review"
+
+- name: contrib-innovation
+  color: "fbca04"
+  description: "Exploración / prototipos / investigación"
+
+# -------------------------
+# Compute tiers (alineado con compute-strategy)
+# -------------------------
+- name: compute-low
+  color: "c5def5"
+  description: "Low compute (docs, yaml, small scripts) → ok en local + CI"
+
+- name: compute-medium
+  color: "fef2c0"
+  description: "Medium compute (spacy-ish, pipelines, parsing) → local/CI según caso"
+
+- name: compute-heavy
+  color: "f9d0c4"
+  description: "Heavy compute (GPU/ML/batch/vector ops) → preferible nightly/infra controlada"
+
+# -------------------------
+# Perfiles emergentes (IA + operación)
+# -------------------------
+- name: role-ai-ops
+  color: "b07219"
+  description: "AI Ops: opera RAG/embeddings/flows con control de coste"
+
+- name: role-gitops-engineer
+  color: "1d76db"
+  description: "GitOps Engineer: manifests, releases, policy gates"
+
+- name: role-docs-engineer
+  color: "5319e7"
+  description: "Docs Engineer: documentación como producto"
+
+- name: role-ux-local
+  color: "e34c26"
+  description: "Local UX Engineer: UI local-first, demo-ready"
+
+# -------------------------
+# Compatibilidad con labels antiguos (mantener si ya hay histórico)
+# -------------------------
+- name: good first issue
+  color: "7057ff"
+  description: "Legacy alias (usar level-good-first)"
+
+- name: learning-task
+  color: "f9d0c4"
+  description: "Legacy alias (usar contrib-learning-task)"
+
+- name: ci-gitops
+  color: "1d76db"
+  description: "Legacy alias (usar skill-devsecops + domain-gitops)"
+
+- name: automation
+  color: "0e8a16"
+  description: "Legacy alias (usar contrib-automation)"
+
 - name: ci-boott
   color: "b60205"
-  description: "Bootstrap and operational tests (CI smoke / e2e)"
+  description: "Legacy alias (usar contrib-review + compute-medium)"
+

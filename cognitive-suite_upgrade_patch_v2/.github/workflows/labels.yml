@@ -2,7 +2,8 @@ name: Sync labels
 
 on:
   workflow_dispatch:
-  push: 
+  push:
+    branches: [main, temp]
     paths:
       - ".github/labels.yml"
 

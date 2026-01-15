@@ -1,0 +1,32 @@
+site_name: Cognitive GitOps Suite
+site_description: Learning by Doing · Cooperativismo · Soberanía Cognitiva
+repo_url: https://github.com/atlantyde-labs/cognitive-suite
+repo_name: atlantyde-labs/cognitive-suite
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - tables
+  - attr_list
+
+nav:
+  - Home: index.md
+  - Start Here:
+      - Quickstart: portal/quickstart.md
+      - Learning Path: portal/learning-path.md
+      - Contributing: portal/contributing.md
+  - Guides:
+      - Installation: installation.md
+      - Adoption Plan: adoption-plan.md
+      - Open Notebook: open_notebook_integration.md
+  - Internal (Ops):
+      - Compute Strategy: internal/compute-strategy.md
+      - Execution Plan: internal/execution-plan.md

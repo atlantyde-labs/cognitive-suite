@@ -21,7 +21,6 @@ Al ejecutar dentro del contenedor Docker de ``frontend`` se utiliza
 """
 
 import json
-import os
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -42,15 +41,10 @@ def load_data(path: Path) -> List[Dict[str, Any]]:
 def main() -> None:
     st.set_page_config(page_title="Cognitive Suite Analysis", layout="wide")
     st.title("📊 Cognitive Suite – Resultados del Análisis")
-    base = Path(os.getenv("COGNITIVE_OUTPUTS", "outputs"))
-    analysis_path = base / "insights" / "analysis.json"
+    analysis_path = Path("outputs/insights/analysis.json")
     data = load_data(analysis_path)
     if not data:
-        msg = (
-            f"No se encontró el archivo de análisis en: {analysis_path}."
-            "\n\nEjecuta primero el pipeline o monta outputs en Docker y define COGNITIVE_OUTPUTS."
-        )
-        st.warning(msg)
+        st.warning("No se encontró el archivo de análisis. Ejecuta primero el pipeline.")
         return
     # Convertir a DataFrame para representación tabular
     df = pd.DataFrame([

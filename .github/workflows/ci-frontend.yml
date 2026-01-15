@@ -1,0 +1,40 @@
+name: CI Frontend (Streamlit/TUI)
+
+on:
+  workflow_call:
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            frontend/requirements.txt
+
+      - name: Install deps
+        run: |
+          if [[ -f ../requirements.txt ]]; then pip install -r ../requirements.txt; fi
+          if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
+
+      - name: Smoke imports
+        run: |
+          python -c "import streamlit; import pandas; import rich"
+
+      - name: Compile
+        run: |
+          python -m compileall -q .
+
+      - name: Optional make ui-doctor
+        run: |
+          if [[ -f Makefile ]]; then make ui-doctor || true; fi

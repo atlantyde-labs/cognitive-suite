@@ -1,0 +1,191 @@
+name: Project v2 - Fields from labels (cognitive-suite)
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: project-fields-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  project_fields:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply Project fields from labels
+        uses: actions/github-script@v7
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          PROJECT_TITLE: "cognitive-suite"
+        with:
+          github-token: ${{ secrets.PROJECTS_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.payload.pull_request.number;
+
+            // 1) Get PR node id + labels
+            const pr = await github.graphql(`
+              query($owner:String!, $repo:String!, $number:Int!){
+                repository(owner:$owner, name:$repo){
+                  pullRequest(number:$number){
+                    id
+                    labels(first:50){ nodes { name } }
+                  }
+                }
+              }`, { owner, repo, number: prNumber });
+
+            const prId = pr.repository.pullRequest.id;
+            const labelNames = pr.repository.pullRequest.labels.nodes.map(n => n.name);
+
+            // 2) Find Project v2 by title under the same owner (USER or ORG)
+            // Try organization first; if fails, try user.
+            async function getProject() {
+              const title = process.env.PROJECT_TITLE;
+
+              // org
+              try {
+                const orgRes = await github.graphql(`
+                  query($login:String!, $title:String!){
+                    organization(login:$login){
+                      projectsV2(first:50){
+                        nodes { id title fields(first:50){ nodes { ... on ProjectV2FieldCommon { id name } ... on ProjectV2SingleSelectField { id name options { id name } } } } }
+                      }
+                    }
+                  }`, { login: owner, title });
+                const proj = orgRes.organization.projectsV2.nodes.find(p => p.title === title);
+                if (proj) return { scope: "org", proj };
+              } catch(e) {}
+
+              // user
+              const userRes = await github.graphql(`
+                query($login:String!){
+                  user(login:$login){
+                    projectsV2(first:50){
+                      nodes { id title fields(first:50){ nodes { ... on ProjectV2FieldCommon { id name } ... on ProjectV2SingleSelectField { id name options { id name } } } } }
+                    }
+                  }
+                }`, { login: owner });
+
+              const proj = userRes.user.projectsV2.nodes.find(p => p.title === title);
+              if (!proj) throw new Error(`Project '${title}' not found under ${owner}`);
+              return { scope: "user", proj };
+            }
+
+            const { proj } = await getProject();
+            const projectId = proj.id;
+            const fields = proj.fields.nodes;
+
+            function getSingleSelectField(fieldName) {
+              const f = fields.find(x => x.name === fieldName && x.options);
+              if (!f) throw new Error(`Missing single-select field '${fieldName}' in project`);
+              return f;
+            }
+
+            function optionId(field, optionName) {
+              const opt = field.options.find(o => o.name === optionName);
+              if (!opt) throw new Error(`Missing option '${optionName}' in field '${field.name}'`);
+              return opt.id;
+            }
+
+            // 3) Add PR to project (idempotent-ish: create item; if already exists, mutation will error; we handle by searching items)
+            async function addToProjectOrGetItemId() {
+              // Try add
+              try {
+                const add = await github.graphql(`
+                  mutation($projectId:ID!, $contentId:ID!){
+                    addProjectV2ItemById(input:{projectId:$projectId, contentId:$contentId}){
+                      item { id }
+                    }
+                  }`, { projectId, contentId: prId });
+                return add.addProjectV2ItemById.item.id;
+              } catch (e) {
+                // Already in project → search item
+                const items = await github.graphql(`
+                  query($projectId:ID!){
+                    node(id:$projectId){
+                      ... on ProjectV2 {
+                        items(first:100){
+                          nodes {
+                            id
+                            content {
+                              ... on PullRequest { id number }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }`, { projectId });
+                const found = items.node.items.nodes.find(n => n.content && n.content.number === prNumber);
+                if (!found) throw e;
+                return found.id;
+              }
+            }
+
+            const itemId = await addToProjectOrGetItemId();
+
+            // 4) Map labels -> field values
+            // Defaults
+            let Area = null, Skill = null, Compute = null, Level = null, Role = null;
+
+            // Area (domain-*)
+            if (labelNames.includes("domain-docs")) Area = "Docs";
+            if (labelNames.includes("domain-ui")) Area = "UI";
+            if (labelNames.includes("domain-core")) Area = "Core";
+            if (labelNames.includes("domain-gitops")) Area = "GitOps";
+            if (labelNames.includes("domain-ops")) Area = "Ops";
+
+            // Skill (skill-*)
+            if (labelNames.includes("skill-python")) Skill = "Python";
+            if (labelNames.includes("skill-frontend")) Skill = "Frontend";
+            if (labelNames.includes("skill-devsecops")) Skill = "DevSecOps";
+            if (labelNames.includes("skill-docker")) Skill = "Docker";
+            if (labelNames.includes("skill-docs")) Skill = "Docs";
+            if (labelNames.includes("skill-data-ai")) { Skill = "Data/AI"; Area = Area ?? "AI/Data"; }
+
+            // Compute (compute-*)
+            if (labelNames.includes("compute-low")) Compute = "Low";
+            if (labelNames.includes("compute-medium")) Compute = "Medium";
+            if (labelNames.includes("compute-heavy")) Compute = "Heavy";
+
+            // Level (level-*)
+            if (labelNames.includes("level-beta")) Level = "Beta";
+            if (labelNames.includes("level-stable")) Level = "Stable";
+            if (labelNames.includes("level-critical")) Level = "Critical";
+
+            // Role (role-*)
+            if (labelNames.includes("role-ai-ops")) Role = "AI Ops";
+            if (labelNames.includes("role-gitops-engineer")) Role = "GitOps Engineer";
+            if (labelNames.includes("role-docs-engineer")) Role = "Docs Engineer";
+            if (labelNames.includes("role-ux-local")) Role = "UX Local";
+
+            // 5) Update fields (only if we have a value)
+            async function setSingleSelect(fieldName, valueName) {
+              if (!valueName) return;
+              const field = getSingleSelectField(fieldName);
+              const opt = optionId(field, valueName);
+              await github.graphql(`
+                mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $optionId:String!){
+                  updateProjectV2ItemFieldValue(input:{
+                    projectId:$projectId,
+                    itemId:$itemId,
+                    fieldId:$fieldId,
+                    value:{ singleSelectOptionId:$optionId }
+                  }){ projectV2Item { id } }
+                }`, { projectId, itemId, fieldId: field.id, optionId: opt });
+            }
+
+            await setSingleSelect("Area", Area);
+            await setSingleSelect("Skill", Skill);
+            await setSingleSelect("Compute", Compute);
+            await setSingleSelect("Level", Level);
+            await setSingleSelect("Role", Role);
+
+            // Optional: force Status=Backlog on open PR if not set
+            await setSingleSelect("Status", "Backlog");
+
+            core.info(`Project updated for PR #${prNumber}: Area=${Area}, Skill=${Skill}, Compute=${Compute}, Level=${Level}, Role=${Role}`);

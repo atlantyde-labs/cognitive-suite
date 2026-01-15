@@ -1,0 +1,36 @@
+name: Label stable when merged
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  stable:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Swap labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner, repo = context.repo.repo;
+            const pr = context.payload.pull_request;
+
+            // Add stable
+            await github.rest.issues.addLabels({
+              owner, repo, issue_number: pr.number, labels: ["level-stable"]
+            });
+
+            // Remove beta if present
+            try {
+              await github.rest.issues.removeLabel({
+                owner, repo, issue_number: pr.number, name: "level-beta"
+              });
+            } catch (e) {
+              if (e.status !== 404) throw e;
+            }

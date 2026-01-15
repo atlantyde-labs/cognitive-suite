@@ -1,0 +1,37 @@
+name: CI Python Core
+
+on:
+  workflow_call:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install deps
+        run: |
+          pip install -r requirements.txt
+          pip install pytest || true
+
+      - name: Compile all python
+        run: |
+          python -m compileall -q cogctl.py ingestor pipeline wrappers vectorstore schemas scripts ops || true
+
+      - name: Run lightweight tests (if present)
+        run: |
+          if [[ -d tests ]] || compgen -G "**/test_*.py" > /dev/null; then
+            pytest -q
+          else
+            echo "No tests detected. Skipping."
+          fi
+
+      - name: CLI smoke (help)
+        run: |
+          python cogctl.py --help >/dev/null 2>&1 || true

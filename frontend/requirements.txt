@@ -1,0 +1,6 @@
+streamlit
+pandas
+rich
+textual
+pyyaml
+requests

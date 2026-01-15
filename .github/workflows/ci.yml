@@ -1,58 +1,88 @@
-name: CI
+name: CI Router
 
 on:
-  push:
-    branches: [main, temp]
   pull_request:
-    branches: [main, temp]
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  build-test:
+  changes:
     runs-on: ubuntu-latest
-
+    outputs:
+      docs:   ${{ steps.filter.outputs.docs }}
+      fe:     ${{ steps.filter.outputs.fe }}
+      py:     ${{ steps.filter.outputs.py }}
+      docker: ${{ steps.filter.outputs.docker }}
+      gitops: ${{ steps.filter.outputs.gitops }}
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /usr/share/dotnet || true
-          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
-          docker system prune -af || true
-          df -h
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: dorny/paths-filter@v3
+        id: filter
         with:
-          python-version: "3.10"
+          filters: |
+            docs:
+              - 'docs/**'
+              - 'mkdocs.yml'
+              - 'requirements-docs.txt'
+              - 'PATCH_MKDOCS_NAV_APPEND.md'
 
-      - name: Install minimal host deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install PyPDF2 pyyaml
+            fe:
+              - 'frontend/**'
 
-      - name: Init folders
-        run: python cogctl.py init
+            py:
+              - 'cogctl.py'
+              - 'ingestor/**'
+              - 'pipeline/**'
+              - 'wrappers/**'
+              - 'vectorstore/**'
+              - 'schemas/**'
+              - 'scripts/**'
+              - 'ops/**'
+              - 'requirements.txt'
+              - 'TESTING_GUIDE.md'
+              - 'test-bootstrap.sh'
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+            docker:
+              - 'docker-compose.yml'
+              - 'docker-compose.prod.yml'
+              - '.dockerignore'
+              - 'frontend/Dockerfile'
+              - '**/Dockerfile'
 
-      - name: Build Docker images
-        env:
-          DOCKER_BUILDKIT: "1"
-          BUILDKIT_PROGRESS: plain
-        run: |
-          docker compose version
-          docker compose build --pull
+            gitops:
+              - 'gitops/**'
+              - '**/*.yaml'
+              - '**/*.yml'
 
-      - name: Run bootstrap test
-        run: |
-          bash test-bootstrap.sh
+  docs:
+    needs: changes
+    if: needs.changes.outputs.docs == 'true'
+    uses: ./.github/workflows/ci-docs.yml
 
-      - name: Upload analysis artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: analysis-results
-          path: outputs/insights/analysis.json
+  frontend:
+    needs: changes
+    if: needs.changes.outputs.fe == 'true'
+    uses: ./.github/workflows/ci-frontend.yml
+
+  python:
+    needs: changes
+    if: needs.changes.outputs.py == 'true'
+    uses: ./.github/workflows/ci-python.yml
+
+  docker:
+    needs: changes
+    if: needs.changes.outputs.docker == 'true'
+    uses: ./.github/workflows/ci-docker.yml
+
+  gitops:
+    needs: changes
+    if: needs.changes.outputs.gitops == 'true'
+    uses: ./.github/workflows/ci-gitops.yml
