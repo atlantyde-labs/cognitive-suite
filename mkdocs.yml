@@ -1,21 +1,58 @@
-site_name: Cognitive GitOps Suite
-site_description: Learning by Doing · Cooperativismo · Soberanía Cognitiva
-repo_url: https://github.com/atlantyde-labs/cognitive-suite
-repo_name: atlantyde-labs/cognitive-suite
+site_name: Atlantyqa Cognitive Suite
+site_description: Digital Sovereignty · Cognitive Governance · Local-First AI
+# repo_url: https://github.com/atlantyde-labs/cognitive-suite
+# repo_name: atlantyde-labs/cognitive-suite
 
 theme:
   name: material
+  palette:
+    scheme: default
+    primary: custom
+    accent: custom
+  
   features:
     - navigation.sections
     - navigation.expand
+    - navigation.tabs
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
     - content.code.copy
+    - content.code.annotate
+  
+  font:
+    text: Inter
+    code: Roboto Mono
+  
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/custom.css
+
+extra_javascript:
+  - javascripts/custom.js
 
 markdown_extensions:
   - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
   - toc:
       permalink: true
   - tables
   - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 nav:
   - Home: index.md
@@ -30,3 +67,26 @@ nav:
   - Internal (Ops):
       - Compute Strategy: internal/compute-strategy.md
       - Execution Plan: internal/execution-plan.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/atlantyde-labs/cognitive-suite
+      name: Atlantyqa on GitHub
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/company/atlantyqa
+      name: Atlantyqa on LinkedIn
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/atlantyqa
+      name: Atlantyqa on Twitter
+  
+copyright: |
+  <span class="atlantyqa-copyright-wrapper">
+    &copy; 2026 Atlantyqa Labs.  | 
+    <a href="#" style="color: rgba(255,255,255,0.5);">Política de Privacidad</a> · 
+    <a href="#" style="color: rgba(255,255,255,0.5);">Términos de Servicio</a>
+  </span>
+
+plugins:
+  - search:
+      lang: es
