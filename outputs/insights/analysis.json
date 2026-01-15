@@ -1,0 +1,13 @@
+[
+  {
+    "file": "/home/oai/share/workdir/outputs/raw/demo_input.json",
+    "word_count": 30,
+    "char_count": 241,
+    "tags": [
+      "riesgo",
+      "idea",
+      "legal",
+      "proyecto"
+    ]
+  }
+]
