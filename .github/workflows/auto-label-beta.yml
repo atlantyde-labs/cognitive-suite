@@ -1,0 +1,54 @@
+name: Auto-label beta on branch pushes
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+concurrency:
+  group: auto-beta-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  beta:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure label exists (level-beta)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner, repo = context.repo.repo;
+            const name = "level-beta";
+            try { await github.rest.issues.getLabel({ owner, repo, name }); }
+            catch (e) {
+              if (e.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner, repo, name, color: "1d76db",
+                  description: "Beta / WIP (rama no-main o trabajo en progreso)"
+                });
+              } else throw e;
+            }
+
+      - name: Label open PR(s) for this branch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner, repo = context.repo.repo;
+            const branch = context.ref.replace("refs/heads/","");
+            const head = `${owner}:${branch}`;
+            const prs = await github.rest.pulls.list({ owner, repo, state: "open", head });
+            if (!prs.data.length) {
+              core.info(`No open PR for ${head}.`);
+              return;
+            }
+            for (const pr of prs.data) {
+              await github.rest.issues.addLabels({
+                owner, repo, issue_number: pr.number, labels: ["level-beta"]
+              });
+              core.info(`PR #${pr.number} labeled level-beta`);
+            }

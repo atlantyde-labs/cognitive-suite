@@ -1,0 +1,28 @@
+name: Nightly Heavy
+
+on:
+  schedule:
+    - cron: "30 2 * * *"  # diario
+  workflow_dispatch:
+
+concurrency:
+  group: nightly
+  cancel-in-progress: true
+
+jobs:
+  heavy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compose config sanity (cheap)
+        run: |
+          docker compose -f docker-compose.yml config -q || true
+          docker compose -f docker-compose.prod.yml config -q || true
+
+      # Aquí metes lo caro cuando decidas:
+      # - SBOM full
+      # - Trivy fs/image
+      # - pip-audit
+      - name: Placeholder
+        run: echo "Nightly heavy checks placeholder"

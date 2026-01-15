@@ -33,3 +33,23 @@ help:
 	@echo "make zip        - Generate ZIP of suite"
 	@echo "make push       - Push outputs to GitHub"
 	@echo "make logs       - Follow container logs"
+
+SHELL := /usr/bin/env bash
+.DEFAULT_GOAL := help
+
+##@ Help
+help: ## Show help
+	@awk 'BEGIN {FS = ":.*##"; printf "\nTargets:\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+
+##@ UI (delegated)
+ui-doctor: ## Check local user view prerequisites
+	@$(MAKE) -C frontend ui-doctor
+
+ui-local: ## Run Streamlit locally
+	@$(MAKE) -C frontend ui-local
+
+ui-build: ## Build Docker image for UI
+	@$(MAKE) -C frontend ui-build
+
+ui-up: ## Run UI in Docker
+	@$(MAKE) -C frontend ui-up
