@@ -14,10 +14,65 @@ jobs:
   add-to-project:
     runs-on: ubuntu-latest
     steps:
+      - name: Create Project v2 if PROJECT_URL not set (requires PROJECT_TOKEN)
+        id: create_project
+        if: ${{ secrets.PROJECT_TOKEN != '' && secrets.PROJECT_URL == '' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const core = require('@actions/core');
+            try {
+              if (!process.env.PROJECT_TOKEN) {
+                core.info('PROJECT_TOKEN not set; skipping project creation.');
+                return;
+              }
+              if (process.env.PROJECT_URL) {
+                core.info('PROJECT_URL already set; skipping project creation.');
+                return;
+              }
+
+              const { owner, repo } = context.repo;
+              core.info(`Repo: ${owner}/${repo} — fetching repository GraphQL id...`);
+
+              // Get repository GraphQL id
+              const repoQuery = `query($owner:String!, $repo:String!){
+                repository(owner:$owner, name:$repo){ id }
+              }`;
+              const repoRes = await github.graphql(repoQuery, { owner, repo });
+              const ownerId = repoRes.repository.id;
+              core.info(`Repository id: ${ownerId}`);
+
+              // Create Project v2
+              const input = {
+                ownerId,
+                title: "Cognitive Suite Project",
+                shortDescription: "Auto-created project by workflow"
+              };
+              const mutation = `mutation($input: CreateProjectV2Input!) {
+                createProjectV2(input: $input) {
+                  projectV2 { id number }
+                }
+              }`;
+              const createRes = await github.graphql(mutation, { input });
+              const number = createRes.createProjectV2.projectV2.number;
+              const projectUrl = `https://github.com/${owner}/${repo}/projects/${number}`;
+
+              core.info(`Created Project v2 number=${number}`);
+              core.info(`Suggested PROJECT_URL: ${projectUrl}`);
+
+              // Expose as step output so subsequent steps can use it
+              core.setOutput('project_number', number);
+              core.setOutput('project_url', projectUrl);
+            } catch (e) {
+              core.warning(`Project creation skipped: ${e.message}`);
+            }
+
       - name: Add to Project (requires secret PROJECT_TOKEN)
         uses: actions/add-to-project@v1.0.2
         with:
-          project-url: ${{ secrets.PROJECT_URL }}
+          # Prefer the explicitly-provided secret PROJECT_URL, otherwise use the project_url output from the create_project step
+          project-url: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || steps.create_project.outputs.project_url }}
           github-token: ${{ secrets.PROJECT_TOKEN }}
           labeled: |
             good first issue
