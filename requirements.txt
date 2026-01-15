@@ -15,4 +15,3 @@ rich
 textual
 pyyaml
 requests  # HTTP client used by wrappers like open_notebook_wrapper.py
-requests  # HTTP client used by wrappers like open_notebook_wrapper.py
