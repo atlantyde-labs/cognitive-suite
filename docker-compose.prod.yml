@@ -1,0 +1,38 @@
+version: "3.9"
+
+# Configuración de despliegue para entornos de producción. Esta variante
+# utiliza las imágenes previamente construidas y aplica políticas de
+# reinicio para mayor resiliencia. Ajusta las variables de entorno
+# GIT_REPO_URL y GIT_BRANCH según tu repositorio.
+
+services:
+  ingestor:
+    image: cognitive/ingestor:latest
+    volumes:
+      - ./data/input:/data/input:ro
+      - ./outputs:/data/outputs
+    restart: always
+
+  pipeline:
+    image: cognitive/pipeline:latest
+    volumes:
+      - ./outputs:/data/outputs
+      - ./schemas:/schemas
+    restart: always
+
+  frontend:
+    image: cognitive/frontend:latest
+    ports:
+      - "8501:80"
+    volumes:
+      - ./outputs:/outputs:ro
+    restart: always
+
+  gitops:
+    image: cognitive/gitops:latest
+    environment:
+      - GIT_REPO_URL=${GIT_REPO_URL}
+      - GIT_BRANCH=${GIT_BRANCH:-main}
+    volumes:
+      - ./outputs:/outputs:ro
+    restart: on-failure
