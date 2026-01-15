@@ -1,0 +1,18 @@
+# Global project dependencies for Cognitive Suite
+# This file lists the Python packages required across services for ingestion,
+# analysis, vector storage, and user interfaces. Keeping a central
+# requirements.txt helps unify development environments and Docker builds.
+PyPDF2
+pymupdf
+openai-whisper
+ffmpeg-python
+spacy
+transformers
+sentence-transformers
+faiss-cpu
+streamlit
+rich
+textual
+pyyaml
+requests  # HTTP client used by wrappers like open_notebook_wrapper.py
+requests  # HTTP client used by wrappers like open_notebook_wrapper.py

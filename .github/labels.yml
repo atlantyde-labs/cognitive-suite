@@ -1,0 +1,20 @@
+# Labels for Learning-by-Doing gamification and delivery tracking
+- name: good first issue
+  color: "7057ff"
+  description: "Good first issue for new contributors"
+
+- name: learning-task
+  color: "f9d0c4"
+  description: "Learning by Doing task (guided challenge)"
+
+- name: ci-gitops
+  color: "1d76db"
+  description: "CI/CD, GitOps, automation and release engineering"
+
+- name: automation
+  color: "0e8a16"
+  description: "Automation scripts, workflows, bots"
+
+- name: ci-boott
+  color: "b60205"
+  description: "Bootstrap and operational tests (CI smoke / e2e)"
