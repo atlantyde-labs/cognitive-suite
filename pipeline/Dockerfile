@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir \
 # necesidades.
 # RUN python -m spacy download es_core_news_sm
 
-COPY analyze.py /app/analyze.py
+COPY pipeline/analyze.py /app/analyze.py
 
 ENTRYPOINT ["python", "analyze.py"]
 

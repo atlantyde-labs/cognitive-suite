@@ -4,7 +4,7 @@ FROM python:3.10-slim
 # ``requirements.txt`` de la raíz del proyecto para instalar las
 # bibliotecas necesarias (incluyendo streamlit y rich).
 WORKDIR /app
-COPY ../requirements.txt /app/requirements.txt
+COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copiar los archivos de la interfaz dentro del contenedor

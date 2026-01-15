@@ -20,6 +20,6 @@ RUN pip install --no-cache-dir \
     ffmpeg-python \
     pyyaml
 
-COPY ingest.py /app/ingest.py
+COPY ingestor/ingest.py /app/ingest.py
 
 ENTRYPOINT ["python", "ingest.py"]
