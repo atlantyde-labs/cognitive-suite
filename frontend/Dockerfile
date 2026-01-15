@@ -8,7 +8,7 @@ COPY ../requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copiar los archivos de la interfaz dentro del contenedor
-COPY ../frontend/ /app/
+COPY frontend/ /app/
 
 # Exponer el puerto usado por Streamlit
 EXPOSE 8501

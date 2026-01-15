@@ -6,7 +6,7 @@ LABEL maintainer="cognitive-suite"
 # spaCy, transformers y faiss-cpu. En un entorno de producción se
 # podrían optimizar estas instalaciones o usarse imágenes específicas.
 WORKDIR /app
-COPY ../requirements.txt /app/requirements.txt
+COPY requirements.txt /app/requirements.txt
 
 # (si quieres mantener subset install, ok; si prefieres -r, mejor)
 RUN pip install --no-cache-dir \

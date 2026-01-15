@@ -10,7 +10,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY ../requirements.txt /app/requirements.txt
+COPY requirements.txt /app/requirements.txt
 # Instalar solo las dependencias necesarias para la ingesta:
 # PyPDF2, pymupdf, openai-whisper, ffmpeg-python y pyyaml.
 RUN pip install --no-cache-dir \
