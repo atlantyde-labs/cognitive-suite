@@ -49,31 +49,38 @@ def cmd_ingest(args: argparse.Namespace) -> None:
     """Ingesta un archivo individual mediante el módulo ``ingestor``."""
     target = INPUT_DIR / args.file
     if not target.exists():
-        print(f'❌ Archivo no encontrado en data/input: {args.file}')
+        print(f'❌ Archivo no encontrado: {args.file}')
         raise SystemExit(1)
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    print(f'📥 Ingestando {args.file}...')
-    subprocess.run([
-        'python',
-        str(BASE_DIR / 'ingestor' / 'ingest.py'),
-        str(target),
-        '--output',
-        str(RAW_DIR)
-    ], check=True)
+    print(f'📥 Ingestando: {args.file}...')
+    try:
+        subprocess.run([
+            'python',
+            str(BASE_DIR / 'ingestor' / 'ingest.py'),
+            str(target),
+            '--output',
+            str(RAW_DIR)
+        ], check=True, capture_output=True)
+        print(f'✅ Ingesta completada: {RAW_DIR / args.file}')
+    except subprocess.CalledProcessError as e:
+        print(f'❌ Error en la ingesta: {e}')
+        raise SystemExit(1)
 
 
 def cmd_analyze(args: argparse.Namespace) -> None:
     """Ejecuta el análisis cognitivo sobre los textos ingeridos."""
     INSIGHTS_DIR.mkdir(parents=True, exist_ok=True)
-    print('🧠 Ejecutando análisis cognitivo...')
-    subprocess.run([
-        'python',
-        str(BASE_DIR / 'pipeline' / 'analyze.py'),
-        '--input', str(RAW_DIR),
-        '--output', str(INSIGHTS_DIR / 'analysis.json'),
-        '--schema', str(BASE_DIR / 'schemas' / 'cognitive-schema.yaml')
-    ], check=True)
-    print('✅ Análisis completado. Resultados en outputs/insights/analysis.json')
+    try:
+        subprocess.run([
+            'python',
+            str(BASE_DIR / 'pipeline' / 'analyze.py'),
+            '--input', str(RAW_DIR),
+            '--output', str(INSIGHTS_DIR / 'analysis.json'),
+            '--schema', str(BASE_DIR / 'schemas' / 'cognitive-schema.yaml')
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f'❌ Error en el análisis: {e}')
+        raise SystemExit(1)
 
 
 def cmd_deploy(args: argparse.Namespace) -> None:

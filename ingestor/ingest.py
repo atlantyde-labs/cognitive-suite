@@ -162,7 +162,7 @@ def main() -> None:
                 out_file = output_dir / rel.with_suffix('.txt')
                 ingest_file(p, out_file)
     else:
-        out_file = output_dir / input_path.name
+        out_file = output_dir / input_path.with_suffix('.txt').name
         ingest_file(input_path, out_file)
 
 
