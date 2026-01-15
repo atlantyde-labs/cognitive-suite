@@ -11,6 +11,9 @@ concurrency:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
+
 
 jobs:
   changes:
@@ -66,6 +69,11 @@ jobs:
     needs: changes
     if: needs.changes.outputs.docs == 'true'
     uses: ./.github/workflows/ci-docs.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
 
   frontend:
     needs: changes
@@ -79,7 +87,7 @@ jobs:
 
   docker:
     needs: changes
-    if: needs.changes.outputs.docker == 'true'
+    if: needs.changes.outputs.docker == 'true' && !contains(github.event.pull_request.labels.*.name, 'compute-heavy')
     uses: ./.github/workflows/ci-docker.yml
 
   gitops:
