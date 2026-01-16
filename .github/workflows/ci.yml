@@ -86,6 +86,8 @@ jobs:
     uses: ./.github/workflows/ci-python.yml
 
   docker:
+    permissions:
+      packages: write
     needs: changes
     if: needs.changes.outputs.docker == 'true' && !contains(github.event.pull_request.labels.*.name, 'compute-heavy')
     uses: ./.github/workflows/ci-docker.yml
