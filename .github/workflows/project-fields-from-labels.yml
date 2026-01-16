@@ -14,20 +14,21 @@ concurrency:
 
 jobs:
   project_fields:
-    # Solo PRs internas + solo si existe el secret
-    if: >
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      secrets.PROJECTS_TOKEN != ''
+    # Solo PRs internas (no forks). Aquí NO uses secrets.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
 
     steps:
       - name: Apply Project fields from labels
+        # Guard del token aquí (en steps sí existe secrets.*)
+        if: ${{ secrets.PROJECT_TOKEN != '' }}
         uses: actions/github-script@v7
         env:
           PROJECT_TITLE: "cognitive-suite"
         with:
           github-token: ${{ secrets.PROJECTS_TOKEN }}
           script: |
+
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const prNumber = context.payload.pull_request.number;
