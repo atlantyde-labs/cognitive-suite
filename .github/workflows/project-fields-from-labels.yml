@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Apply Project fields from labels
         # Guard del token aquí (en steps sí existe secrets.*)
-        if: ${{ secrets.PROJECT_TOKEN != '' }}
+        # if: ${{ secrets.PROJECT_TOKEN != '' }}
         uses: actions/github-script@v7
         env:
           PROJECT_TITLE: "cognitive-suite"
