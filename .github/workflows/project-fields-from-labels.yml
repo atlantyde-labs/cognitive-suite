@@ -17,8 +17,17 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
+      - name: Guard: PROJECTS_TOKEN present?
+        run: |
+          if [ -z "${{ secrets.PROJECTS_TOKEN }}" ]; then
+            echo "::warning::Missing secrets.PROJECTS_TOKEN. Skipping Project sync."
+            exit 0
+          fi
+
       - name: Apply Project fields from labels
         uses: actions/github-script@v7
+        env:
+          PROJECT_TITLE: "cognitive-suite"
         with:
           github-token: ${{ secrets.PROJECTS_TOKEN }}
           script: |
