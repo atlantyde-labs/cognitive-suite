@@ -1,30 +1,29 @@
 name: Project v2 - Fields from labels (cognitive-suite)
 
 on:
-  push: 
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
 
 permissions:
   contents: read
   pull-requests: read
-
-concurrency:
-  group: project-fields-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  # si tu org/política lo permite, añade lo mínimo necesario
+  # (Projects v2 suele requerir token PAT/App igualmente)
 
 jobs:
   project_fields:
     runs-on: ubuntu-latest
-
     steps:
       - name: Apply Project fields from labels
         uses: actions/github-script@v7
         env:
           PROJECT_TITLE: "cognitive-suite"
         with:
+          # Usa tu PAT (fine-grained) o token de App con permisos de Projects V2
           github-token: ${{ secrets.PROJECTS_TOKEN }}
           script: |
+            // ...tu script tal cual...
+
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const prNumber = context.payload.pull_request.number;
