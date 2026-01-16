@@ -14,10 +14,6 @@ concurrency:
 
 jobs:
   project_fields:
-    # Solo PRs internas + solo si existe el secret
-    if: >
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      secrets.PROJECTS_TOKEN != ''
     runs-on: ubuntu-latest
 
     steps:
