@@ -60,6 +60,8 @@ nav:
       - Quickstart: portal/quickstart.md
       - Learning Path: portal/learning-path.md
       - GitOps + Streamlit: portal/learning-gitops-streamlit.md
+      - Talent Challenge Labs: portal/talent-challenge-labs.md
+      - Bootstrap Streamlit: portal/bootstrap-streamlit.md
       - Contributing: portal/contributing.md
   - Guides:
       - Installation: installation.md

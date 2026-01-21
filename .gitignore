@@ -30,6 +30,11 @@ tmp/
 *.log
 local_runtime/
 audit/
+labs/ledger.json
+labs/ledger.csv
+labs/evidence/
+labs/submissions/
+labs/*.local
 
 # Web artifacts
 site/
