@@ -59,6 +59,8 @@ nav:
   - Comienza aqui:
       - Inicio rapido: portal/quickstart.md
       - Ruta de aprendizaje: portal/learning-path.md
+      - Identidad y ecosistema: portal/identity-ecosystem.md
+      - Metricas: portal/metrics.md
       - GitOps + Streamlit: portal/learning-gitops-streamlit.md
       - Labs de desafio de talento: portal/talent-challenge-labs.md
       - Bootstrap de Streamlit: portal/bootstrap-streamlit.md
@@ -66,6 +68,10 @@ nav:
   - Guias:
       - Instalacion: installation.md
       - Plan de adopcion: adoption-plan.md
+      - Plan de ejecucion: execution-plan.md
+      - Plan de ejecucion early adopters: execution-plan-early-adopters.md
+      - Estrategia de computo: compute-strategy.md
+      - Vision de usuario: user-vision.md
       - Open Notebook: open_notebook_integration.md
   - Interfaz de Usuario:
       - Vision General: user-interface/overview.md
@@ -73,6 +79,7 @@ nav:
       - Flujos de Ingesta: user-interface/flows.md
       - Panel GitOps: user-interface/gitops.md
       - Terminal CLI: user-interface/cli.md
+      - Vista local (UI): user-view/local-ui.md
   - Operaciones internas:
       - Estrategia de computo: internal/compute-strategy.md
       - Plan de ejecucion: internal/execution-plan.md
@@ -93,11 +100,14 @@ nav:
           - Ejemplo de revision de accesos: internal/examples/access-review-example.md
           - Ejemplo de registro de evidencias: internal/examples/control-evidence-log-example.md
           - Ejemplo de prueba de restauracion: internal/examples/restore-test-report.md
+          - Nota de endurecimiento: internal/examples/hardening-note.md
   - English:
       - Home: en/index.md
       - Start Here:
           - Quickstart: en/portal/quickstart.md
           - Learning Path: en/portal/learning-path.md
+          - Identity and Ecosystem: en/portal/identity-ecosystem.md
+          - Metrics: en/portal/metrics.md
           - GitOps + Streamlit: en/portal/learning-gitops-streamlit.md
           - Talent Challenge Labs: en/portal/talent-challenge-labs.md
           - Bootstrap Streamlit: en/portal/bootstrap-streamlit.md
@@ -105,6 +115,10 @@ nav:
       - Guides:
           - Installation: en/installation.md
           - Adoption Plan: en/adoption-plan.md
+          - Execution Plan: en/execution-plan.md
+          - Execution Plan (Early Adopters): en/execution-plan-early-adopters.md
+          - Compute Strategy: en/compute-strategy.md
+          - User Vision: en/user-vision.md
           - Open Notebook: en/open_notebook_integration.md
       - User Interface:
           - Overview: en/user-interface/overview.md
@@ -112,6 +126,7 @@ nav:
           - Ingestion Flows: en/user-interface/flows.md
           - GitOps Panel: en/user-interface/gitops.md
           - CLI Terminal: en/user-interface/cli.md
+          - Local UI View: en/user-view/local-ui.md
       - Internal (Ops):
           - Compute Strategy: en/internal/compute-strategy.md
           - Execution Plan: en/internal/execution-plan.md
@@ -132,6 +147,7 @@ nav:
               - Access Review Example: en/internal/examples/access-review-example.md
               - Evidence Log Example: en/internal/examples/control-evidence-log-example.md
               - Restore Test Example: en/internal/examples/restore-test-report.md
+              - Hardening Note: en/internal/examples/hardening-note.md
 
 extra:
   social:

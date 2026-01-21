@@ -7,7 +7,7 @@ title: Installation and Packages
 This guide describes how to install the **Cognitive GitOps Suite** on your
 machine and how to generate a Debian package (`.deb`) to deploy the suite in
 Ubuntu or Debian-based environments. The instructions here complement the
-project [README](../README.md) and are part of the documentation published on
+project [README](https://github.com/atlantyde-labs/cognitive-suite/blob/main/README.md) and are part of the documentation published on
 GitHub Pages.
 
 ## Development installation

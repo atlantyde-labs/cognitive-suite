@@ -5,7 +5,7 @@ description: "Detailed action plan to organize issues, projects, and tutorials"
 
 # Execution Plan for Early Adopters
 
-This plan complements the [Adoption Plan](/en/adoption-plan.md) and details the
+This plan complements the [Adoption Plan](adoption-plan.md) and details the
 specific activities required to coordinate early adopter participation on
 GitHub. It includes a suggested timeline, issue creation, project organization,
 and feedback mechanisms.
