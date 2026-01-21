@@ -1,4 +1,4 @@
-# 🎮 Ruta de aprendizaje (Learning by Doing)
+# 🎮 Ruta de aprendizaje (Aprender haciendo)
 
 ## Niveles
 - 🟢 Nivel 1 — Explorador Cognitivo

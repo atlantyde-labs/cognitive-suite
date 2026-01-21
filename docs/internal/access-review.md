@@ -1,26 +1,26 @@
-# Access Review Template (Draft)
+# Plantilla de revision de accesos (Borrador)
 
-## 1. Review metadata
-- Review period:
-- Reviewer:
-- Date:
-- Scope (systems, repos, environments):
+## 1. Metadatos de revision
+- Periodo de revision:
+- Revisor:
+- Fecha:
+- Alcance (sistemas, repos, entornos):
 
-## 2. Access inventory
-| User / Service | Role | Access scope | Justification | Last used | Action |
+## 2. Inventario de accesos
+| Usuario / Servicio | Rol | Alcance de acceso | Justificacion | Ultimo uso | Accion |
 | --- | --- | --- | --- | --- | --- |
 |  |  |  |  |  |  |
 
-## 3. Findings
-- Over-privileged accounts:
-- Orphaned accounts:
-- MFA coverage:
+## 3. Hallazgos
+- Cuentas con sobre-privilegios:
+- Cuentas huerfanas:
+- Cobertura MFA:
 
-## 4. Actions
-- Remove access:
-- Reduce access:
-- Exceptions approved:
+## 4. Acciones
+- Revocar accesos:
+- Reducir accesos:
+- Excepciones aprobadas:
 
-## 5. Evidence
-- Access export snapshots
-- Approvals
+## 5. Evidencias
+- Exportacion de accesos
+- Aprobaciones

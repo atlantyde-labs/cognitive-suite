@@ -1,48 +1,48 @@
-# BCP / DR Plan (Draft)
+# Plan BCP / DR (Borrador)
 
-## 1. Objectives
-- RTO (Recovery Time Objective):
-- RPO (Recovery Point Objective):
-- Availability targets:
+## 1. Objetivos
+- RTO (Objetivo de Tiempo de Recuperacion):
+- RPO (Objetivo de Punto de Recuperacion):
+- Objetivos de disponibilidad:
 
-## 2. Critical services
+## 2. Servicios criticos
 - Ingestor
 - Pipeline
 - Frontend
 - GitOps
-- Storage (outputs, audit logs)
+- Almacenamiento (outputs, logs de auditoria)
 
-## 3. Dependencies
-- Container runtime
-- Host filesystem
-- External services (if any)
+## 3. Dependencias
+- Runtime de contenedores
+- Sistema de archivos del host
+- Servicios externos (si aplica)
 
-## 4. Backup strategy
-- Backup scope:
-- Backup frequency:
-- Backup location:
-- Encryption at rest:
-- Retention policy:
+## 4. Estrategia de copias de seguridad
+- Alcance del backup:
+- Frecuencia del backup:
+- Ubicacion del backup:
+- Cifrado en reposo:
+- Politica de retencion:
 
-## 5. Recovery procedures
-- Restore from backup:
-- Validate integrity:
-- Rollback procedures:
-- Communication plan:
+## 5. Procedimientos de recuperacion
+- Restaurar desde backup:
+- Validar integridad:
+- Procedimientos de rollback:
+- Plan de comunicacion:
 
-## 6. Testing
-- Test frequency:
-- Last test date:
-- Issues found:
-- Remediation actions:
+## 6. Pruebas
+- Frecuencia de pruebas:
+- Fecha de ultima prueba:
+- Problemas encontrados:
+- Acciones de remediacion:
 
-## 7. Roles and responsibilities
-- Incident commander:
-- Operations lead:
-- Security lead:
-- Communications lead:
+## 7. Roles y responsabilidades
+- Comandante de incidentes:
+- Lider de operaciones:
+- Lider de seguridad:
+- Lider de comunicaciones:
 
-## 8. Evidence
-- Backup logs:
-- Restore test reports:
-- Change records:
+## 8. Evidencias
+- Logs de backup:
+- Reportes de pruebas de restauracion:
+- Registros de cambios:

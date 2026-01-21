@@ -1,26 +1,26 @@
-# RoPA Example (Fictional)
+# Ejemplo de RoPA (Ficticio)
 
-## 1. Controller details
-- Controller name: Example Cooperative Ltd
-- Contact: privacy@example.test
-- DPO (if applicable): dpo@example.test
+## 1. Detalles del responsable
+- Nombre del responsable: Example Cooperative Ltd
+- Contacto: privacy@example.test
+- DPO (si aplica): dpo@example.test
 
-## 2. Processing activities
+## 2. Actividades de tratamiento
 
-| Activity ID | Purpose | Categories of data | Data subjects | Recipients | Transfers | Retention | Security measures | Notes |
+| ID de actividad | Proposito | Categorias de datos | Sujetos de datos | Destinatarios | Transferencias | Retencion | Medidas de seguridad | Notas |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ACT-001 | Document analysis | names, emails, text | staff | internal only | none | 90 days | redaction, RBAC, audit logs | prod outputs only |
-| ACT-002 | GitOps sync | redacted insights | staff | internal repo | none | 180 days | redacted only, env gating | prod only |
+| ACT-001 | Analisis de documentos | nombres, correos, texto | personal | solo interno | ninguna | 90 dias | redaccion, RBAC, logs de auditoria | solo outputs prod |
+| ACT-002 | Sync GitOps | insights redactados | personal | repo interno | ninguna | 180 dias | solo redactados, gating por entorno | solo prod |
 
-## 3. Processors
-- Processor name: Example Cooperative Ltd (internal)
-- Service provided: data processing
-- DPA in place: not required
+## 3. Encargados
+- Nombre del encargado: Example Cooperative Ltd (interno)
+- Servicio prestado: procesamiento de datos
+- DPA vigente: no requerido
 
-## 4. International transfers
-- Country: none
-- Legal mechanism: not applicable
+## 4. Transferencias internacionales
+- Pais: ninguno
+- Mecanismo legal: no aplica
 
-## 5. Updates and review
-- Last review: 2026-02-14
-- Next review: 2026-05-14
+## 5. Actualizaciones y revision
+- Ultima revision: 2026-02-14
+- Proxima revision: 2026-05-14

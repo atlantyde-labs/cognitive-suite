@@ -1,25 +1,25 @@
-# RoPA Template (GDPR Article 30)
+# Plantilla RoPA (GDPR Artículo 30)
 
-## 1. Controller details
-- Controller name:
-- Contact:
-- DPO (if applicable):
+## 1. Datos del responsable
+- Nombre del responsable:
+- Contacto:
+- DPO (si aplica):
 
-## 2. Processing activities
+## 2. Actividades de tratamiento
 
-| Activity ID | Purpose | Categories of data | Data subjects | Recipients | Transfers | Retention | Security measures | Notes |
+| ID de actividad | Propósito | Categorías de datos | Sujetos de datos | Destinatarios | Transferencias | Retención | Medidas de seguridad | Notas |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | ACT-001 |  |  |  |  |  |  |  |  |
 
-## 3. Processors
-- Processor name:
-- Service provided:
-- DPA in place: yes/no
+## 3. Encargados
+- Nombre del encargado:
+- Servicio prestado:
+- DPA en vigor: sí/no
 
-## 4. International transfers
-- Country:
-- Legal mechanism:
+## 4. Transferencias internacionales
+- País:
+- Mecanismo legal:
 
-## 5. Updates and review
-- Last review:
-- Next review:
+## 5. Actualizaciones y revisión
+- Última revisión:
+- Próxima revisión:

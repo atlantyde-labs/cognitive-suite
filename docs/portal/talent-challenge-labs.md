@@ -1,113 +1,113 @@
-# Talent Detection Challenge (Labs + AI Agents)
+# Desafio de deteccion de talento (Labs + agentes IA)
 
-This guide defines a structured challenge for early adopters to surface talent signals through Labs, reward systems, and personal AI agents that accompany the user experience.
+Esta guia define un desafio estructurado para que los adoptantes tempranos revelen senales de talento mediante Labs, sistemas de recompensas y agentes de IA personales que acompanan la experiencia del usuario.
 
-## Goals
-- Detect technical talent using practical Labs.
-- Provide a personal AI agent for guidance and feedback.
-- Award transparent, auditable rewards based on evidence.
-- Maintain privacy, compliance, and sovereign constraints.
+## Objetivos
+- Detectar talento tecnico usando Labs practicos.
+- Proveer un agente de IA personal para guia y retroalimentacion.
+- Otorgar recompensas transparentes y auditables basadas en evidencia.
+- Mantener privacidad, cumplimiento y restricciones soberanas.
 
-## Core concept
-- Labs are short, practical missions that mirror real workflows.
-- Each Lab produces evidence via GitOps (PRs, logs, artifacts).
-- Rewards are granted from evidence, not opinions.
-- The personal agent is a companion: coach, reviewer, and safety guard.
+## Concepto base
+- Los Labs son misiones cortas y practicas que reflejan flujos reales.
+- Cada Lab genera evidencia via GitOps (PRs, logs, artefactos).
+- Las recompensas se otorgan por evidencia, no por opiniones.
+- El agente personal es un acompanante: guia, revisor y guardia de seguridad.
 
-## User journey
-1) Onboarding
-   - Select track (Data, DevSecOps, ML, Product, Frontend, Docs).
-   - Create a profile with opt-in consent for scoring.
+## Recorrido del usuario
+1) Incorporacion
+   - Selecciona una ruta (Data, DevSecOps, ML, Product, Frontend, Docs).
+   - Crea un perfil con consentimiento explicito para puntuacion.
 
-2) Lab selection
-   - Choose a Lab from a difficulty ladder.
-   - The agent explains objectives, risks, and reward rules.
+2) Seleccion de Lab
+   - Elige un Lab de una escalera de dificultad.
+   - El agente explica objetivos, riesgos y reglas de recompensa.
 
-3) Execution
-   - User completes tasks in a fork or sandbox branch.
-   - Agent supports with hints, guardrails, and validation checks.
+3) Ejecucion
+   - El usuario completa tareas en un fork o rama sandbox.
+   - El agente ayuda con pistas, controles y validaciones.
 
-4) Evidence submission
-   - Submit via PR or GitOps sync.
-   - CI records evidence: SBOM, SCA, tests, audit logs.
+4) Envio de evidencia
+   - Envios via PR o sync GitOps.
+   - CI registra evidencia: SBOM, SCA, tests, logs de auditoria.
 
-5) Scoring and rewards
-   - Automated scoring from evidence logs.
-   - Manual review only for edge cases.
+5) Puntuacion y recompensas
+   - Puntuacion automatica basada en evidencias.
+   - Revision manual solo en casos limite.
 
-6) Growth
-   - Next Lab is tailored from observed strengths and gaps.
+6) Crecimiento
+   - El siguiente Lab se ajusta segun fortalezas y brechas observadas.
 
-## Lab structure (template)
-- Title:
-- Difficulty: L1 / L2 / L3 / L4
-- Objective:
-- Required outputs:
-- Evidence sources:
-- Risk and compliance guardrails:
-- Reward:
+## Estructura del Lab (plantilla)
+- Titulo:
+- Dificultad: L1 / L2 / L3 / L4
+- Objetivo:
+- Salidas requeridas:
+- Fuentes de evidencia:
+- Controles de riesgo y cumplimiento:
+- Recompensa:
 
-## Example Labs
+## Ejemplos de Labs
 
-### Lab 01 - Secure pipeline baseline
-- Difficulty: L1
-- Objective: run pipeline with redaction and audit logs.
-- Required outputs: analysis.json, audit log entries.
-- Evidence: `outputs/audit/analysis.jsonl` + GitOps PR.
-- Reward: 50 points + badge `secure-runner`.
+### Lab 01 - Linea base de pipeline seguro
+- Dificultad: L1
+- Objetivo: ejecutar pipeline con redaccion y logs de auditoria.
+- Salidas requeridas: analysis.json, entradas de log de auditoria.
+- Evidencia: `outputs/audit/analysis.jsonl` + PR GitOps.
+- Recompensa: 50 puntos + insignia `secure-runner`.
 
-### Lab 02 - GitOps redacted sync
-- Difficulty: L2
-- Objective: sync redacted outputs to a remote repo.
-- Required outputs: PR with redacted outputs only.
-- Evidence: CI logs, gitops/sync.sh evidence.
-- Reward: 100 points + badge `gitops-steward`.
+### Lab 02 - Sync GitOps con outputs redactados
+- Dificultad: L2
+- Objetivo: sincronizar outputs redactados a un repo remoto.
+- Salidas requeridas: PR con solo outputs redactados.
+- Evidencia: logs de CI, evidencia de `gitops/sync.sh`.
+- Recompensa: 100 puntos + insignia `gitops-steward`.
 
-### Lab 03 - Hardening runbook
-- Difficulty: L3
-- Objective: apply container hardening and document risks.
-- Required outputs: updated compose and a short risk note.
-- Evidence: `docker-compose.prod.yml` diff + review notes.
-- Reward: 200 points + badge `runtime-guardian`.
+### Lab 03 - Guia de endurecimiento
+- Dificultad: L3
+- Objetivo: aplicar endurecimiento de contenedores y documentar riesgos.
+- Salidas requeridas: compose actualizado y nota corta de riesgo.
+- Evidencia: diff de `docker-compose.prod.yml` + notas de revision.
+- Recompensa: 200 puntos + insignia `runtime-guardian`.
 
-## Rewards system
-- Points: 0 to 1000 per Lab depending on difficulty.
-- Badges: permanent proof of capability.
-- Levels: L1 (Explorer) -> L4 (Expert).
-- Bonuses: extra points for clean SCA, tests, and docs.
+## Sistema de recompensas
+- Puntos: 0 a 1000 por Lab segun dificultad.
+- Insignias: prueba permanente de capacidad.
+- Niveles: L1 (Explorador) -> L4 (Experto).
+- Bonos: puntos extra por SCA limpio, tests y docs.
 
-## Scoring rubric
-- Correctness (40%): objectives met and reproducible.
-- Security (25%): no policy violations; redaction applied.
-- Quality (20%): clean diffs, clear docs, tests.
-- Collaboration (15%): PR description, peer feedback.
+## Rubrica de evaluacion
+- Correccion (40%): objetivos cumplidos y reproducibles.
+- Seguridad (25%): sin violaciones de politica; redaccion aplicada.
+- Calidad (20%): diffs limpios, docs claras, tests.
+- Colaboracion (15%): descripcion de PR, retroalimentacion de pares.
 
-## AI agent roles
-- Onboarding agent: config help, prerequisites, consent.
-- Lab coach: hints, time planning, scope management.
-- Security guard: flags risky actions (raw data sync, secrets).
-- Reviewer: highlights gaps before submission.
-- Career agent: suggests next Lab based on score trends.
+## Roles del agente de IA
+- Agente de incorporacion: ayuda de config, prerequisitos, consentimiento.
+- Guia de Lab: pistas, planificacion de tiempo, gestion de alcance.
+- Guardia de seguridad: alerta acciones riesgosas (sync de datos en bruto, secretos).
+- Revisor: destaca brechas antes de envio.
+- Agente de carrera: sugiere el siguiente Lab segun tendencias de puntuacion.
 
-## Compliance and privacy
-- Explicit opt-in for scoring and data retention.
-- Only redacted outputs in prod evidence.
-- Audit logs for each Lab run.
-- Sovereign mode: local-only, no external calls.
+## Cumplimiento y privacidad
+- Consentimiento explicito para puntuacion y retencion de datos.
+- Solo outputs redactados en evidencia prod.
+- Logs de auditoria por cada ejecucion de Lab.
+- Modo soberano: solo local, sin llamadas externas.
 
-## Evidence checklist
-- CI logs attached
-- SBOM artifacts
-- SCA results
-- Audit logs
-- PR with checklist completed
+## Lista de verificacion de evidencia
+- Logs de CI adjuntos
+- Artefactos SBOM
+- Resultados SCA
+- Logs de auditoria
+- PR con lista de verificacion completa
 
-## Anti-gaming controls
-- Randomized checks and hidden tests.
-- Rewards require reproducible evidence.
-- Manual review for suspicious patterns.
+## Controles anti-fraude
+- Revisiones aleatorias y tests ocultos.
+- Recompensas requieren evidencia reproducible.
+- Revision manual en patrones sospechosos.
 
-## Next steps
-- Publish Labs to a dedicated repo or `labs/` folder.
-- Define reward ledger (JSON or simple CSV).
-- Assign reviewers for L3 and L4 Labs.
+## Proximos pasos
+- Publicar Labs en un repo dedicado o carpeta `labs/`.
+- Definir registro de recompensas (JSON o CSV simple).
+- Asignar revisores para Labs L3 y L4.

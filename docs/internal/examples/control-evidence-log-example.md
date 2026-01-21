@@ -1,14 +1,14 @@
-# Control Evidence Log Example (Fictional)
+# Ejemplo de registro de evidencias de control (Ficticio)
 
-## Evidence register
-| Date | Control ID | Description | Artifact | Owner | Status |
+## Registro de evidencias
+| Fecha | ID de control | Descripcion | Artefacto | Responsable | Estado |
 | --- | --- | --- | --- | --- | --- |
-| 2026-02-10 | AU-2 | Audit logging enabled | audit/analysis.jsonl | ops@example.test | verified |
-| 2026-02-10 | AU-2 | UI access logging enabled | audit/ui_access.jsonl | ops@example.test | verified |
-| 2026-02-11 | RA-5 | SCA scan results | ci-security.yml logs | sec@example.test | verified |
-| 2026-02-11 | SBOM | SBOM artifacts | sbom.spdx.json, sbom.cdx.json | sec@example.test | verified |
-| 2026-02-12 | CM-6 | Hardening config applied | docker-compose.prod.yml | ops@example.test | verified |
+| 2026-02-10 | AU-2 | Registro de auditoria habilitado | audit/analysis.jsonl | ops@example.test | verificado |
+| 2026-02-10 | AU-2 | Registro de accesos UI habilitado | audit/ui_access.jsonl | ops@example.test | verificado |
+| 2026-02-11 | RA-5 | Resultados de SCA | logs de ci-security.yml | sec@example.test | verificado |
+| 2026-02-11 | SBOM | Artefactos SBOM | sbom.spdx.json, sbom.cdx.json | sec@example.test | verificado |
+| 2026-02-12 | CM-6 | Config de hardening aplicada | docker-compose.prod.yml | ops@example.test | verificado |
 
-## Notes
-- Store artifacts in a controlled location.
-- Link to build logs, SBOMs, audit logs, and test reports.
+## Notas
+- Guarda los artefactos en una ubicacion controlada.
+- Enlaza logs de build, SBOMs, logs de auditoria y reportes de pruebas.

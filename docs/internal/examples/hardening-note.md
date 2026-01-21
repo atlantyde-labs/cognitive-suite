@@ -1,12 +1,12 @@
-# Hardening Note (Fictional)
+# Nota de endurecimiento (Ficticio)
 
-- Date: 2026-02-14
-- Scope: production compose
-- Controls verified:
-  - non-root user
-  - read-only filesystem
-  - tmpfs for /tmp
+- Fecha: 2026-02-14
+- Alcance: compose de produccion
+- Controles verificados:
+  - usuario non-root
+  - filesystem de solo lectura
+  - tmpfs para /tmp
   - no-new-privileges
-  - dropped capabilities
-- Residual risk: no seccomp/apparmor profile applied
-- Follow-up: define seccomp profile for production
+  - capacidades eliminadas
+- Riesgo residual: sin perfil seccomp/apparmor aplicado
+- Seguimiento: definir perfil seccomp para produccion

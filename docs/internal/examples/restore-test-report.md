@@ -1,8 +1,8 @@
-# Restore Test Report (Fictional)
+# Informe de prueba de restauracion (Ficticio)
 
-- Test date: 2026-01-20
-- Scope: outputs + audit logs
-- RTO achieved: 2h 15m
-- RPO achieved: 12h
-- Result: success
-- Issues: none
+- Fecha de prueba: 2026-01-20
+- Alcance: outputs + logs de auditoria
+- RTO alcanzado: 2h 15m
+- RPO alcanzado: 12h
+- Resultado: exito
+- Incidencias: ninguna

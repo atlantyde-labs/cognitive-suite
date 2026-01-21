@@ -1,57 +1,57 @@
-# DPIA Template (Draft)
+# Plantilla DPIA (Borrador)
 
-## 1. Overview
-- Project: Cognitive Suite
-- Environment: dev / prod
-- Processing owner:
-- Date:
-- Version:
+## 1. Resumen
+- Proyecto: Cognitive Suite
+- Entorno: dev / prod
+- Responsable del tratamiento:
+- Fecha:
+- Versión:
 
-## 2. Processing description
-- Purpose of processing:
-- Data sources:
-- Data flow summary:
-- Systems involved:
-- Data storage locations:
-- Data retention period:
+## 2. Descripción del tratamiento
+- Propósito del tratamiento:
+- Fuentes de datos:
+- Resumen del flujo de datos:
+- Sistemas involucrados:
+- Ubicaciones de almacenamiento:
+- Periodo de retención:
 
-## 3. Data categories
-- Personal data categories:
-- Special categories (if any):
-- Data subjects:
+## 3. Categorías de datos
+- Categorías de datos personales:
+- Categorías especiales (si aplica):
+- Sujetos de datos:
 
-## 4. Lawful basis (GDPR)
-- Lawful basis:
-- Legitimate interest assessment (if applicable):
-- Consent mechanism (if applicable):
+## 4. Base legal (GDPR)
+- Base legal:
+- Evaluación de interés legítimo (si aplica):
+- Mecanismo de consentimiento (si aplica):
 
-## 5. Necessity and proportionality
-- Is the data necessary for the purpose:
-- Data minimization measures:
-- Access controls:
-- Transparency and user notice:
+## 5. Necesidad y proporcionalidad
+- ¿Los datos son necesarios para el propósito?:
+- Medidas de minimización:
+- Controles de acceso:
+- Transparencia y aviso al usuario:
 
-## 6. Risk assessment
-- Identified risks:
-- Likelihood:
-- Impact:
-- Risk rating:
+## 6. Evaluación de riesgos
+- Riesgos identificados:
+- Probabilidad:
+- Impacto:
+- Nivel de riesgo:
 
-## 7. Mitigation measures
-- Technical controls:
-- Organizational controls:
-- Residual risk after mitigation:
+## 7. Medidas de mitigación
+- Controles técnicos:
+- Controles organizativos:
+- Riesgo residual tras mitigación:
 
-## 8. Data transfers
-- Cross-border transfers:
-- Safeguards (SCC, adequacy, etc):
+## 8. Transferencias de datos
+- Transferencias internacionales:
+- Salvaguardas (SCC, adecuación, etc):
 
-## 9. Consultation and approvals
-- DPO consulted: yes/no
-- Security review completed: yes/no
-- Final approval:
+## 9. Consulta y aprobaciones
+- DPO consultado: sí/no
+- Revisión de seguridad completada: sí/no
+- Aprobación final:
 
-## 10. References
-- Policies:
-- Evidence logs:
-- System diagrams:
+## 10. Referencias
+- Políticas:
+- Logs de evidencia:
+- Diagramas del sistema:

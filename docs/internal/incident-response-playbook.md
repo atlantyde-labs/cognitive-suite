@@ -1,44 +1,44 @@
-# Incident Response Playbook (Draft)
+# Playbook de respuesta a incidentes (Borrador)
 
-## 0. Severity levels
-- SEV1: Critical impact, data breach, or extended outage
-- SEV2: Major impact, degraded service
-- SEV3: Minor impact, limited scope
+## 0. Niveles de severidad
+- SEV1: impacto critico, brecha de datos o caida prolongada
+- SEV2: impacto mayor, servicio degradado
+- SEV3: impacto menor, alcance limitado
 
-## 1. Detection and triage
-- Trigger sources: alerts, user reports, monitoring
-- Initial triage checklist:
-  - Identify affected services
-  - Determine severity
-  - Start incident log
+## 1. Deteccion y triaje
+- Fuentes de disparo: alertas, reportes de usuarios, monitoreo
+- Checklist inicial de triaje:
+  - Identificar servicios afectados
+  - Determinar severidad
+  - Iniciar log de incidente
 
-## 2. Containment
-- Isolate affected components
-- Disable risky workflows (GitOps sync, external calls)
-- Preserve evidence (logs, configs)
+## 2. Contencion
+- Aislar componentes afectados
+- Deshabilitar flujos riesgosos (sync GitOps, llamadas externas)
+- Preservar evidencia (logs, configs)
 
-## 3. Eradication
-- Remove root cause
-- Patch vulnerabilities
-- Validate integrity
+## 3. Erradicacion
+- Remover causa raiz
+- Parchear vulnerabilidades
+- Validar integridad
 
-## 4. Recovery
-- Restore services
-- Monitor for recurrence
-- Verify data integrity
+## 4. Recuperacion
+- Restaurar servicios
+- Monitorear recurrencia
+- Verificar integridad de datos
 
-## 5. Communication
-- Internal comms timeline
-- External notifications (if required)
-- Regulatory reporting (if required)
+## 5. Comunicacion
+- Linea de tiempo de comunicaciones internas
+- Notificaciones externas (si aplica)
+- Reporte regulatorio (si aplica)
 
-## 6. Post-incident review
-- Timeline
-- Root cause analysis
-- Corrective actions
-- Lessons learned
+## 6. Revision post-incidente
+- Linea de tiempo
+- Analisis de causa raiz
+- Acciones correctivas
+- Lecciones aprendidas
 
-## 7. Evidence
-- Incident log
-- Forensic artifacts
-- Approval of closure
+## 7. Evidencias
+- Log del incidente
+- Artefactos forenses
+- Aprobacion de cierre

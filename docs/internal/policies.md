@@ -1,59 +1,59 @@
-# Policies (Draft)
+# Políticas (Borrador)
 
-## Data classification
-- Levels: public, internal, confidential, restricted.
-- Default: all ingested data is confidential or restricted.
-- Owners approve classification for any dataset.
+## Clasificación de datos
+- Niveles: público, interno, confidencial, restringido.
+- Por defecto: todos los datos ingeridos son confidenciales o restringidos.
+- Los responsables aprueban la clasificación de cualquier dataset.
 
-## Data retention and deletion
-- Dev: retain raw inputs for 30 days max, outputs for 90 days max.
-- Prod: raw inputs disabled by default; only anonymized outputs retained.
-- Deletion: on request within 7 days; verify removal from GitOps remotes.
+## Retención y borrado de datos
+- Dev: retener inputs raw máximo 30 días, outputs máximo 90 días.
+- Prod: inputs raw deshabilitados por defecto; solo outputs anonimizados.
+- Borrado: bajo solicitud en 7 días; verificar eliminación en GitOps remotos.
 
-## Data minimization and anonymization
-- Store only fields required for analysis outputs.
-- Redact personal identifiers from summaries and entities.
-- Prohibit syncing raw data to remote repos in prod.
-- Production runs must use `COGNITIVE_ENV=prod` and set `COGNITIVE_HASH_SALT`.
-- GitOps in prod must use `GITOPS_DATA_MODE=redacted`.
+## Minimización y anonimización
+- Guardar solo campos necesarios para outputs de análisis.
+- Redactar identificadores personales en resúmenes y entidades.
+- Prohibir sincronizar datos raw a repos remotos en prod.
+- Las ejecuciones en prod deben usar `COGNITIVE_ENV=prod` y definir `COGNITIVE_HASH_SALT`.
+- GitOps en prod debe usar `GITOPS_DATA_MODE=redacted`.
 
-## Access control
-- Principle of least privilege.
-- MFA required for admin and CI/CD.
-- RBAC roles: viewer, analyst, admin.
-- UI access requires tokens in production (COGNITIVE_UI_TOKEN_*).
+## Control de acceso
+- Principio de mínimo privilegio.
+- MFA requerido para admin y CI/CD.
+- Roles RBAC: viewer, analyst, admin.
+- Acceso UI requiere tokens en producción (COGNITIVE_UI_TOKEN_*).
 
-## Encryption and key management
-- TLS for UI/API in multi-tenant or prod.
-- Encrypt data at rest (disk or object storage).
-- Centralized key management (KMS or vault).
+## Cifrado y gestión de claves
+- TLS para UI/API en multi-tenant o prod.
+- Cifrar datos en reposo (disco u object storage).
+- Gestión centralizada de claves (KMS o vault).
 
-## Logging and audit
-- Log who ran analysis, when, input source, output location.
-- Store audit logs in append-only storage.
-- Retain audit logs for 1 year minimum.
+## Logging y auditoría
+- Registrar quién ejecutó el análisis, cuándo, fuente de input, ubicación de output.
+- Guardar logs de auditoría en almacenamiento append-only.
+- Retener logs de auditoría mínimo 1 año.
 
-## Container hardening
-- Run as non-root user in production containers.
-- Use read-only root filesystem with tmpfs for /tmp.
-- Drop Linux capabilities and enforce no-new-privileges.
+## Hardening de contenedores
+- Ejecutar como usuario no-root en contenedores de producción.
+- Usar filesystem root read-only con tmpfs para /tmp.
+- Eliminar capacidades Linux y aplicar no-new-privileges.
 
-## Secure SDLC
-- Code reviews required for changes to security-sensitive areas.
-- SCA and SBOM required for release builds (Grype + SBOM artifacts).
-- Dependency updates on a defined cadence.
-- Dependency versions must be pinned via lockfiles (`requirements*.txt`).
+## SDLC seguro
+- Revisiones de código obligatorias en áreas sensibles.
+- SCA y SBOM obligatorios para builds de release (Grype + artefactos SBOM).
+- Actualización de dependencias con cadencia definida.
+- Versiones de dependencias fijadas vía lockfiles (`requirements*.txt`).
 
-## Vulnerability management
-- Triage within 5 business days.
-- Patch SLAs: critical 7 days, high 14 days, medium 30 days.
-- Secrets scanning required on PRs (Gitleaks).
+## Gestión de vulnerabilidades
+- Triage en 5 días laborables.
+- SLAs de parcheo: crítico 7 días, alto 14 días, medio 30 días.
+- Escaneo de secretos requerido en PRs (Gitleaks).
 
-## Incident response
-- Defined on-call and escalation path.
-- Post-incident review and corrective actions tracked.
+## Respuesta a incidentes
+- On-call y ruta de escalado definida.
+- Post-incident review y acciones correctivas registradas.
 
-## Sovereign and air-gap rules
-- Production builds must be reproducible offline.
-- No external network egress in prod unless approved.
-- Data must stay in approved regions.
+## Reglas soberanas y air-gap
+- Builds de producción reproducibles offline.
+- Sin egress externo en prod salvo aprobación.
+- Datos deben permanecer en regiones aprobadas.

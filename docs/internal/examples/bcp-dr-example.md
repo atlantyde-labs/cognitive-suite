@@ -1,48 +1,48 @@
-# BCP / DR Example (Fictional)
+# Ejemplo BCP / DR (Ficticio)
 
-## 1. Objectives
-- RTO: 4 hours
-- RPO: 24 hours
-- Availability targets: 99.5%
+## 1. Objetivos
+- RTO: 4 horas
+- RPO: 24 horas
+- Objetivos de disponibilidad: 99.5%
 
-## 2. Critical services
+## 2. Servicios criticos
 - Ingestor
 - Pipeline
 - Frontend
 - GitOps
-- Storage (outputs, audit logs)
+- Almacenamiento (outputs, logs de auditoria)
 
-## 3. Dependencies
-- Container runtime: Docker
-- Host filesystem: local SSD
-- External services: none
+## 3. Dependencias
+- Runtime de contenedores: Docker
+- Sistema de archivos del host: SSD local
+- Servicios externos: ninguno
 
-## 4. Backup strategy
-- Backup scope: outputs, audit logs, config
-- Backup frequency: daily
-- Backup location: offline encrypted volume (EU region)
-- Encryption at rest: AES-256
-- Retention policy: 30 days
+## 4. Estrategia de copias de seguridad
+- Alcance del backup: outputs, logs de auditoria, config
+- Frecuencia del backup: diario
+- Ubicacion del backup: volumen cifrado offline (region UE)
+- Cifrado en reposo: AES-256
+- Politica de retencion: 30 dias
 
-## 5. Recovery procedures
-- Restore from backup to clean host
-- Validate integrity via hash checks
-- Rollback procedures: restore last known good backup
-- Communication plan: internal status channel
+## 5. Procedimientos de recuperacion
+- Restaurar desde backup a un host limpio
+- Validar integridad via sumas de verificacion
+- Procedimientos de rollback: restaurar el ultimo backup valido
+- Plan de comunicacion: canal interno de estado
 
-## 6. Testing
-- Test frequency: quarterly
-- Last test date: 2026-01-20
-- Issues found: none
-- Remediation actions: not required
+## 6. Pruebas
+- Frecuencia de pruebas: trimestral
+- Fecha de ultima prueba: 2026-01-20
+- Problemas encontrados: ninguno
+- Acciones de remediacion: no requeridas
 
-## 7. Roles and responsibilities
-- Incident commander: ops@example.test
-- Operations lead: ops-lead@example.test
-- Security lead: sec@example.test
-- Communications lead: comms@example.test
+## 7. Roles y responsabilidades
+- Comandante de incidentes: ops@example.test
+- Lider de operaciones: ops-lead@example.test
+- Lider de seguridad: sec@example.test
+- Lider de comunicaciones: comms@example.test
 
-## 8. Evidence
-- Backup logs: audit/backup.log
-- Restore test reports: docs/internal/examples/restore-test-report.md
-- Change records: control-evidence-log.md
+## 8. Evidencias
+- Logs de backup: audit/backup.log
+- Reportes de prueba de restauracion: restore-test-report.md
+- Registros de cambios: ../control-evidence-log.md

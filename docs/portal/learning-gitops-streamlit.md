@@ -1,67 +1,67 @@
-# Learning by Doing: GitOps + Streamlit (Early Adopters)
+# Aprender haciendo: GitOps + Streamlit (Adoptantes tempranos)
 
-This guide is a hands-on path for early adopters to run the suite locally, learn GitOps flow, and validate the Streamlit UI in a safe way.
+Esta guia es un recorrido practico para que los adoptantes tempranos ejecuten la suite en local, aprendan el flujo GitOps y validen la UI de Streamlit de forma segura.
 
-## 0. Goals
-- Run ingest -> analyze -> view in Streamlit.
-- Practice GitOps sync with redacted outputs.
-- Validate audit logs and access controls.
+## 0. Objetivos
+- Ejecutar ingesta -> analisis -> vista en Streamlit.
+- Practicar sync GitOps con salidas redactadas.
+- Validar logs de auditoria y controles de acceso.
 
-## 1. Prerequisites
+## 1. Prerrequisitos
 - Python 3.10+
-- Docker (optional)
+- Docker (opcional)
 - Git
 
-## 2. Local run (dev)
+## 2. Ejecucion local (dev)
 ```bash
 python cogctl.py init
 python cogctl.py ingest demo_input.json
 python cogctl.py analyze
 ```
 
-View results:
+Ver resultados:
 ```bash
 python frontend/app.py
 ```
 
-## 3. Streamlit UI (local)
+## 3. UI de Streamlit (local)
 ```bash
 streamlit run frontend/streamlit_app.py --server.headless true --server.port 8501
 ```
-Open: http://localhost:8501
+Abrir: http://localhost:8501
 
-## 4. GitOps sync (dev with real data)
-Set repo target:
+## 4. Sync GitOps (dev con datos reales)
+Configura el destino del repo:
 ```bash
 export GIT_REPO_URL=git@github.com:example-org/example-repo.git
 export GIT_BRANCH=main
 export COGNITIVE_ENV=dev
 ```
 
-Sync (dev allows raw outputs):
+Sincroniza (dev permite salidas en bruto):
 ```bash
 bash gitops/sync.sh
 ```
 
-## 5. GitOps sync (prod redacted outputs only)
+## 5. Sync GitOps (prod solo salidas redactadas)
 ```bash
 export COGNITIVE_ENV=prod
 export GITOPS_DATA_MODE=redacted
 export COGNITIVE_HASH_SALT=change_me
 ```
 
-Run analysis with redaction:
+Ejecuta el analisis con redaccion:
 ```bash
 python pipeline/analyze.py --input outputs/raw --output outputs/insights/analysis.json
 ```
 
-Sync redacted outputs:
+Sincroniza salidas redactadas:
 ```bash
 bash gitops/sync.sh
 ```
 
-## 6. Streamlit auth (prod behavior)
-Set tokens:
+## 6. Autenticacion en Streamlit (comportamiento prod)
+Define tokens:
 ```bash
 export COGNITIVE_UI_TOKEN_VIEWER=viewer_token
 export COGNITIVE_UI_TOKEN_ANALYST=analyst_token
@@ -69,27 +69,27 @@ export COGNITIVE_UI_TOKEN_ADMIN=admin_token
 export COGNITIVE_ENV=prod
 ```
 
-Start UI:
+Inicia la UI:
 ```bash
 streamlit run frontend/streamlit_app.py --server.headless true --server.port 8501
 ```
 
-## 7. Audit logs (evidence)
-- Analysis audit log: `outputs/audit/analysis.jsonl`
-- UI access log: `outputs/audit/ui_access.jsonl`
+## 7. Logs de auditoria (evidencias)
+- Log de auditoria de analisis: `outputs/audit/analysis.jsonl`
+- Log de acceso UI: `outputs/audit/ui_access.jsonl`
 
-## 8. Learning tasks (checklist)
-- [ ] Run ingest -> analyze locally
-- [ ] Open Streamlit and review a record
-- [ ] Enable redaction and confirm outputs are masked
-- [ ] Sync redacted outputs via GitOps
-- [ ] Review audit logs and record evidence
+## 8. Tareas de aprendizaje (lista de verificacion)
+- [ ] Ejecutar ingesta -> analisis en local
+- [ ] Abrir Streamlit y revisar un registro
+- [ ] Activar redaccion y confirmar que las salidas se enmascaran
+- [ ] Sincronizar salidas redactadas via GitOps
+- [ ] Revisar logs de auditoria y registrar evidencia
 
-## 9. Air-gap note
-- For sovereign builds, mirror dependencies and models offline.
-- Disable external network egress in prod.
+## 9. Nota de air-gap
+- Para builds soberanos, replica dependencias y modelos en offline.
+- Deshabilita el egress de red externo en prod.
 
-## Success criteria
-- Redacted outputs only in prod GitOps
-- UI access is token gated
-- Audit logs captured for analysis and access
+## Criterios de exito
+- Solo salidas redactadas en GitOps prod
+- Acceso UI protegido por token
+- Logs de auditoria capturados para analisis y acceso

@@ -1,10 +1,10 @@
-# Control Evidence Log (Draft)
+# Registro de evidencias de control (Borrador)
 
-## Evidence register
-| Date | Control ID | Description | Artifact | Owner | Status |
+## Registro de evidencias
+| Fecha | ID de control | Descripcion | Artefacto | Responsable | Estado |
 | --- | --- | --- | --- | --- | --- |
 |  |  |  |  |  |  |
 
-## Notes
-- Store artifacts in a controlled location.
-- Link to build logs, SBOMs, audit logs, and test reports.
+## Notas
+- Guarda los artefactos en una ubicacion controlada.
+- Enlaza logs de build, SBOMs, logs de auditoria y reportes de pruebas.
