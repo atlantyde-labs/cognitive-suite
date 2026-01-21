@@ -73,6 +73,9 @@ nav:
   - Internal (Ops):
       - Compute Strategy: internal/compute-strategy.md
       - Execution Plan: internal/execution-plan.md
+      - Compliance Controls: internal/compliance-controls.md
+      - Compliance Roadmap: internal/compliance-roadmap.md
+      - Policies: internal/policies.md
 
 extra:
   social:
