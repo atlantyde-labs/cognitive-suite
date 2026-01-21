@@ -33,6 +33,11 @@
 - Store audit logs in append-only storage.
 - Retain audit logs for 1 year minimum.
 
+## Container hardening
+- Run as non-root user in production containers.
+- Use read-only root filesystem with tmpfs for /tmp.
+- Drop Linux capabilities and enforce no-new-privileges.
+
 ## Secure SDLC
 - Code reviews required for changes to security-sensitive areas.
 - SCA and SBOM required for release builds (Grype + SBOM artifacts).

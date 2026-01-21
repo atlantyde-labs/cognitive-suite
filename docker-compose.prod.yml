@@ -6,6 +6,15 @@
 services:
   ingestor:
     image: cognitive/ingestor:latest
+    user: "${COGNITIVE_UID:-10001}:${COGNITIVE_GID:-10001}"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    init: true
     volumes:
       - ./data/input:/data/input:ro
       - ./outputs:/data/outputs
@@ -13,6 +22,15 @@ services:
 
   pipeline:
     image: cognitive/pipeline:latest
+    user: "${COGNITIVE_UID:-10001}:${COGNITIVE_GID:-10001}"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    init: true
     environment:
       - COGNITIVE_ENV=prod
       - COGNITIVE_HASH_SALT=${COGNITIVE_HASH_SALT:-}
@@ -24,6 +42,15 @@ services:
 
   frontend:
     image: cognitive/frontend:latest
+    user: "${COGNITIVE_UID:-10001}:${COGNITIVE_GID:-10001}"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    init: true
     ports:
       - "8501:80"
     environment:
@@ -41,6 +68,15 @@ services:
 
   gitops:
     image: cognitive/gitops:latest
+    user: "${COGNITIVE_UID:-10001}:${COGNITIVE_GID:-10001}"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    init: true
     environment:
       - COGNITIVE_ENV=prod
       - GITOPS_DATA_MODE=redacted
