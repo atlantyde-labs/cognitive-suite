@@ -26,8 +26,17 @@ services:
     image: cognitive/frontend:latest
     ports:
       - "8501:80"
+    environment:
+      - COGNITIVE_ENV=prod
+      - COGNITIVE_UI_AUTH_REQUIRED=1
+      - COGNITIVE_UI_TOKEN_VIEWER=${COGNITIVE_UI_TOKEN_VIEWER:-}
+      - COGNITIVE_UI_TOKEN_ANALYST=${COGNITIVE_UI_TOKEN_ANALYST:-}
+      - COGNITIVE_UI_TOKEN_ADMIN=${COGNITIVE_UI_TOKEN_ADMIN:-}
+      - COGNITIVE_UI_AUDIT_LOG=/audit/ui_access.jsonl
+      - COGNITIVE_HASH_SALT=${COGNITIVE_HASH_SALT:-}
     volumes:
       - ./outputs:/outputs:ro
+      - ./audit:/audit
     restart: always
 
   gitops:

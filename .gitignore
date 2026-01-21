@@ -29,6 +29,7 @@ logs/
 tmp/
 *.log
 local_runtime/
+audit/
 
 # Web artifacts
 site/

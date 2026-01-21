@@ -21,6 +21,7 @@
 - Principle of least privilege.
 - MFA required for admin and CI/CD.
 - RBAC roles: viewer, analyst, admin.
+- UI access requires tokens in production (COGNITIVE_UI_TOKEN_*).
 
 ## Encryption and key management
 - TLS for UI/API in multi-tenant or prod.
