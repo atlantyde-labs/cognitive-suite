@@ -11,18 +11,11 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-# 1) Torch CPU explícito (EVITA nvidia-*cu12)
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu \
-      torch torchvision torchaudio
+COPY ingestor/requirements.txt /app/requirements.txt
 
-# 2) Dependencias específicas de ingesta + whisper
-RUN pip install --no-cache-dir \
-      PyPDF2 \
-      pymupdf \
-      openai-whisper \
-      ffmpeg-python \
-      pyyaml
+# Dependencias con versiones fijadas (CPU-only)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /app/requirements.txt
 
 COPY ingestor/ingest.py /app/ingest.py
 

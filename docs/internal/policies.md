@@ -35,12 +35,14 @@
 
 ## Secure SDLC
 - Code reviews required for changes to security-sensitive areas.
-- SCA and SBOM required for release builds.
+- SCA and SBOM required for release builds (Grype + SBOM artifacts).
 - Dependency updates on a defined cadence.
+- Dependency versions must be pinned via lockfiles (`requirements*.txt`).
 
 ## Vulnerability management
 - Triage within 5 business days.
 - Patch SLAs: critical 7 days, high 14 days, medium 30 days.
+- Secrets scanning required on PRs (Gitleaks).
 
 ## Incident response
 - Defined on-call and escalation path.

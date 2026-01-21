@@ -6,21 +6,13 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
 
 WORKDIR /app
 
-# Torch CPU explícito (EVITA nvidia-*cu12)
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu \
-      torch torchvision torchaudio
+COPY pipeline/requirements.txt /app/requirements.txt
 
-# NLP stack (solo lo que usa pipeline)
-RUN pip install --no-cache-dir \
-      pyyaml \
-      spacy \
-      transformers \
-      sentence-transformers \
-      faiss-cpu
+# Dependencias con versiones fijadas (CPU-only)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /app/requirements.txt
 
 COPY pipeline/analyze.py /app/analyze.py
 ENTRYPOINT ["python", "analyze.py"]
-
 
 

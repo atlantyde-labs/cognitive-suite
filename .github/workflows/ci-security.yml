@@ -1,0 +1,117 @@
+name: CI Security (SCA/SBOM/Secrets)
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate SBOM (SPDX)
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Generate SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: |
+            sbom.spdx.json
+            sbom.cdx.json
+
+  grype:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vulnerability scan (Grype)
+        uses: anchore/scan-action@v3
+        with:
+          path: .
+          severity-cutoff: high
+          fail-build: true
+          output-format: sarif
+          output-file: grype.sarif
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: grype.sarif
+
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Pip audit (core)
+        uses: pypa/gh-action-pip-audit@v1
+        with:
+          requirements: requirements.txt
+
+      - name: Pip audit (docs)
+        uses: pypa/gh-action-pip-audit@v1
+        with:
+          requirements: requirements-docs.txt
+
+      - name: Pip audit (frontend)
+        uses: pypa/gh-action-pip-audit@v1
+        with:
+          requirements: frontend/requirements.txt
+
+      - name: Pip audit (ingestor)
+        uses: pypa/gh-action-pip-audit@v1
+        with:
+          requirements: ingestor/requirements.txt
+
+      - name: Pip audit (pipeline)
+        uses: pypa/gh-action-pip-audit@v1
+        with:
+          requirements: pipeline/requirements.txt
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gitleaks scan
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          config: .gitleaks.toml
+
+  dockerfile-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hadolint Dockerfiles
+        run: |
+          set -euo pipefail
+          files=$(find . -name 'Dockerfile*' -type f)
+          if [ -z "$files" ]; then
+            echo "No Dockerfiles found."
+            exit 0
+          fi
+          for file in $files; do
+            echo "Linting $file"
+            docker run --rm -i hadolint/hadolint:v2.12.0 < "$file"
+          done

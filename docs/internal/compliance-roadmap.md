@@ -11,7 +11,7 @@
 - Implement authentication + RBAC for UI and API.
 - Separate tenants by storage and access boundaries.
 - Add encryption at rest and in transit (TLS for UI/API).
-- Add SCA/SBOM in CI (pip-audit, trivy, sbom export).
+- Add SCA/SBOM in CI (pip-audit, grype, gitleaks, sbom export).
 - Add centralized logging and basic alerting.
 
 ## Phase 2 - Sovereign production / air-gap
@@ -25,4 +25,3 @@
 - P0 complete: policies published and enforced in dev tooling.
 - P1 complete: multi-tenant isolation + auth + encryption + audit logs.
 - P2 complete: air-gap build, sovereign data residency proof, and DR evidence.
-
