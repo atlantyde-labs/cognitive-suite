@@ -55,24 +55,99 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 nav:
-  - Home: index.md
-  - Start Here:
-      - Quickstart: portal/quickstart.md
-      - Learning Path: portal/learning-path.md
-      - Contributing: portal/contributing.md
-  - Guides:
-      - Installation: installation.md
-      - Adoption Plan: adoption-plan.md
+  - Inicio: index.md
+  - Comienza aqui:
+      - Inicio rapido: portal/quickstart.md
+      - Ruta de aprendizaje: portal/learning-path.md
+      - Identidad y ecosistema: portal/identity-ecosystem.md
+      - Metricas: portal/metrics.md
+      - GitOps + Streamlit: portal/learning-gitops-streamlit.md
+      - Labs de desafio de talento: portal/talent-challenge-labs.md
+      - Bootstrap de Streamlit: portal/bootstrap-streamlit.md
+      - Contribuir: portal/contributing.md
+  - Guias:
+      - Instalacion: installation.md
+      - Plan de adopcion: adoption-plan.md
+      - Plan de ejecucion: execution-plan.md
+      - Plan de ejecucion early adopters: execution-plan-early-adopters.md
+      - Estrategia de computo: compute-strategy.md
+      - Vision de usuario: user-vision.md
       - Open Notebook: open_notebook_integration.md
   - Interfaz de Usuario:
-      - Visión General: user-interface/overview.md
+      - Vision General: user-interface/overview.md
       - Dashboard Operativo: user-interface/dashboard.md
       - Flujos de Ingesta: user-interface/flows.md
       - Panel GitOps: user-interface/gitops.md
       - Terminal CLI: user-interface/cli.md
-  - Internal (Ops):
-      - Compute Strategy: internal/compute-strategy.md
-      - Execution Plan: internal/execution-plan.md
+      - Vista local (UI): user-view/local-ui.md
+  - Operaciones internas:
+      - Estrategia de computo: internal/compute-strategy.md
+      - Plan de ejecucion: internal/execution-plan.md
+      - Controles de cumplimiento: internal/compliance-controls.md
+      - Hoja de ruta de cumplimiento: internal/compliance-roadmap.md
+      - Politicas: internal/policies.md
+      - DPIA: internal/dpia.md
+      - RoPA: internal/ropa.md
+      - BCP-DR: internal/bcp-dr.md
+      - Respuesta a incidentes: internal/incident-response-playbook.md
+      - Revision de accesos: internal/access-review.md
+      - Registro de evidencias: internal/control-evidence-log.md
+      - Ejemplos:
+          - Ejemplo DPIA: internal/examples/dpia-example.md
+          - Ejemplo RoPA: internal/examples/ropa-example.md
+          - Ejemplo BCP-DR: internal/examples/bcp-dr-example.md
+          - Ejemplo de respuesta a incidentes: internal/examples/incident-response-example.md
+          - Ejemplo de revision de accesos: internal/examples/access-review-example.md
+          - Ejemplo de registro de evidencias: internal/examples/control-evidence-log-example.md
+          - Ejemplo de prueba de restauracion: internal/examples/restore-test-report.md
+          - Nota de endurecimiento: internal/examples/hardening-note.md
+  - English:
+      - Home: en/index.md
+      - Start Here:
+          - Quickstart: en/portal/quickstart.md
+          - Learning Path: en/portal/learning-path.md
+          - Identity and Ecosystem: en/portal/identity-ecosystem.md
+          - Metrics: en/portal/metrics.md
+          - GitOps + Streamlit: en/portal/learning-gitops-streamlit.md
+          - Talent Challenge Labs: en/portal/talent-challenge-labs.md
+          - Bootstrap Streamlit: en/portal/bootstrap-streamlit.md
+          - Contributing: en/portal/contributing.md
+      - Guides:
+          - Installation: en/installation.md
+          - Adoption Plan: en/adoption-plan.md
+          - Execution Plan: en/execution-plan.md
+          - Execution Plan (Early Adopters): en/execution-plan-early-adopters.md
+          - Compute Strategy: en/compute-strategy.md
+          - User Vision: en/user-vision.md
+          - Open Notebook: en/open_notebook_integration.md
+      - User Interface:
+          - Overview: en/user-interface/overview.md
+          - Operations Dashboard: en/user-interface/dashboard.md
+          - Ingestion Flows: en/user-interface/flows.md
+          - GitOps Panel: en/user-interface/gitops.md
+          - CLI Terminal: en/user-interface/cli.md
+          - Local UI View: en/user-view/local-ui.md
+      - Internal (Ops):
+          - Compute Strategy: en/internal/compute-strategy.md
+          - Execution Plan: en/internal/execution-plan.md
+          - Compliance Controls: en/internal/compliance-controls.md
+          - Compliance Roadmap: en/internal/compliance-roadmap.md
+          - Policies: en/internal/policies.md
+          - DPIA: en/internal/dpia.md
+          - RoPA: en/internal/ropa.md
+          - BCP-DR: en/internal/bcp-dr.md
+          - Incident Response: en/internal/incident-response-playbook.md
+          - Access Review: en/internal/access-review.md
+          - Evidence Log: en/internal/control-evidence-log.md
+          - Examples:
+              - DPIA Example: en/internal/examples/dpia-example.md
+              - RoPA Example: en/internal/examples/ropa-example.md
+              - BCP-DR Example: en/internal/examples/bcp-dr-example.md
+              - Incident Response Example: en/internal/examples/incident-response-example.md
+              - Access Review Example: en/internal/examples/access-review-example.md
+              - Evidence Log Example: en/internal/examples/control-evidence-log-example.md
+              - Restore Test Example: en/internal/examples/restore-test-report.md
+              - Hardening Note: en/internal/examples/hardening-note.md
 
 extra:
   social:
@@ -95,4 +170,4 @@ copyright: |
 
 plugins:
   - search:
-      lang: es
+      lang: [es, en]

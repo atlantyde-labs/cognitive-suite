@@ -7,7 +7,7 @@ title: Instalación y Paquetes
 Esta guía describe cómo instalar la **Cognitive GitOps Suite** en tu máquina y
 cómo generar un paquete Debian (`.deb`) para desplegar la suite en entornos
 basados en Ubuntu o Debian. Las instrucciones aquí complementan el
-[README](../README.md) del proyecto y forman parte de la documentación que se
+[README](https://github.com/atlantyde-labs/cognitive-suite/blob/main/README.md) del proyecto y forman parte de la documentación que se
 publica en GitHub Pages.
 
 ## Instalación en modo desarrollo

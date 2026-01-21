@@ -1,0 +1,126 @@
+name: CI Security (SCA/SBOM/Secrets)
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate SBOM (SPDX)
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Generate SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: |
+            sbom.spdx.json
+            sbom.cdx.json
+
+  grype:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vulnerability scan (Grype)
+        id: grype
+        uses: anchore/scan-action@v3
+        with:
+          path: .
+          severity-cutoff: high
+          fail-build: true
+          output-format: sarif
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ${{ steps.grype.outputs.sarif || 'results.sarif' }}
+
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install pip-audit
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pip-audit
+
+      - name: Pip audit (core)
+        run: python -m pip_audit -r requirements.txt
+
+      - name: Pip audit (docs)
+        run: python -m pip_audit -r requirements-docs.txt
+
+      - name: Pip audit (frontend)
+        run: python -m pip_audit -r frontend/requirements.txt
+
+      - name: Pip audit (ingestor)
+        run: python -m pip_audit -r ingestor/requirements.txt
+
+      - name: Pip audit (pipeline)
+        run: python -m pip_audit -r pipeline/requirements.txt
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gitleaks scan
+        env:
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITLEAKS_IMAGE: ghcr.io/gitleaks/gitleaks:latest
+        run: |
+          set -euo pipefail
+          args=(detect --source=/repo --config=/repo/.gitleaks.toml --report-format sarif --report-path /repo/gitleaks.sarif)
+          if [ -n "${GITLEAKS_LICENSE:-}" ]; then
+            docker run --rm -e GITLEAKS_LICENSE="$GITLEAKS_LICENSE" -v "$PWD:/repo" "$GITLEAKS_IMAGE" "${args[@]}"
+          else
+            docker run --rm -v "$PWD:/repo" "$GITLEAKS_IMAGE" "${args[@]}"
+          fi
+
+      - name: Upload gitleaks SARIF
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: gitleaks.sarif
+
+  dockerfile-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hadolint Dockerfiles
+        run: |
+          set -euo pipefail
+          files=$(find . -name 'Dockerfile*' -type f)
+          if [ -z "$files" ]; then
+            echo "No Dockerfiles found."
+            exit 0
+          fi
+          for file in $files; do
+            echo "Linting $file"
+            docker run --rm -i --entrypoint /bin/hadolint hadolint/hadolint:v2.12.0 \
+              --ignore DL3007 --ignore DL3008 - < "$file"
+          done

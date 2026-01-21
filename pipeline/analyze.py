@@ -43,10 +43,14 @@ codificada en el código.
 """
 
 import argparse
+import hashlib
 import json
 import logging
+import os
 import re
+import time
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -69,6 +73,132 @@ logger = logging.getLogger(__name__)
 # Desactivar logs de transformers que no son informativos
 logging.getLogger("transformers").setLevel(logging.ERROR)
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+
+REDACTION_ENTITY_LABELS = {"PERSON", "ORG", "GPE", "LOC", "FAC", "NORP", "LAW"}
+EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
+PHONE_RE = re.compile(r"\b(?:\+?\d[\d\s().-]{6,}\d)\b")
+IPV4_RE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
+SSN_RE = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
+CARD_RE = re.compile(r"\b(?:\d[ -]*?){13,19}\b")
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def normalize_env(value: str) -> str:
+    env = (value or "dev").strip().lower()
+    if env in {"prod", "production"}:
+        return "prod"
+    if env in {"dev", "development", "local"}:
+        return "dev"
+    logger.warning("Valor desconocido de COGNITIVE_ENV=%s. Se usa 'dev'.", value)
+    return "dev"
+
+
+def hash_identifier(value: str, salt: str) -> str:
+    payload = f"{salt}{value}".encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()[:12]
+
+
+def luhn_check(number: str) -> bool:
+    digits = [int(ch) for ch in number if ch.isdigit()]
+    if len(digits) < 13 or len(digits) > 19:
+        return False
+    checksum = 0
+    parity = len(digits) % 2
+    for idx, digit in enumerate(digits):
+        if idx % 2 == parity:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+        checksum += digit
+    return checksum % 10 == 0
+
+
+def redact_credit_cards(text: str) -> str:
+    def replacer(match: re.Match[str]) -> str:
+        raw = match.group(0)
+        digits = "".join(ch for ch in raw if ch.isdigit())
+        if luhn_check(digits):
+            return "[REDACTED_CARD]"
+        return raw
+
+    return CARD_RE.sub(replacer, text)
+
+
+def redact_regex(text: str) -> str:
+    text = EMAIL_RE.sub("[REDACTED_EMAIL]", text)
+    text = IPV4_RE.sub("[REDACTED_IP]", text)
+    text = SSN_RE.sub("[REDACTED_SSN]", text)
+    text = redact_credit_cards(text)
+    text = PHONE_RE.sub("[REDACTED_PHONE]", text)
+    return text
+
+
+def redact_text(text: str, doc: Optional[Any]) -> str:
+    redacted = text
+    if doc is not None:
+        try:
+            for ent in doc.ents:
+                if ent.label_ in REDACTION_ENTITY_LABELS:
+                    ent_text = ent.text.strip()
+                    if len(ent_text) >= 3:
+                        pattern = re.compile(re.escape(ent_text), re.IGNORECASE)
+                        redacted = pattern.sub(f"[REDACTED_{ent.label_}]", redacted)
+        except Exception as e:
+            logger.debug("Error al aplicar redacción por entidades: %s", e)
+    return redact_regex(redacted)
+
+
+def redact_record(
+    record: Dict[str, Any],
+    doc: Optional[Any],
+    hash_salt: str,
+    env: str
+) -> Dict[str, Any]:
+    redacted = dict(record)
+    file_name = Path(record.get("file", "")).name
+    file_hash = hash_identifier(file_name or record.get("uuid", ""), hash_salt)
+    redacted["uuid"] = hash_identifier(record.get("uuid", ""), hash_salt)
+    redacted["file"] = f"file_{file_hash}"
+    redacted["title"] = f"document_{file_hash}"
+    redacted["summary"] = redact_text(record.get("summary", ""), doc)
+    redacted["idea_summary"] = redact_text(record.get("idea_summary", ""), doc)
+    redacted["entities"] = [
+        (label, "[REDACTED]") for label, _ in record.get("entities", [])
+    ]
+    redacted["author_signature"] = ""
+    redacted["legal_reference"] = [
+        (label, "[REDACTED]") for label, _ in record.get("legal_reference", [])
+    ]
+    redacted["risk_flags"] = [
+        (label, "[REDACTED]") for label, _ in record.get("risk_flags", [])
+    ]
+    redacted["redacted"] = True
+    redacted["redaction"] = {
+        "enabled": True,
+        "env": env,
+        "methods": [
+            "spacy_entities",
+            "regex_email",
+            "regex_phone",
+            "regex_ip",
+            "regex_ssn",
+            "luhn_credit_card"
+        ],
+        "hash_salt_set": bool(hash_salt),
+    }
+    return redacted
+
+
+def write_audit_event(event: Dict[str, Any], audit_path: Path) -> None:
+    try:
+        audit_path.parent.mkdir(parents=True, exist_ok=True)
+        with audit_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(event, ensure_ascii=False) + "\n")
+    except Exception as e:
+        logger.warning("No se pudo escribir auditoría: %s", e)
 
 
 def load_spacy_model() -> Optional[Any]:
@@ -308,7 +438,14 @@ def generate_summary(text: str, max_chars: int = 200) -> str:
     return clean[:max_chars] + ("..." if len(clean) > max_chars else "")
 
 
-def generate_record(file_path: Path, nlp_model: Optional[Any], sentiment_classifier: Optional[Any]) -> Dict[str, Any]:
+def generate_record(
+    file_path: Path,
+    nlp_model: Optional[Any],
+    sentiment_classifier: Optional[Any],
+    redact: bool,
+    hash_salt: str,
+    env: str
+) -> Dict[str, Any]:
     """Procesa un archivo y devuelve un registro semántico conforme al esquema.
     
     Lee el archivo, aplica análisis de NLP, extrae entidades, clasifica sentimiento
@@ -362,6 +499,8 @@ def generate_record(file_path: Path, nlp_model: Optional[Any], sentiment_classif
         "entities": entities,
         "summary": generate_summary(text, 400),
     }
+    record["redacted"] = False
+    record["redaction"] = {"enabled": False, "env": env}
     
     # Campos adicionales basados en heurísticas
     record["idea_summary"] = record["summary"] if "idea" in tags else ""
@@ -397,7 +536,10 @@ def generate_record(file_path: Path, nlp_model: Optional[Any], sentiment_classif
     )
     
     record["relevance_score"] = round(min(1.0, relevance), 3)
-    
+
+    if redact:
+        return redact_record(record, doc, hash_salt, env)
+
     return record
 
 
@@ -416,6 +558,16 @@ def main() -> None:
     else:
         logger.setLevel(logging.WARNING)
 
+    env = normalize_env(os.getenv("COGNITIVE_ENV", "dev"))
+    force_redact = os.getenv("COGNITIVE_REDACT", "0").strip().lower() in {"1", "true", "yes"}
+    redact_enabled = env == "prod" or force_redact
+    hash_salt = os.getenv("COGNITIVE_HASH_SALT", "")
+    audit_path = Path(os.getenv("COGNITIVE_AUDIT_LOG", "outputs/audit/analysis.jsonl"))
+    redaction_mode = "env_prod" if env == "prod" else ("forced" if force_redact else "disabled")
+
+    if env == "prod" and not hash_salt:
+        logger.warning("COGNITIVE_HASH_SALT no definido; los IDs se hashearán sin salt.")
+
     input_dir = Path(args.input)
     output_file = Path(args.output)
 
@@ -429,9 +581,31 @@ def main() -> None:
     nlp_model = load_spacy_model()
     sentiment_classifier = load_sentiment_classifier()
 
+    if redact_enabled:
+        print(f"🔒 Redacción habilitada (env={env}, modo={redaction_mode})")
+
     results: List[Dict[str, Any]] = []
     file_count = 0
     error_count = 0
+    error_files: List[str] = []
+    run_id = str(uuid.uuid4())
+    start_time = time.time()
+    actor = os.getenv("USER") or os.getenv("USERNAME") or "unknown"
+
+    write_audit_event(
+        {
+            "event": "analysis_start",
+            "timestamp": now_iso(),
+            "run_id": run_id,
+            "actor": actor,
+            "env": env,
+            "redaction_enabled": redact_enabled,
+            "redaction_mode": redaction_mode,
+            "input_dir": str(input_dir),
+            "output_file": str(output_file),
+        },
+        audit_path
+    )
     
     # Procesar archivos de texto
     print(f"📂 Procesando archivos en {input_dir}...")
@@ -439,12 +613,25 @@ def main() -> None:
         if p.is_file() and p.suffix.lower() in {'.txt', '.json', '.md'}:
             try:
                 logger.debug(f"Procesando: {p}")
-                results.append(generate_record(p, nlp_model, sentiment_classifier))
+                results.append(
+                    generate_record(
+                        p,
+                        nlp_model,
+                        sentiment_classifier,
+                        redact_enabled,
+                        hash_salt,
+                        env
+                    )
+                )
                 file_count += 1
                 print(f"  ✓ {p.name}")
             except Exception as e:
                 logger.error(f"Error procesando {p}: {e}")
                 error_count += 1
+                if redact_enabled:
+                    error_files.append(f"file_{hash_identifier(p.name, hash_salt)}")
+                else:
+                    error_files.append(p.name)
                 print(f"  ✗ {p.name} (error)")
                 continue
     
@@ -452,6 +639,25 @@ def main() -> None:
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with output_file.open('w', encoding='utf-8') as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
+
+    duration_ms = int((time.time() - start_time) * 1000)
+    write_audit_event(
+        {
+            "event": "analysis_end",
+            "timestamp": now_iso(),
+            "run_id": run_id,
+            "actor": actor,
+            "env": env,
+            "redaction_enabled": redact_enabled,
+            "redaction_mode": redaction_mode,
+            "file_count": file_count,
+            "error_count": error_count,
+            "error_files": error_files,
+            "duration_ms": duration_ms,
+            "output_file": str(output_file),
+        },
+        audit_path
+    )
     
     # Resumen final
     print("\n" + "="*60)

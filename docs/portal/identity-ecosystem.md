@@ -62,11 +62,11 @@ Ejes de operación:
 ## 6) Cómo se refleja en este repo
 
 Este repositorio debe ser:
-- **Portal de aprendizaje** (learning by doing)
+- **Portal de aprendizaje** (aprender haciendo)
 - **Referencia reproducible** (GitOps + CI)
-- **Herramienta de impacto** (docs + adopción + comunidad)
+- **Herramienta de impacto** (docs + adopcion + comunidad)
 
 Enlaces:
-- `docs/adoption-plan.md`
-- `docs/internal/execution-plan.md`
-- `docs/portal/metrics.md`
+- [Plan de adopcion](../adoption-plan.md)
+- [Plan de ejecucion](../internal/execution-plan.md)
+- [Metricas](metrics.md)

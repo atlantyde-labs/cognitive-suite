@@ -14,15 +14,15 @@ Plataforma local-first de soberanía digital que transforma tus datos en conocim
 <div class="hero-tagline">
   <span class="hero-tagline-item">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-    Digital Sovereignty
+    Soberania digital
   </span>
   <span class="hero-tagline-item">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-    Cognitive Governance
+    Gobernanza cognitiva
   </span>
   <span class="hero-tagline-item">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-    Privacy-First
+    Privacidad primero
   </span>
 </div>
 
@@ -82,7 +82,7 @@ Contenedores Docker para cada componente. Despliegue reproducible, escalable y f
 <div class="feature-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
 </div>
-<h3 class="feature-title">Privacy-First</h3>
+<h3 class="feature-title">Privacidad primero</h3>
 <p class="feature-description">
 Ejecución 100% local. Tus datos nunca salen de tu infraestructura. Control total sobre tu información y soberanía digital garantizada.
 </p>
@@ -156,8 +156,8 @@ Atlantyqa está diseñado con una arquitectura modular que garantiza escalabilid
 
 <div class="glass-card" markdown="1">
 ### Aprendizaje
-- [Quickstart](portal/quickstart.md)
-- [Learning Path](portal/learning-path.md)
+- [Inicio rapido](portal/quickstart.md)
+- [Ruta de aprendizaje](portal/learning-path.md)
 - [Contribuir](portal/contributing.md)
 </div>
 
