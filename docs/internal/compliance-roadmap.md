@@ -14,6 +14,7 @@
 - Add SCA/SBOM in CI (pip-audit, grype, gitleaks, sbom export).
 - Add centralized logging and basic alerting.
 - Harden containers (non-root, read-only FS, drop caps).
+- Maintain DPIA and RoPA documentation with evidence logs.
 
 ## Phase 2 - Sovereign production / air-gap
 - Offline dependency mirror and model registry.

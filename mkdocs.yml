@@ -76,6 +76,12 @@ nav:
       - Compliance Controls: internal/compliance-controls.md
       - Compliance Roadmap: internal/compliance-roadmap.md
       - Policies: internal/policies.md
+      - DPIA: internal/dpia.md
+      - RoPA: internal/ropa.md
+      - BCP-DR: internal/bcp-dr.md
+      - Incident Response: internal/incident-response-playbook.md
+      - Access Review: internal/access-review.md
+      - Evidence Log: internal/control-evidence-log.md
 
 extra:
   social:
