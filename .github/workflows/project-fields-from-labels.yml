@@ -7,6 +7,7 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  projects: write
   # si tu org/política lo permite, añade lo mínimo necesario
   # (Projects v2 suele requerir token PAT/App igualmente)
 
@@ -20,7 +21,7 @@ jobs:
           PROJECT_TITLE: "cognitive-suite"
         with:
           # Usa tu PAT (fine-grained) o token de App con permisos de Projects V2
-          github-token: ${{ secrets.PROJECT_TOKEN }}
+          github-token: ${{ secrets.PROJECT_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
             // ...tu script tal cual...
 

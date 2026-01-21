@@ -101,3 +101,6 @@ jobs:
   security:
     needs: changes
     uses: ./.github/workflows/ci-security.yml
+    permissions:
+      contents: read
+      security-events: write
