@@ -91,13 +91,14 @@ jobs:
       - name: Gitleaks scan
         env:
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITLEAKS_IMAGE: ghcr.io/gitleaks/gitleaks:latest
         run: |
           set -euo pipefail
           args=(detect --source=/repo --config=/repo/.gitleaks.toml --report-format sarif --report-path /repo/gitleaks.sarif)
           if [ -n "${GITLEAKS_LICENSE:-}" ]; then
-            docker run --rm -e GITLEAKS_LICENSE="$GITLEAKS_LICENSE" -v "$PWD:/repo" gitleaks/gitleaks:latest "${args[@]}"
+            docker run --rm -e GITLEAKS_LICENSE="$GITLEAKS_LICENSE" -v "$PWD:/repo" "$GITLEAKS_IMAGE" "${args[@]}"
           else
-            docker run --rm -v "$PWD:/repo" gitleaks/gitleaks:latest "${args[@]}"
+            docker run --rm -v "$PWD:/repo" "$GITLEAKS_IMAGE" "${args[@]}"
           fi
 
       - name: Upload gitleaks SARIF
