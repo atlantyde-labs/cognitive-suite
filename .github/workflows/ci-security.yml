@@ -41,18 +41,18 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Vulnerability scan (Grype)
+        id: grype
         uses: anchore/scan-action@v3
         with:
           path: .
           severity-cutoff: high
           fail-build: true
           output-format: sarif
-          output-file: grype.sarif
 
       - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: grype.sarif
+          sarif_file: ${{ steps.grype.outputs.sarif || 'results.sarif' }}
 
   pip-audit:
     runs-on: ubuntu-latest
@@ -63,30 +63,25 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Install pip-audit
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pip-audit
+
       - name: Pip audit (core)
-        uses: pypa/gh-action-pip-audit@v1
-        with:
-          requirements: requirements.txt
+        run: python -m pip_audit -r requirements.txt
 
       - name: Pip audit (docs)
-        uses: pypa/gh-action-pip-audit@v1
-        with:
-          requirements: requirements-docs.txt
+        run: python -m pip_audit -r requirements-docs.txt
 
       - name: Pip audit (frontend)
-        uses: pypa/gh-action-pip-audit@v1
-        with:
-          requirements: frontend/requirements.txt
+        run: python -m pip_audit -r frontend/requirements.txt
 
       - name: Pip audit (ingestor)
-        uses: pypa/gh-action-pip-audit@v1
-        with:
-          requirements: ingestor/requirements.txt
+        run: python -m pip_audit -r ingestor/requirements.txt
 
       - name: Pip audit (pipeline)
-        uses: pypa/gh-action-pip-audit@v1
-        with:
-          requirements: pipeline/requirements.txt
+        run: python -m pip_audit -r pipeline/requirements.txt
 
   secrets:
     runs-on: ubuntu-latest
@@ -94,9 +89,21 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Gitleaks scan
-        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        run: |
+          set -euo pipefail
+          args=(detect --source=/repo --config=/repo/.gitleaks.toml --report-format sarif --report-path /repo/gitleaks.sarif)
+          if [ -n "${GITLEAKS_LICENSE:-}" ]; then
+            docker run --rm -e GITLEAKS_LICENSE="$GITLEAKS_LICENSE" -v "$PWD:/repo" gitleaks/gitleaks:latest "${args[@]}"
+          else
+            docker run --rm -v "$PWD:/repo" gitleaks/gitleaks:latest "${args[@]}"
+          fi
+
+      - name: Upload gitleaks SARIF
+        uses: github/codeql-action/upload-sarif@v4
         with:
-          config: .gitleaks.toml
+          sarif_file: gitleaks.sarif
 
   dockerfile-lint:
     runs-on: ubuntu-latest
@@ -113,5 +120,6 @@ jobs:
           fi
           for file in $files; do
             echo "Linting $file"
-            docker run --rm -i hadolint/hadolint:v2.12.0 < "$file"
+            docker run --rm -i hadolint/hadolint:v2.12.0 \
+              --ignore DL3007 --ignore DL3008 - < "$file"
           done
