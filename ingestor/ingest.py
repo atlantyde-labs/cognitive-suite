@@ -124,7 +124,7 @@ def ingest_file(in_path: Path, out_path: Path) -> bool:
     suffix = in_path.suffix.lower()
     try:
         if suffix in ['.txt', '.md', '.json', '.yaml', '.yml']:
-            content = in_path.read_text(errors='ignore')
+            content = in_path.read_text(encoding='utf-8', errors='ignore')
         elif suffix == '.docx':
             content = extract_docx_text(in_path)
         elif suffix == '.pdf':
@@ -138,7 +138,7 @@ def ingest_file(in_path: Path, out_path: Path) -> bool:
             import base64
             content = base64.b64encode(in_path.read_bytes()).decode('utf-8')
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(content)
+        out_path.write_text(content, encoding='utf-8')
         return True
     except Exception:
         return False

@@ -14,6 +14,7 @@ son:
 - ``analyze`` → Ejecutar el pipeline de análisis sobre los textos ingeridos.
 - ``deploy``  → Levantar los servicios definidos en ``docker-compose.yml``.
 - ``status``  → Mostrar el estado de los contenedores Docker.
+- ``verify``  → Validar el progreso de un Lab (evidencia y seguridad).
 
 Uso:
 
@@ -29,6 +30,7 @@ python cogctl.py status
 import argparse
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -55,7 +57,7 @@ def cmd_ingest(args: argparse.Namespace) -> None:
     print(f'📥 Ingestando: {args.file}...')
     try:
         subprocess.run([
-            'python',
+            sys.executable,
             str(BASE_DIR / 'ingestor' / 'ingest.py'),
             str(target),
             '--output',
@@ -72,7 +74,7 @@ def cmd_analyze(args: argparse.Namespace) -> None:
     INSIGHTS_DIR.mkdir(parents=True, exist_ok=True)
     try:
         subprocess.run([
-            'python',
+            sys.executable,
             str(BASE_DIR / 'pipeline' / 'analyze.py'),
             '--input', str(RAW_DIR),
             '--output', str(INSIGHTS_DIR / 'analysis.json'),
@@ -92,6 +94,44 @@ def cmd_deploy(args: argparse.Namespace) -> None:
 def cmd_status(args: argparse.Namespace) -> None:
     """Muestra el estado actual de los contenedores Docker."""
     subprocess.run(['docker', 'ps'], check=True)
+
+
+def cmd_verify(args: argparse.Namespace) -> None:
+    """Valida la evidencia generada durante un Lab."""
+    print("🔍 Validando Lab 01 - Línea base de pipeline seguro...")
+    
+    # Check analysis.json
+    analysis_file = INSIGHTS_DIR / 'analysis.json'
+    if not analysis_file.exists():
+        print("❌ ERROR: No se encontró 'analysis.json'. ¿Has ejecutado 'python cogctl.py analyze'?")
+        return
+
+    import json
+    try:
+        data = json.loads(analysis_file.read_text(encoding='utf-8'))
+        if not data:
+            print("⚠️ ADVERTENCIA: 'analysis.json' está vacío. No hay archivos procesados.")
+        else:
+            print(f"✅ 'analysis.json' encontrado con {len(data)} registros.")
+            
+            # Check for redaction
+            redacted_count = sum(1 for r in data if r.get('redacted'))
+            if redacted_count > 0:
+                print(f"✅ Seguridad: {redacted_count} registros están correctamente REDACTADOS.")
+            else:
+                print("⚠️ Seguridad: Ningún registro está redactado. Prueba con $env:COGNITIVE_REDACT='1' para pasar el Lab en modo 'Secure'.")
+
+            # Check for entities (AI Power-ups)
+            if any(r.get('entities') for r in data):
+                print("✅ IA: Se han detectado entidades mediante spaCy.")
+            else:
+                print("⚠️ IA: No se han detectado entidades. ¿Has instalado spaCy y su modelo de español?")
+
+    except Exception as e:
+        print(f"❌ ERROR: Fallo al leer la evidencia: {e}")
+        return
+
+    print("\n🎉 Si ves checks verdes, ¡has completado los requisitos técnicos del Lab 01!")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -118,6 +158,10 @@ def build_parser() -> argparse.ArgumentParser:
     # status
     parser_status = subparsers.add_parser('status', help='Muestra el estado de los contenedores')
     parser_status.set_defaults(func=cmd_status)
+
+    # verify
+    parser_verify = subparsers.add_parser('verify', help='Valida el progreso del Lab')
+    parser_verify.set_defaults(func=cmd_verify)
 
     return parser
 
