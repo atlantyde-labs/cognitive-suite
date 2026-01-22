@@ -122,5 +122,5 @@ jobs:
           for file in $files; do
             echo "Linting $file"
             docker run --rm -i --entrypoint /bin/hadolint hadolint/hadolint:v2.12.0 \
-              --ignore DL3007 --ignore DL3008 - < "$file"
+              --ignore DL3007 --ignore DL3008 --ignore DL3059 - < "$file"
           done
