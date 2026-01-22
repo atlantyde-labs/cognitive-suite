@@ -1,34 +1,239 @@
 name: Project v2 - Fields from labels (cognitive-suite)
 
 on:
+  # PR metadata events (needs secrets -> use pull_request_target)
   pull_request_target:
     types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
+
+  # Issues metadata events (runs on default branch; uses secrets)
+  issues:
+    types: [opened, labeled, unlabeled, reopened]
+
+  workflow_dispatch:
 
 permissions:
   contents: read
   pull-requests: read
-  # si tu org/política lo permite, añade lo mínimo necesario
-  # (Projects v2 suele requerir token PAT/App igualmente)
+  issues: read
+  repository-projects: write
+
+concurrency:
+  group: project-fields-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   project_fields:
     runs-on: ubuntu-latest
     steps:
-      - name: Apply Project fields from labels
-        uses: actions/github-script@v7
+      - name: "Guard: require PROJECT_TOKEN"
+        run: |
+          if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then
+            echo "::error::Missing secrets.PROJECT_TOKEN (PAT/App token required for Org Projects v2)"
+            exit 1
+          fi
+
+      - name: Install jq (for robust parsing)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Resolve context (Issue vs PR)
+        id: ctx
         env:
-          PROJECT_TITLE: "cognitive-suite"
-        with:
-          # Usa tu PAT (fine-grained) o token de App con permisos de Projects V2
-          github-token: ${{ secrets.PROJECTS_TOKEN }}
-          script: |
-            // ...tu script tal cual...
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
 
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const prNumber = context.payload.pull_request.number;
+          if [ "$EVENT_NAME" = "pull_request_target" ]; then
+            echo "kind=pr" >> $GITHUB_OUTPUT
+            echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+            exit 0
+          fi
 
-            const pr = await github.graphql(`
+          if [ "$EVENT_NAME" = "issues" ]; then
+            echo "kind=issue" >> $GITHUB_OUTPUT
+            echo "number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # workflow_dispatch: require manual inputs? fallback to error
+          echo "::error::Unsupported event_name=$EVENT_NAME for auto-resolution."
+          echo "Provide a PR/Issue event or extend workflow_dispatch with inputs."
+          exit 1
+
+      - name: Apply Project fields from labels (native run + gh api graphql)
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          PROJECT_TITLE: cognitive-suite
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          KIND: ${{ steps.ctx.outputs.kind }}
+          NUMBER: ${{ steps.ctx.outputs.number }}
+        run: |
+          set -euo pipefail
+
+          echo "Repo: ${OWNER}/${REPO} — Kind=${KIND} #${NUMBER}"
+
+          # ----------------------------
+          # Helpers
+          # ----------------------------
+          gql() {
+            gh api graphql -f query="$1" "${@:2}"
+          }
+
+          # Build a comma-separated label list into LABELS var
+          has_label () {
+            echo ",$LABELS," | grep -q ",$1,"
+          }
+
+          # Extract project fields metadata for lookups
+          field_id () {
+            echo "$FIELDS_JSON" | jq -r --arg n "$1" '
+              .[] | select(.name==$n and .options != null) | .id
+            ' | head -n 1
+          }
+
+          option_id () {
+            local fname="$1"
+            local oname="$2"
+            echo "$FIELDS_JSON" | jq -r --arg fn "$fname" --arg on "$oname" '
+              .[] | select(.name==$fn and .options!=null) | .options[] | select(.name==$on) | .id
+            ' | head -n 1
+          }
+
+          set_single_select () {
+            local fname="$1"
+            local val="$2"
+            if [ -z "$val" ]; then
+              echo "Skip $fname (no value)"
+              return 0
+            fi
+            local fid oid
+            fid="$(field_id "$fname")"
+            if [ -z "$fid" ] || [ "$fid" = "null" ]; then
+              echo "::error::Missing single-select field '$fname' in project"
+              exit 1
+            fi
+            oid="$(option_id "$fname" "$val")"
+            if [ -z "$oid" ] || [ "$oid" = "null" ]; then
+              echo "::error::Missing option '$val' in field '$fname'"
+              exit 1
+            fi
+
+            gql '
+              mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $optionId:String!){
+                updateProjectV2ItemFieldValue(input:{
+                  projectId:$projectId,
+                  itemId:$itemId,
+                  fieldId:$fieldId,
+                  value:{ singleSelectOptionId:$optionId }
+                }){ projectV2Item { id } }
+              }' -f projectId="$PROJECT_ID" -f itemId="$ITEM_ID" -f fieldId="$fid" -f optionId="$oid" >/dev/null
+
+            echo "Set $fname=$val"
+          }
+
+          set_number_field () {
+            local fname="$1"
+            local num="$2"
+            if [ -z "$num" ]; then
+              echo "Skip $fname (no value)"
+              return 0
+            fi
+
+            # Number field (ProjectV2FieldCommon) may appear as ProjectV2FieldCommon without options
+            local fid
+            fid="$(echo "$FIELDS_JSON" | jq -r --arg n "$fname" '
+              .[] | select(.name==$n and (.options|not)) | .id
+            ' | head -n 1)"
+            if [ -z "$fid" ] || [ "$fid" = "null" ]; then
+              echo "::error::Missing number field '$fname' in project"
+              exit 1
+            fi
+
+            gql '
+              mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $number:Float!){
+                updateProjectV2ItemFieldValue(input:{
+                  projectId:$projectId,
+                  itemId:$itemId,
+                  fieldId:$fieldId,
+                  value:{ number:$number }
+                }){ projectV2Item { id } }
+              }' -f projectId="$PROJECT_ID" -f itemId="$ITEM_ID" -f fieldId="$fid" -F number="$num" >/dev/null
+
+            echo "Set $fname=$num"
+          }
+
+          # Find project item id by content id (pagination)
+          find_item_id_by_content() {
+            local projectId="$1"
+            local contentId="$2"
+            local cursor=""
+            for i in $(seq 1 50); do
+              if [ -z "$cursor" ]; then
+                RES="$(gql '
+                  query($projectId: ID!) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        items(first: 100) {
+                          pageInfo { hasNextPage endCursor }
+                          nodes {
+                            id
+                            content {
+                              ... on Issue { id }
+                              ... on PullRequest { id }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }' -f projectId="$projectId")"
+              else
+                RES="$(gql '
+                  query($projectId: ID!, $cursor: String!) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        items(first: 100, after: $cursor) {
+                          pageInfo { hasNextPage endCursor }
+                          nodes {
+                            id
+                            content {
+                              ... on Issue { id }
+                              ... on PullRequest { id }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }' -f projectId="$projectId" -f cursor="$cursor")"
+              fi
+
+              ITEM_ID="$(echo "$RES" | jq -r --arg cid "$contentId" '
+                .data.node.items.nodes[] | select(.content.id==$cid) | .id
+              ' | head -n 1)"
+
+              if [ -n "$ITEM_ID" ] && [ "$ITEM_ID" != "null" ]; then
+                echo "$ITEM_ID"
+                return 0
+              fi
+
+              HAS_NEXT="$(echo "$RES" | jq -r '.data.node.items.pageInfo.hasNextPage')"
+              if [ "$HAS_NEXT" != "true" ]; then
+                break
+              fi
+              cursor="$(echo "$RES" | jq -r '.data.node.items.pageInfo.endCursor')"
+            done
+
+            echo ""
+          }
+
+          # ----------------------------
+          # 1) Fetch content (Issue/PR) id + labels
+          # ----------------------------
+          if [ "$KIND" = "pr" ]; then
+            CONTENT_JSON="$(gql '
               query($owner:String!, $repo:String!, $number:Int!){
                 repository(owner:$owner, name:$repo){
                   pullRequest(number:$number){
@@ -36,153 +241,169 @@ jobs:
                     labels(first:50){ nodes { name } }
                   }
                 }
-              }`, { owner, repo, number: prNumber });
+              }' -f owner="$OWNER" -f repo="$REPO" -F number="$NUMBER")"
 
-            const prId = pr.repository.pullRequest.id;
-            const labelNames = pr.repository.pullRequest.labels.nodes.map(n => n.name);
+            CONTENT_ID="$(echo "$CONTENT_JSON" | jq -r '.data.repository.pullRequest.id')"
+            LABELS="$(echo "$CONTENT_JSON" | jq -r '.data.repository.pullRequest.labels.nodes[].name' | tr '\n' ',' | sed 's/,$//')"
+          elif [ "$KIND" = "issue" ]; then
+            CONTENT_JSON="$(gql '
+              query($owner:String!, $repo:String!, $number:Int!){
+                repository(owner:$owner, name:$repo){
+                  issue(number:$number){
+                    id
+                    labels(first:50){ nodes { name } }
+                  }
+                }
+              }' -f owner="$OWNER" -f repo="$REPO" -F number="$NUMBER")"
 
-            async function getProject() {
-              const title = process.env.PROJECT_TITLE;
+            CONTENT_ID="$(echo "$CONTENT_JSON" | jq -r '.data.repository.issue.id')"
+            LABELS="$(echo "$CONTENT_JSON" | jq -r '.data.repository.issue.labels.nodes[].name' | tr '\n' ',' | sed 's/,$//')"
+          else
+            echo "::error::Unknown KIND=$KIND"
+            exit 1
+          fi
 
-              try {
-                const orgRes = await github.graphql(`
-                  query($login:String!){
-                    organization(login:$login){
-                      projectsV2(first:50){
-                        nodes {
-                          id title
-                          fields(first:50){
-                            nodes {
-                              ... on ProjectV2FieldCommon { id name }
-                              ... on ProjectV2SingleSelectField { id name options { id name } }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }`, { login: owner });
+          if [ -z "$CONTENT_ID" ] || [ "$CONTENT_ID" = "null" ]; then
+            echo "::error::Could not resolve content id for $KIND #$NUMBER"
+            exit 1
+          fi
 
-                const proj = orgRes.organization.projectsV2.nodes.find(p => p.title === title);
-                if (proj) return proj;
-              } catch (e) {}
+          echo "CONTENT_ID: $CONTENT_ID"
+          echo "Labels: $LABELS"
 
-              const userRes = await github.graphql(`
-                query($login:String!){
-                  user(login:$login){
-                    projectsV2(first:50){
-                      nodes {
-                        id title
-                        fields(first:50){
-                          nodes {
-                            ... on ProjectV2FieldCommon { id name }
-                            ... on ProjectV2SingleSelectField { id name options { id name } }
-                          }
-                        }
+          # ----------------------------
+          # 2) Mapping labels -> fields (extend here)
+          # ----------------------------
+          Area=""
+          Skill=""
+          Compute=""
+          Level=""
+          Role=""
+
+          if has_label "domain-docs"; then Area="Docs"; fi
+          if has_label "domain-ui"; then Area="UI"; fi
+          if has_label "domain-core"; then Area="Core"; fi
+          if has_label "domain-gitops"; then Area="GitOps"; fi
+          if has_label "domain-ops"; then Area="Ops"; fi
+
+          if has_label "skill-python"; then Skill="Python"; fi
+          if has_label "skill-frontend"; then Skill="Frontend"; fi
+          if has_label "skill-devsecops"; then Skill="DevSecOps"; fi
+          if has_label "skill-docker"; then Skill="Docker"; fi
+          if has_label "skill-docs"; then Skill="Docs"; fi
+          if has_label "skill-data-ai"; then Skill="Data/AI"; [ -n "$Area" ] || Area="AI/Data"; fi
+
+          if has_label "compute-low"; then Compute="Low"; fi
+          if has_label "compute-medium"; then Compute="Medium"; fi
+          if has_label "compute-heavy"; then Compute="Heavy"; fi
+
+          if has_label "level-beta"; then Level="Beta"; fi
+          if has_label "level-stable"; then Level="Stable"; fi
+          if has_label "level-critical"; then Level="Critical"; fi
+
+          if has_label "role-ai-ops"; then Role="AI Ops"; fi
+          if has_label "role-gitops-engineer"; then Role="GitOps Engineer"; fi
+          if has_label "role-docs-engineer"; then Role="Docs Engineer"; fi
+          if has_label "role-ux-local"; then Role="UX Local"; fi
+
+          # Gamification mapping (Level/XP) based on labels you already use:
+          # (you can change logic easily)
+          GAME_LEVEL=""
+          if has_label "good first issue"; then GAME_LEVEL="1"; fi
+          if has_label "learning-task"; then GAME_LEVEL="2"; fi
+          if has_label "ci-gitops"; then GAME_LEVEL="3"; fi
+          if has_label "automation"; then GAME_LEVEL="3"; fi
+          if has_label "ci-boott"; then GAME_LEVEL="2"; fi
+
+          XP="0"
+          if [ "$GAME_LEVEL" = "1" ]; then XP="10"; fi
+          if [ "$GAME_LEVEL" = "2" ]; then XP="25"; fi
+          if [ "$GAME_LEVEL" = "3" ]; then XP="50"; fi
+          if [ "$GAME_LEVEL" = "4" ]; then XP="100"; fi
+
+          echo "Computed: Area=$Area Skill=$Skill Compute=$Compute Level=$Level Role=$Role | GameLevel=$GAME_LEVEL XP=$XP"
+
+          # ----------------------------
+          # 3) Find Project v2 by title under org
+          # ----------------------------
+          PROJ_JSON="$(gql '
+            query($login:String!){
+              organization(login:$login){
+                projectsV2(first:50){
+                  nodes{
+                    id
+                    title
+                    fields(first:50){
+                      nodes{
+                        __typename
+                        ... on ProjectV2FieldCommon { id name }
+                        ... on ProjectV2SingleSelectField { id name options { id name } }
                       }
                     }
                   }
-                }`, { login: owner });
-
-              const proj = userRes.user.projectsV2.nodes.find(p => p.title === title);
-              if (!proj) throw new Error(`Project '${title}' not found under ${owner}`);
-              return proj;
-            }
-
-            const proj = await getProject();
-            const projectId = proj.id;
-            const fields = proj.fields.nodes;
-
-            function getSingleSelectField(fieldName) {
-              const f = fields.find(x => x.name === fieldName && x.options);
-              if (!f) throw new Error(`Missing single-select field '${fieldName}' in project`);
-              return f;
-            }
-
-            function optionId(field, optionName) {
-              const opt = field.options.find(o => o.name === optionName);
-              if (!opt) throw new Error(`Missing option '${optionName}' in field '${field.name}'`);
-              return opt.id;
-            }
-
-            async function addToProjectOrGetItemId() {
-              try {
-                const add = await github.graphql(`
-                  mutation($projectId:ID!, $contentId:ID!){
-                    addProjectV2ItemById(input:{projectId:$projectId, contentId:$contentId}){
-                      item { id }
-                    }
-                  }`, { projectId, contentId: prId });
-                return add.addProjectV2ItemById.item.id;
-              } catch (e) {
-                const items = await github.graphql(`
-                  query($projectId:ID!){
-                    node(id:$projectId){
-                      ... on ProjectV2 {
-                        items(first:100){
-                          nodes { id content { ... on PullRequest { number } } }
-                        }
-                      }
-                    }
-                  }`, { projectId });
-
-                const found = items.node.items.nodes.find(n => n.content && n.content.number === prNumber);
-                if (!found) throw e;
-                return found.id;
+                }
               }
-            }
+            }' -f login="$OWNER")"
 
-            const itemId = await addToProjectOrGetItemId();
+          PROJECT_ID="$(echo "$PROJ_JSON" | jq -r --arg t "$PROJECT_TITLE" '
+            .data.organization.projectsV2.nodes[] | select(.title==$t) | .id
+          ' | head -n 1)"
 
-            let Area = null, Skill = null, Compute = null, Level = null, Role = null;
+          if [ -z "$PROJECT_ID" ] || [ "$PROJECT_ID" = "null" ]; then
+            echo "::error::Project titled '$PROJECT_TITLE' not found under org '$OWNER'"
+            exit 1
+          fi
 
-            if (labelNames.includes("domain-docs")) Area = "Docs";
-            if (labelNames.includes("domain-ui")) Area = "UI";
-            if (labelNames.includes("domain-core")) Area = "Core";
-            if (labelNames.includes("domain-gitops")) Area = "GitOps";
-            if (labelNames.includes("domain-ops")) Area = "Ops";
+          FIELDS_JSON="$(echo "$PROJ_JSON" | jq -c --arg t "$PROJECT_TITLE" '
+            .data.organization.projectsV2.nodes[] | select(.title==$t) | .fields.nodes
+          ')"
 
-            if (labelNames.includes("skill-python")) Skill = "Python";
-            if (labelNames.includes("skill-frontend")) Skill = "Frontend";
-            if (labelNames.includes("skill-devsecops")) Skill = "DevSecOps";
-            if (labelNames.includes("skill-docker")) Skill = "Docker";
-            if (labelNames.includes("skill-docs")) Skill = "Docs";
-            if (labelNames.includes("skill-data-ai")) { Skill = "Data/AI"; Area = Area ?? "AI/Data"; }
+          echo "PROJECT_ID: $PROJECT_ID"
 
-            if (labelNames.includes("compute-low")) Compute = "Low";
-            if (labelNames.includes("compute-medium")) Compute = "Medium";
-            if (labelNames.includes("compute-heavy")) Compute = "Heavy";
+          # ----------------------------
+          # 4) Add content to project or find existing item (pagination-safe)
+          # ----------------------------
+          ADD_RES="$(gql '
+            mutation($projectId:ID!, $contentId:ID!){
+              addProjectV2ItemById(input:{projectId:$projectId, contentId:$contentId}){
+                item { id }
+              }
+            }' -f projectId="$PROJECT_ID" -f contentId="$CONTENT_ID" 2>/dev/null || true)"
 
-            if (labelNames.includes("level-beta")) Level = "Beta";
-            if (labelNames.includes("level-stable")) Level = "Stable";
-            if (labelNames.includes("level-critical")) Level = "Critical";
+          ITEM_ID="$(echo "$ADD_RES" | jq -r '.data.addProjectV2ItemById.item.id // empty' || true)"
 
-            if (labelNames.includes("role-ai-ops")) Role = "AI Ops";
-            if (labelNames.includes("role-gitops-engineer")) Role = "GitOps Engineer";
-            if (labelNames.includes("role-docs-engineer")) Role = "Docs Engineer";
-            if (labelNames.includes("role-ux-local")) Role = "UX Local";
+          if [ -z "$ITEM_ID" ]; then
+            echo "Item not added (maybe already exists). Searching item id by content id (paginated)..."
+            ITEM_ID="$(find_item_id_by_content "$PROJECT_ID" "$CONTENT_ID")"
+          fi
 
-            async function setSingleSelect(fieldName, valueName) {
-              if (!valueName) return;
-              const field = getSingleSelectField(fieldName);
-              const opt = optionId(field, valueName);
-              await github.graphql(`
-                mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $optionId:String!){
-                  updateProjectV2ItemFieldValue(input:{
-                    projectId:$projectId,
-                    itemId:$itemId,
-                    fieldId:$fieldId,
-                    value:{ singleSelectOptionId:$optionId }
-                  }){ projectV2Item { id } }
-                }`, { projectId, itemId, fieldId: field.id, optionId: opt });
-            }
+          if [ -z "$ITEM_ID" ] || [ "$ITEM_ID" = "null" ]; then
+            echo "::error::Could not resolve Project itemId for $KIND #$NUMBER"
+            exit 1
+          fi
 
-            await setSingleSelect("Area", Area);
-            await setSingleSelect("Skill", Skill);
-            await setSingleSelect("Compute", Compute);
-            await setSingleSelect("Level", Level);
-            await setSingleSelect("Role", Role);
+          echo "ITEM_ID: $ITEM_ID"
 
-            // Status default
-            await setSingleSelect("Status", "Backlog");
+          # ----------------------------
+          # 5) Apply project fields
+          # ----------------------------
+          set_single_select "Area" "$Area"
+          set_single_select "Skill" "$Skill"
+          set_single_select "Compute" "$Compute"
+          set_single_select "Level" "$Level"
+          set_single_select "Role" "$Role"
 
-            core.info(`Project updated for PR #${prNumber}: Area=${Area}, Skill=${Skill}, Compute=${Compute}, Level=${Level}, Role=${Role}`);
+          # Default status
+          set_single_select "Status" "Backlog"
+
+          # Gamification fields (project has these fields already)
+          # - Level: single select (option names "1","2","3","4")
+          # - XP: number
+          if [ -n "$GAME_LEVEL" ] && [ "$XP" != "0" ]; then
+            set_single_select "Level" "$GAME_LEVEL"
+            set_number_field "XP" "$XP"
+          else
+            echo "Skip gamification Level/XP (no mapping for labels)"
+          fi
+
+          echo "✅ Project updated for $KIND #${NUMBER}: Area=${Area} Skill=${Skill} Compute=${Compute} Level=${Level} Role=${Role} | GameLevel=${GAME_LEVEL} XP=${XP}"

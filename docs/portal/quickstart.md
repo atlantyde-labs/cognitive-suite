@@ -1,4 +1,4 @@
-# 🚀 Quickstart (5 minutos)
+# 🚀 Inicio rapido (5 minutos)
 
 1) Inicializa:
 ```bash

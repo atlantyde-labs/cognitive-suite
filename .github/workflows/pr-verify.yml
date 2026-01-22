@@ -1,0 +1,62 @@
+name: PR Verify (Full)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: pr-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sanity checks
+        run: |
+          set -euo pipefail
+          test -f frontend/onboarding_app.py
+          test -d labs
+          test -f labs/lab-01-secure-pipeline.md
+          test -f docs/portal/bootstrap-streamlit.md
+          test -f docs/portal/learning-gitops-streamlit.md
+
+  python-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Compile Python sources
+        run: |
+          python -m compileall -q cogctl.py ingestor pipeline frontend scripts
+
+  docs-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+      - name: Install docs deps
+        run: |
+          pip install -r requirements-docs.txt
+      - name: Build docs (strict)
+        run: |
+          mkdocs build --strict
+
+  compose-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compose config sanity
+        run: |
+          docker compose -f docker-compose.yml config -q || true
+          docker compose -f docker-compose.prod.yml config -q || true

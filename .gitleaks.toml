@@ -1,0 +1,12 @@
+title = "Cognitive Suite Gitleaks Config"
+
+[allowlist]
+  description = "Allow documented placeholders and sample tokens"
+  regexes = [
+    "TU_API_KEY",
+    "PROJECT_TOKEN",
+    "PROJECT_URL",
+    "<TU_USUARIO>",
+    "<TU_REPOSITORIO>",
+    "git@github.com:TU_USUARIO/"
+  ]
