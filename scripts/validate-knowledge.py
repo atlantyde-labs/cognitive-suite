@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 import yaml
-from jsonschema import RefResolver
+from referencing import Registry, Resource
 
 try:
     from jsonschema import Draft202012Validator as SchemaValidator
@@ -38,30 +38,29 @@ def rewrite_refs(value, base_uri: str):
     return value
 
 
-def build_schema_store() -> dict:
-    store = {}
+def build_schema_registry() -> Registry:
+    registry = Registry()
     for schema_path in SCHEMAS_DIR.glob("*.schema.json"):
         base_uri = schema_path.parent.as_uri()
-        schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        rewritten = rewrite_refs(schema, base_uri)
-        store[schema_path.as_uri()] = rewritten
-        store[schema_path.name] = rewritten
-        schema_id = schema.get("$id")
-        if schema_id:
-            store[schema_id] = rewritten
-    return store
+        raw_schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        rewritten = rewrite_refs(raw_schema, base_uri)
+        resource = Resource.from_contents(rewritten)
+        registry = registry.with_resource(schema_path.as_uri(), resource)
+        if isinstance(raw_schema, dict):
+            schema_id = raw_schema.get("$id")
+            if schema_id:
+                registry = registry.with_resource(schema_id, resource)
+    return registry
 
 
-SCHEMA_STORE = build_schema_store()
+SCHEMA_REGISTRY = build_schema_registry()
 
 
 def load_schema(schema_path: Path) -> SchemaValidator:
-    schema = SCHEMA_STORE.get(schema_path.as_uri())
-    if schema is None:
-        schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        schema = rewrite_refs(schema, schema_path.parent.as_uri())
-    resolver = RefResolver(base_uri=schema_path.as_uri(), referrer=schema, store=SCHEMA_STORE)
-    return SchemaValidator(schema, resolver=resolver)
+    base_uri = schema_path.as_uri()
+    raw_schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    rewritten = rewrite_refs(raw_schema, schema_path.parent.as_uri())
+    return SchemaValidator(rewritten, registry=SCHEMA_REGISTRY)
 
 
 def validate_jsonl(path: Path, validator: SchemaValidator) -> None:
@@ -103,11 +102,8 @@ def main() -> int:
     validate_yaml_key(DATASETS_DIR / "taxonomy.labels.yml", "labels")
 
     insight_schema = json.loads(INSIGHT_SCHEMA.read_text(encoding="utf-8"))
-    insight_schema.pop("$id", None)
-    insight_validator = SchemaValidator(
-        insight_schema,
-        resolver=RefResolver(base_uri=INSIGHT_SCHEMA.as_uri(), referrer=insight_schema)
-    )
+    insight_schema = rewrite_refs(insight_schema, INSIGHT_SCHEMA.parent.as_uri())
+    insight_validator = SchemaValidator(insight_schema, registry=SCHEMA_REGISTRY)
     insight_data = json.loads(INSIGHT_SAMPLE.read_text(encoding="utf-8"))
     errors = sorted(insight_validator.iter_errors(insight_data), key=lambda e: e.path)
     if errors:
