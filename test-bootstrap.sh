@@ -14,7 +14,8 @@ docker compose up -d --build
 
 RESULT_FILE="outputs/insights/analysis.json"
 echo "⏳ Esperando análisis..."
-timeout_secs=60
+# GitHub-hosted runners limit jobs to 6h; keep default aligned and allow override.
+timeout_secs="${BOOTSTRAP_TIMEOUT_SECS:-21600}"
 elapsed=0
 while [ ! -f "$RESULT_FILE" ] && [ "$elapsed" -lt "$timeout_secs" ]; do
   sleep 5

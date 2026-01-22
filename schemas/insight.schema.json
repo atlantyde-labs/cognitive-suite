@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:cognitive-suite:insight",
   "title": "Cognitive Insight Output",
   "type": "array",
@@ -64,7 +64,7 @@
         }
       },
       "entities": {
-        "$ref": "#/definitions/entity_list"
+        "$ref": "#/$defs/entity_list"
       },
       "summary": {
         "type": "string"
@@ -73,10 +73,10 @@
         "type": "string"
       },
       "risk_flags": {
-        "$ref": "#/definitions/entity_list"
+        "$ref": "#/$defs/entity_list"
       },
       "legal_reference": {
-        "$ref": "#/definitions/entity_list"
+        "$ref": "#/$defs/entity_list"
       },
       "author_signature": {
         "type": "string"
@@ -96,13 +96,13 @@
         "additionalProperties": true,
         "properties": {
           "entities": {
-            "$ref": "#/definitions/entity_list"
+            "$ref": "#/$defs/entity_list"
           },
           "legal_reference": {
-            "$ref": "#/definitions/entity_list"
+            "$ref": "#/$defs/entity_list"
           },
           "risk_flags": {
-            "$ref": "#/definitions/entity_list"
+            "$ref": "#/$defs/entity_list"
           }
         }
       },
@@ -132,7 +132,7 @@
             "type": "boolean"
           },
           "flags": {
-            "$ref": "#/definitions/entity_list"
+            "$ref": "#/$defs/entity_list"
           },
           "level": {
             "type": "string",
@@ -205,12 +205,12 @@
       }
     }
   },
-  "definitions": {
+  "$defs": {
     "entity_pair": {
       "type": "array",
       "minItems": 2,
       "maxItems": 2,
-      "items": [
+      "prefixItems": [
         {
           "type": "string"
         },
@@ -218,12 +218,12 @@
           "type": "string"
         }
       ],
-      "additionalItems": false
+      "items": false
     },
     "entity_list": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/entity_pair"
+        "$ref": "#/$defs/entity_pair"
       }
     }
   }

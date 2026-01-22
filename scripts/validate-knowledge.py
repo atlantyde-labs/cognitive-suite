@@ -6,11 +6,7 @@ from pathlib import Path
 
 import yaml
 from referencing import Registry, Resource
-
-try:
-    from jsonschema import Draft202012Validator as SchemaValidator
-except ImportError:
-    from jsonschema import Draft7Validator as SchemaValidator
+from jsonschema import validators
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -56,14 +52,18 @@ def build_schema_registry() -> Registry:
 SCHEMA_REGISTRY = build_schema_registry()
 
 
-def load_schema(schema_path: Path) -> SchemaValidator:
-    base_uri = schema_path.as_uri()
+def make_validator(schema: object):
+    validator_cls = validators.validator_for(schema)
+    return validator_cls(schema, registry=SCHEMA_REGISTRY)
+
+
+def load_schema(schema_path: Path):
     raw_schema = json.loads(schema_path.read_text(encoding="utf-8"))
     rewritten = rewrite_refs(raw_schema, schema_path.parent.as_uri())
-    return SchemaValidator(rewritten, registry=SCHEMA_REGISTRY)
+    return make_validator(rewritten)
 
 
-def validate_jsonl(path: Path, validator: SchemaValidator) -> None:
+def validate_jsonl(path: Path, validator) -> None:
     for idx, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         stripped = line.strip()
         if not stripped:
@@ -103,7 +103,7 @@ def main() -> int:
 
     insight_schema = json.loads(INSIGHT_SCHEMA.read_text(encoding="utf-8"))
     insight_schema = rewrite_refs(insight_schema, INSIGHT_SCHEMA.parent.as_uri())
-    insight_validator = SchemaValidator(insight_schema, registry=SCHEMA_REGISTRY)
+    insight_validator = make_validator(insight_schema)
     insight_data = json.loads(INSIGHT_SAMPLE.read_text(encoding="utf-8"))
     errors = sorted(insight_validator.iter_errors(insight_data), key=lambda e: e.path)
     if errors:
