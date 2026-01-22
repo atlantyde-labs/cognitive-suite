@@ -16,7 +16,7 @@ COPY ingestor/requirements/base.txt /app/requirements/base.txt
 COPY ingestor/requirements/torch-cpu.txt /app/requirements/torch-cpu.txt
 
 # pip upgrade (pineable si quieres ultra compliance)
-RUN pip install --no-cache-dir --upgrade pip=25.3
+RUN pip install --no-cache-dir --upgrade pip==25.3
 
 # 1) Torch CPU explícito (EVITA nvidia-*cu12)
 RUN pip install --no-cache-dir \
