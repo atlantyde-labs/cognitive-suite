@@ -13,7 +13,7 @@ RUN useradd -m -u 10001 -s /usr/sbin/nologin appuser
 
 COPY frontend/requirements.txt /app/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip==25.3 && \
     pip install --no-cache-dir -r /app/requirements.txt
 
 COPY frontend/ /app/
