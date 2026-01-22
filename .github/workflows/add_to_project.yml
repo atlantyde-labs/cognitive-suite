@@ -41,12 +41,12 @@ jobs:
         with:
           project-url: ${{ steps.determine_project_url.outputs.project_url }}
           github-token: ${{ secrets.PROJECT_TOKEN }}
-          labeled: |
-            good first issue
-            learning-task
-            ci-gitops
-            automation
-            ci-boott
+          #labeled: |
+          #  good first issue
+          #  learning-task
+          #  ci-gitops
+          #  automation
+          #  ci-boott
 
       - name: Set Project fields (Level/XP) in Org Project v2 (GraphQL)
         if: ${{ steps.check_token.outputs.has_token == 'true' && steps.determine_project_url.outputs.project_url != '' }}
