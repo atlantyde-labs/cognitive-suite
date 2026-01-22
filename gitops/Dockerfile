@@ -1,4 +1,4 @@
-FROM alpine/git
+FROM alpine/git:v2.52.0
 
 WORKDIR /app
 COPY gitops/sync.sh /app/sync.sh
