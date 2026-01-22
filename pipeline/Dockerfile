@@ -15,7 +15,7 @@ RUN useradd -m -u 10001 -s /usr/sbin/nologin appuser
 COPY pipeline/requirements.txt /app/requirements.txt
 
 # Dependencias con versiones fijadas (CPU-only)
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip==25.3 && \
     pip install --no-cache-dir -r /app/requirements.txt
 
 COPY pipeline/analyze.py /app/analyze.py

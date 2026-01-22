@@ -10,6 +10,19 @@ on:
     types: [opened, labeled, unlabeled, reopened]
 
   workflow_dispatch:
+    inputs:
+      kind:
+        description: "pr | issue"
+        required: true
+        default: "pr"
+        type: choice
+        options:
+          - pr
+          - issue
+      number:
+        description: "PR/Issue number"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -18,7 +31,7 @@ permissions:
   repository-projects: write
 
 concurrency:
-  group: project-fields-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
+  group: project-fields-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -29,6 +42,10 @@ jobs:
         run: |
           if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then
             echo "::error::Missing secrets.PROJECT_TOKEN (PAT/App token required for Org Projects v2)"
+            exit 1
+          fi
+          if [ -z "${{ secrets.PROJECT_URL }}" ]; then
+            echo "::error::Missing secrets.PROJECT_URL (e.g. https://github.com/orgs/<org>/projects/<number>)"
             exit 1
           fi
 
@@ -43,30 +60,51 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          DISPATCH_KIND: ${{ github.event.inputs.kind }}
+          DISPATCH_NUMBER: ${{ github.event.inputs.number }}
         run: |
           set -euo pipefail
 
           if [ "$EVENT_NAME" = "pull_request_target" ]; then
-            echo "kind=pr" >> $GITHUB_OUTPUT
-            echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+            echo "kind=pr" >> "$GITHUB_OUTPUT"
+            echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [ "$EVENT_NAME" = "issues" ]; then
-            echo "kind=issue" >> $GITHUB_OUTPUT
-            echo "number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+            echo "kind=issue" >> "$GITHUB_OUTPUT"
+            echo "number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # workflow_dispatch: require manual inputs? fallback to error
-          echo "::error::Unsupported event_name=$EVENT_NAME for auto-resolution."
-          echo "Provide a PR/Issue event or extend workflow_dispatch with inputs."
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ -z "${DISPATCH_KIND:-}" ] || [ -z "${DISPATCH_NUMBER:-}" ]; then
+              echo "::error::workflow_dispatch requires inputs: kind and number"
+              exit 1
+            fi
+
+            if [ "$DISPATCH_KIND" != "pr" ] && [ "$DISPATCH_KIND" != "issue" ]; then
+              echo "::error::Invalid kind='$DISPATCH_KIND' (expected pr|issue)"
+              exit 1
+            fi
+
+            if ! echo "$DISPATCH_NUMBER" | grep -Eq '^[0-9]+$'; then
+              echo "::error::Invalid number='$DISPATCH_NUMBER' (expected digits)"
+              exit 1
+            fi
+
+            echo "kind=$DISPATCH_KIND" >> "$GITHUB_OUTPUT"
+            echo "number=$DISPATCH_NUMBER" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "::error::Unsupported event_name=$EVENT_NAME"
           exit 1
 
       - name: Apply Project fields from labels (native run + gh api graphql)
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-          PROJECT_TITLE: cognitive-suite
+          PROJECT_URL: "https://github.com/orgs/atlantyde-labs/projects/2"  #{{ secrets.PROJECT_URL }}   # e.g. https://github.com/orgs/atlantyde-labs/projects/2
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
           KIND: ${{ steps.ctx.outputs.kind }}
@@ -75,20 +113,14 @@ jobs:
           set -euo pipefail
 
           echo "Repo: ${OWNER}/${REPO} — Kind=${KIND} #${NUMBER}"
+          echo "Project URL: ${PROJECT_URL}"
 
           # ----------------------------
           # Helpers
           # ----------------------------
-          gql() {
-            gh api graphql -f query="$1" "${@:2}"
-          }
+          gql() { gh api graphql -f query="$1" "${@:2}"; }
+          has_label () { echo ",$LABELS," | grep -q ",$1,"; }
 
-          # Build a comma-separated label list into LABELS var
-          has_label () {
-            echo ",$LABELS," | grep -q ",$1,"
-          }
-
-          # Extract project fields metadata for lookups
           field_id () {
             echo "$FIELDS_JSON" | jq -r --arg n "$1" '
               .[] | select(.name==$n and .options != null) | .id
@@ -143,7 +175,6 @@ jobs:
               return 0
             fi
 
-            # Number field (ProjectV2FieldCommon) may appear as ProjectV2FieldCommon without options
             local fid
             fid="$(echo "$FIELDS_JSON" | jq -r --arg n "$fname" '
               .[] | select(.name==$n and (.options|not)) | .id
@@ -181,10 +212,7 @@ jobs:
                           pageInfo { hasNextPage endCursor }
                           nodes {
                             id
-                            content {
-                              ... on Issue { id }
-                              ... on PullRequest { id }
-                            }
+                            content { ... on Issue { id } ... on PullRequest { id } }
                           }
                         }
                       }
@@ -199,10 +227,7 @@ jobs:
                           pageInfo { hasNextPage endCursor }
                           nodes {
                             id
-                            content {
-                              ... on Issue { id }
-                              ... on PullRequest { id }
-                            }
+                            content { ... on Issue { id } ... on PullRequest { id } }
                           }
                         }
                       }
@@ -228,6 +253,50 @@ jobs:
 
             echo ""
           }
+
+          # ----------------------------
+          # 0) Resolve PROJECT_ID from PROJECT_URL
+          # Supports org URL: https://github.com/orgs/<org>/projects/<number>
+          # ----------------------------
+          ORG="$(echo "$PROJECT_URL" | sed -n 's|.*github.com/orgs/\([^/]*\)/projects/.*|\1|p')"
+          PROJ_NUM="$(echo "$PROJECT_URL" | sed -n 's|.*/projects/\([0-9][0-9]*\).*|\1|p')"
+
+          if [ -z "$ORG" ] || [ -z "$PROJ_NUM" ]; then
+            echo "::error::PROJECT_URL format not recognized (expected https://github.com/orgs/<org>/projects/<number>)"
+            echo "Got: $PROJECT_URL"
+            exit 1
+          fi
+
+          PROJECT_ID="$(gql '
+            query($org:String!, $number:Int!){
+              organization(login:$org){
+                projectV2(number:$number){ id title }
+              }
+            }' -f org="$ORG" -F number="$PROJ_NUM" | jq -r '.data.organization.projectV2.id')"
+
+          if [ -z "$PROJECT_ID" ] || [ "$PROJECT_ID" = "null" ]; then
+            echo "::error::Could not resolve PROJECT_ID from URL=$PROJECT_URL (org=$ORG number=$PROJ_NUM). Check token permissions."
+            exit 1
+          fi
+
+          echo "Resolved ORG=$ORG ProjectNumber=$PROJ_NUM"
+          echo "PROJECT_ID: $PROJECT_ID"
+
+          # Load project fields once
+          FIELDS_JSON="$(gql '
+            query($projectId: ID!) {
+              node(id: $projectId) {
+                ... on ProjectV2 {
+                  fields(first: 50) {
+                    nodes {
+                      __typename
+                      ... on ProjectV2FieldCommon { id name }
+                      ... on ProjectV2SingleSelectField { id name options { id name } }
+                    }
+                  }
+                }
+              }
+            }' -f projectId="$PROJECT_ID" | jq -c '.data.node.fields.nodes')"
 
           # ----------------------------
           # 1) Fetch content (Issue/PR) id + labels
@@ -272,7 +341,7 @@ jobs:
           echo "Labels: $LABELS"
 
           # ----------------------------
-          # 2) Mapping labels -> fields (extend here)
+          # 2) Mapping labels -> fields
           # ----------------------------
           Area=""
           Skill=""
@@ -306,8 +375,6 @@ jobs:
           if has_label "role-docs-engineer"; then Role="Docs Engineer"; fi
           if has_label "role-ux-local"; then Role="UX Local"; fi
 
-          # Gamification mapping (Level/XP) based on labels you already use:
-          # (you can change logic easily)
           GAME_LEVEL=""
           if has_label "good first issue"; then GAME_LEVEL="1"; fi
           if has_label "learning-task"; then GAME_LEVEL="2"; fi
@@ -324,44 +391,7 @@ jobs:
           echo "Computed: Area=$Area Skill=$Skill Compute=$Compute Level=$Level Role=$Role | GameLevel=$GAME_LEVEL XP=$XP"
 
           # ----------------------------
-          # 3) Find Project v2 by title under org
-          # ----------------------------
-          PROJ_JSON="$(gql '
-            query($login:String!){
-              organization(login:$login){
-                projectsV2(first:50){
-                  nodes{
-                    id
-                    title
-                    fields(first:50){
-                      nodes{
-                        __typename
-                        ... on ProjectV2FieldCommon { id name }
-                        ... on ProjectV2SingleSelectField { id name options { id name } }
-                      }
-                    }
-                  }
-                }
-              }
-            }' -f login="$OWNER")"
-
-          PROJECT_ID="$(echo "$PROJ_JSON" | jq -r --arg t "$PROJECT_TITLE" '
-            .data.organization.projectsV2.nodes[] | select(.title==$t) | .id
-          ' | head -n 1)"
-
-          if [ -z "$PROJECT_ID" ] || [ "$PROJECT_ID" = "null" ]; then
-            echo "::error::Project titled '$PROJECT_TITLE' not found under org '$OWNER'"
-            exit 1
-          fi
-
-          FIELDS_JSON="$(echo "$PROJ_JSON" | jq -c --arg t "$PROJECT_TITLE" '
-            .data.organization.projectsV2.nodes[] | select(.title==$t) | .fields.nodes
-          ')"
-
-          echo "PROJECT_ID: $PROJECT_ID"
-
-          # ----------------------------
-          # 4) Add content to project or find existing item (pagination-safe)
+          # 3) Add content to project or find existing item
           # ----------------------------
           ADD_RES="$(gql '
             mutation($projectId:ID!, $contentId:ID!){
@@ -385,7 +415,7 @@ jobs:
           echo "ITEM_ID: $ITEM_ID"
 
           # ----------------------------
-          # 5) Apply project fields
+          # 4) Apply project fields
           # ----------------------------
           set_single_select "Area" "$Area"
           set_single_select "Skill" "$Skill"
@@ -396,10 +426,10 @@ jobs:
           # Default status
           set_single_select "Status" "Backlog"
 
-          # Gamification fields (project has these fields already)
-          # - Level: single select (option names "1","2","3","4")
-          # - XP: number
+          # Gamification
           if [ -n "$GAME_LEVEL" ] && [ "$XP" != "0" ]; then
+            # NOTE: This overwrites "Level" (your severity level) with game level.
+            # If you have two different fields, rename one of them (e.g. "Severity" vs "Game Level").
             set_single_select "Level" "$GAME_LEVEL"
             set_number_field "XP" "$XP"
           else
