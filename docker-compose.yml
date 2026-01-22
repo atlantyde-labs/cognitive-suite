@@ -8,7 +8,7 @@ services:
       - ./data/input:/data/input
       - ./outputs:/data/outputs
     # Procesar todos los archivos de /data/input y volcar resultados en /data/outputs/raw
-    command: ["python", "ingest.py", "/data/input", "--output", "/data/outputs/raw"]
+    command: ["/data/input", "--output", "/data/outputs/raw"]
 
   pipeline:
     build:
@@ -19,16 +19,15 @@ services:
       - ./outputs:/data/outputs
       - ./schemas:/schemas
       - ./outputs:/outputs
+    depends_on:
+      ingestor:
+        condition: service_completed_successfully
     # Analizar los textos ingeridos y generar insights en JSON
     command: [
-      "python",
-      "analyze.py",
       "--input",
       "/data/outputs/raw",
       "--output",
-      "/data/outputs/insights/analysis.json",
-      "--schema",
-      "/schemas/semantic-schema.yaml"
+      "/data/outputs/insights/analysis.json"
     ]
 
   frontend:
@@ -43,13 +42,14 @@ services:
     # El comando por defecto se define en el Dockerfile para ejecutar
     # Streamlit. Puede sobreescribirse para usar la interfaz de
     # consola (app.py) o la TUI rich (tui.py).
-    command: []
 
   gitops:
     build:
       context: .
       dockerfile: gitops/Dockerfile
     image: cognitive/gitops:latest
+    profiles:
+      - gitops
     environment:
       - GIT_REPO_URL=git@github.com:TU_USUARIO/mi-cerebro-digital.git
       - GIT_BRANCH=main
