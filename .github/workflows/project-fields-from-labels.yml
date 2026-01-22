@@ -66,7 +66,7 @@ jobs:
       - name: Apply Project fields from labels (native run + gh api graphql)
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-          PROJECT_TITLE: cognitive-suite
+          PROJECT_URL: ${{ secrets.PROJECT_URL }}   # ej: https://github.com/orgs/atlantyde-labs/projects/2
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
           KIND: ${{ steps.ctx.outputs.kind }}
@@ -75,20 +75,15 @@ jobs:
           set -euo pipefail
 
           echo "Repo: ${OWNER}/${REPO} — Kind=${KIND} #${NUMBER}"
+          echo "Project URL: ${PROJECT_URL}"
 
           # ----------------------------
           # Helpers
           # ----------------------------
-          gql() {
-            gh api graphql -f query="$1" "${@:2}"
-          }
+          gql() { gh api graphql -f query="$1" "${@:2}"; }
 
-          # Build a comma-separated label list into LABELS var
-          has_label () {
-            echo ",$LABELS," | grep -q ",$1,"
-          }
+          has_label () { echo ",$LABELS," | grep -q ",$1,"; }
 
-          # Extract project fields metadata for lookups
           field_id () {
             echo "$FIELDS_JSON" | jq -r --arg n "$1" '
               .[] | select(.name==$n and .options != null) | .id
@@ -143,7 +138,6 @@ jobs:
               return 0
             fi
 
-            # Number field (ProjectV2FieldCommon) may appear as ProjectV2FieldCommon without options
             local fid
             fid="$(echo "$FIELDS_JSON" | jq -r --arg n "$fname" '
               .[] | select(.name==$n and (.options|not)) | .id
@@ -166,7 +160,6 @@ jobs:
             echo "Set $fname=$num"
           }
 
-          # Find project item id by content id (pagination)
           find_item_id_by_content() {
             local projectId="$1"
             local contentId="$2"
@@ -181,10 +174,7 @@ jobs:
                           pageInfo { hasNextPage endCursor }
                           nodes {
                             id
-                            content {
-                              ... on Issue { id }
-                              ... on PullRequest { id }
-                            }
+                            content { ... on Issue { id } ... on PullRequest { id } }
                           }
                         }
                       }
@@ -199,10 +189,7 @@ jobs:
                           pageInfo { hasNextPage endCursor }
                           nodes {
                             id
-                            content {
-                              ... on Issue { id }
-                              ... on PullRequest { id }
-                            }
+                            content { ... on Issue { id } ... on PullRequest { id } }
                           }
                         }
                       }
@@ -225,9 +212,57 @@ jobs:
               fi
               cursor="$(echo "$RES" | jq -r '.data.node.items.pageInfo.endCursor')"
             done
-
             echo ""
           }
+
+          # ----------------------------
+          # 0) Resolve PROJECT_ID from PROJECT_URL
+          # Supports org URL: https://github.com/orgs/<org>/projects/<number>
+          # ----------------------------
+          if [ -z "${PROJECT_URL:-}" ]; then
+            echo "::error::Missing secrets.PROJECT_URL"
+            exit 1
+          fi
+
+          ORG="$(echo "$PROJECT_URL" | sed -n 's|.*github.com/orgs/\([^/]*\)/projects/.*|\1|p')"
+          PROJ_NUM="$(echo "$PROJECT_URL" | sed -n 's|.*/projects/\([0-9][0-9]*\).*|\1|p')"
+
+          if [ -z "$ORG" ] || [ -z "$PROJ_NUM" ]; then
+            echo "::error::PROJECT_URL format not recognized (expected https://github.com/orgs/<org>/projects/<number>)"
+            echo "Got: $PROJECT_URL"
+            exit 1
+          fi
+
+          PROJECT_ID="$(gql '
+            query($org:String!, $number:Int!){
+              organization(login:$org){
+                projectV2(number:$number){ id title }
+              }
+            }' -f org="$ORG" -F number="$PROJ_NUM" | jq -r '.data.organization.projectV2.id')"
+
+          if [ -z "$PROJECT_ID" ] || [ "$PROJECT_ID" = "null" ]; then
+            echo "::error::Could not resolve PROJECT_ID from URL=$PROJECT_URL (org=$ORG number=$PROJ_NUM). Check token permissions."
+            exit 1
+          fi
+
+          echo "Resolved ORG=$ORG ProjectNumber=$PROJ_NUM"
+          echo "PROJECT_ID: $PROJECT_ID"
+
+          # Load fields once (no title lookup)
+          FIELDS_JSON="$(gql '
+            query($projectId: ID!) {
+              node(id: $projectId) {
+                ... on ProjectV2 {
+                  fields(first: 50) {
+                    nodes {
+                      __typename
+                      ... on ProjectV2FieldCommon { id name }
+                      ... on ProjectV2SingleSelectField { id name options { id name } }
+                    }
+                  }
+                }
+              }
+            }' -f projectId="$PROJECT_ID" | jq -c '.data.node.fields.nodes')"
 
           # ----------------------------
           # 1) Fetch content (Issue/PR) id + labels
@@ -272,7 +307,7 @@ jobs:
           echo "Labels: $LABELS"
 
           # ----------------------------
-          # 2) Mapping labels -> fields (extend here)
+          # 2) Mapping labels -> fields
           # ----------------------------
           Area=""
           Skill=""
@@ -306,8 +341,6 @@ jobs:
           if has_label "role-docs-engineer"; then Role="Docs Engineer"; fi
           if has_label "role-ux-local"; then Role="UX Local"; fi
 
-          # Gamification mapping (Level/XP) based on labels you already use:
-          # (you can change logic easily)
           GAME_LEVEL=""
           if has_label "good first issue"; then GAME_LEVEL="1"; fi
           if has_label "learning-task"; then GAME_LEVEL="2"; fi
@@ -324,44 +357,7 @@ jobs:
           echo "Computed: Area=$Area Skill=$Skill Compute=$Compute Level=$Level Role=$Role | GameLevel=$GAME_LEVEL XP=$XP"
 
           # ----------------------------
-          # 3) Find Project v2 by title under org
-          # ----------------------------
-          PROJ_JSON="$(gql '
-            query($login:String!){
-              organization(login:$login){
-                projectsV2(first:50){
-                  nodes{
-                    id
-                    title
-                    fields(first:50){
-                      nodes{
-                        __typename
-                        ... on ProjectV2FieldCommon { id name }
-                        ... on ProjectV2SingleSelectField { id name options { id name } }
-                      }
-                    }
-                  }
-                }
-              }
-            }' -f login="$OWNER")"
-
-          PROJECT_ID="$(echo "$PROJ_JSON" | jq -r --arg t "$PROJECT_TITLE" '
-            .data.organization.projectsV2.nodes[] | select(.title==$t) | .id
-          ' | head -n 1)"
-
-          if [ -z "$PROJECT_ID" ] || [ "$PROJECT_ID" = "null" ]; then
-            echo "::error::Project titled '$PROJECT_TITLE' not found under org '$OWNER'"
-            exit 1
-          fi
-
-          FIELDS_JSON="$(echo "$PROJ_JSON" | jq -c --arg t "$PROJECT_TITLE" '
-            .data.organization.projectsV2.nodes[] | select(.title==$t) | .fields.nodes
-          ')"
-
-          echo "PROJECT_ID: $PROJECT_ID"
-
-          # ----------------------------
-          # 4) Add content to project or find existing item (pagination-safe)
+          # 4) Add content to project or find existing item
           # ----------------------------
           ADD_RES="$(gql '
             mutation($projectId:ID!, $contentId:ID!){
@@ -393,12 +389,8 @@ jobs:
           set_single_select "Level" "$Level"
           set_single_select "Role" "$Role"
 
-          # Default status
           set_single_select "Status" "Backlog"
 
-          # Gamification fields (project has these fields already)
-          # - Level: single select (option names "1","2","3","4")
-          # - XP: number
           if [ -n "$GAME_LEVEL" ] && [ "$XP" != "0" ]; then
             set_single_select "Level" "$GAME_LEVEL"
             set_number_field "XP" "$XP"
