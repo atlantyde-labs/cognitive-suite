@@ -71,12 +71,13 @@ logger = logging.getLogger(__name__)
 logging.getLogger("transformers").setLevel(logging.ERROR)
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
-REDACTION_ENTITY_LABELS = {"PERSON", "ORG", "GPE", "LOC", "FAC", "NORP", "LAW"}
+REDACTION_ENTITY_LABELS = {"PERSON", "PER", "ORG", "GPE", "LOC", "FAC", "NORP", "LAW"}
 EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
-PHONE_RE = re.compile(r"\b(?:\+?\d[\d\s().-]{6,}\d)\b")
+PHONE_RE = re.compile(r"\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}\b")
 IPV4_RE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
 SSN_RE = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 CARD_RE = re.compile(r"\b(?:\d[ -]*?){13,19}\b")
+CURRENCY_RE = re.compile(r"\b\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\s?(?:€|\$|USD|EUR)")
 
 
 def now_iso() -> str:
@@ -135,6 +136,7 @@ def redact_regex(text: str) -> str:
     text = SSN_RE.sub("[REDACTED_SSN]", text)
     text = redact_credit_cards(text)
     text = PHONE_RE.sub("[REDACTED_PHONE]", text)
+    text = CURRENCY_RE.sub("[REDACTED_MONEY]", text)
     return text
 
 
@@ -303,7 +305,7 @@ def load_sentiment_classifier() -> Optional[Any]:
             warnings.simplefilter("ignore")
             classifier = hf_pipeline(
                 "sentiment-analysis",
-                model="xlm-roberta-base",  # multilingüe
+                model="lxyuan/distilbert-base-multilingual-cased-sentiments-student",
                 device=-1  # CPU (cambiar a 0 si hay GPU disponible)
             )
         logger.debug("✓ Modelo de sentimientos cargado")
@@ -506,7 +508,7 @@ def generate_record(
     y genera etiquetas cognitivas.
     """
     try:
-        text = file_path.read_text(errors='ignore')
+        text = file_path.read_text(encoding='utf-8', errors='ignore')
     except Exception as e:
         logger.error(f"Error al leer {file_path}: {e}")
         raise
