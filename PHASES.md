@@ -12,7 +12,7 @@ Prereqs
 Phases
 1) Foundation and governance
    - Files: `README.md`, `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`,
-     `CODE_OF_CONDUCT.md`, `.gitignore`, `.dockerignore`,
+     `CODE_OF_CONDUCT.md`, `.gitignore`, `.dockerignore`, `.gitattributes`,
      `.github/pull_request_template.md`, `.github/CODEOWNERS`,
      `PR_DESCRIPTION.md`
    - Commit: `phase(1): governance and onboarding`

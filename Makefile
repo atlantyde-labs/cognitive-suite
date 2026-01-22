@@ -1,4 +1,4 @@
-.PHONY: all build run clean zip push help
+.PHONY: all build run clean zip export push help
 
 all: build run
 
@@ -18,6 +18,9 @@ clean:
 
 zip:
 	zip -r cognitive-suite.zip docker-compose.yml ingestor pipeline frontend gitops
+
+export: ## Export clean source archive (git-tracked only)
+	@bash scripts/export-release.sh
 
 push:
 	cd outputs && bash ../gitops/sync.sh

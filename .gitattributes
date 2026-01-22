@@ -1,0 +1,13 @@
+/.venv export-ignore
+/outputs export-ignore
+/data export-ignore
+/qdrant_storage export-ignore
+/dist export-ignore
+/build export-ignore
+/site export-ignore
+/node_modules export-ignore
+/logs export-ignore
+/tmp export-ignore
+/local_runtime export-ignore
+/__pycache__ export-ignore
+*.pyc export-ignore

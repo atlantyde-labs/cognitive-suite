@@ -33,7 +33,7 @@ PHASE_COMMITS=(
 )
 
 PHASE_PATHS=(
-  "README.md LICENSE SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md .gitignore .dockerignore PR_DESCRIPTION.md .github/pull_request_template.md .github/CODEOWNERS"
+  "README.md LICENSE SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md .gitignore .dockerignore .gitattributes PR_DESCRIPTION.md .github/pull_request_template.md .github/CODEOWNERS"
   "mkdocs.yml docs knowledge requirements-docs.txt PATCH_MKDOCS_NAV_APPEND.md"
   ".github/workflows .github/ISSUE_TEMPLATE .github/labels.yml .github/project_v2 .gitleaks.toml requirements-ci.txt scripts/validate-knowledge.py"
   "Makefile dev ops scripts gitops test-bootstrap.sh upgrade_rollback.sh commit_from_bundles.sh"
