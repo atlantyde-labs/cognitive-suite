@@ -1,0 +1,2 @@
+{"id": "evt-001", "ts": "2026-01-22T00:00:00Z", "event_type": "ci_fail", "summary": "Docker build falla por 'No space left on device' (torch/whisper)", "refs": [{"type": "workflow_run", "ref": "https://github.com/atlantyde-labs/cognitive-suite/actions/runs/21029181528/job/60460805108"}]}
+{"id": "evt-002", "ts": "2026-01-22T00:00:00Z", "event_type": "ci_fix", "summary": "Se define CI smoke + schema validation (jsonschema)", "refs": [{"type": "repo", "ref": "https://github.com/atlantyde-labs/cognitive-suite"}], "metrics": {"mode": "contracts-smoke"}}

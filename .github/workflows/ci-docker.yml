@@ -38,3 +38,12 @@ jobs:
             ghcr.io/${{ github.repository }}/cognitive-frontend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Docker compose E2E
+        run: |
+          bash test-bootstrap.sh
+
+      - name: Docker compose teardown
+        if: always()
+        run: |
+          docker compose down -v --remove-orphans

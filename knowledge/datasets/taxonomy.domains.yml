@@ -1,0 +1,7 @@
+domains:
+  atlantyqa:
+    description: "Ecosistema soberano (local-first, compliance, GitOps) para ciudadanía/territorios."
+  cognitive_suite:
+    description: "Repo operativo para CI/CD, portal institucional, y flujos learning-by-doing."
+  coop_model:
+    description: "Modelo cooperativo de capital cognitivo compartido (aportación = aprendizaje + valor)."

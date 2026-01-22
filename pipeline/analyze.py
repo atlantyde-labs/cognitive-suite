@@ -22,12 +22,9 @@ información estructurada de los textos ingeridos. Concretamente:
   viabilidad, emoción, intuición, acción pendiente, otros) combinando
   reglas simples con el análisis de entidades y la predicción de
   sentimiento.
-* El resultado para cada archivo se ajusta a un esquema semántico
-  definido en `schemas/semantic-schema.yaml`, incluyendo campos como
-  identificador único, título (nombre del archivo), tipo de contenido,
-  etiquetas de intención, resumen de la idea, indicadores de riesgo,
-  referencias legales, firma de autor, puntuación de relevancia y un
-  listado de entidades reconocidas.
+* El resultado para cada archivo se ajusta al esquema de insights
+  definido en `schemas/insight.schema.json`, manteniendo los campos
+  historicos del esquema semantico y agregando trazabilidad GitOps.
 
 Este script se invoca desde la línea de comandos de la siguiente
 manera:
@@ -36,10 +33,10 @@ manera:
 python pipeline/analyze.py --input outputs/raw --output outputs/insights/analysis.json
 ```
 
-El parámetro `--schema` indica la ubicación de un archivo YAML con la
-definición del esquema semántico. En esta versión se carga únicamente
-para verificar su existencia, ya que la definición de campos está
-codificada en el código.
+El parametro `--schema` indica la ubicacion de un archivo con la
+definicion del esquema. En esta version se carga unicamente para
+verificar su existencia, ya que la definicion de campos esta codificada
+en el codigo.
 """
 
 import argparse
@@ -99,6 +96,11 @@ def normalize_env(value: str) -> str:
 def hash_identifier(value: str, salt: str) -> str:
     payload = f"{salt}{value}".encode("utf-8")
     return hashlib.sha256(payload).hexdigest()[:12]
+
+
+def hash_text(value: str, salt: str) -> str:
+    payload = f"{salt}{value}".encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def luhn_check(number: str) -> bool:
@@ -190,6 +192,57 @@ def redact_record(
         "hash_salt_set": bool(hash_salt),
     }
     return redacted
+
+
+def attach_insight_sections(
+    record: Dict[str, Any],
+    content_hash: str,
+    trace_context: Dict[str, str]
+) -> None:
+    tags = record.get("intent_tags", [])
+    risk_flags = record.get("risk_flags", [])
+    has_idea = "idea" in tags
+    has_risk = "riesgo" in tags
+
+    risk_level = "none"
+    if has_risk:
+        if len(risk_flags) >= 3:
+            risk_level = "high"
+        elif len(risk_flags) >= 1:
+            risk_level = "medium"
+        else:
+            risk_level = "low"
+
+    record["schema_version"] = trace_context.get("schema_version", "1.0")
+    record["cognitive_entities"] = {
+        "entities": record.get("entities", []),
+        "legal_reference": record.get("legal_reference", []),
+        "risk_flags": risk_flags,
+    }
+    record["idea_analysis"] = {
+        "has_idea": has_idea,
+        "summary": record.get("idea_summary", ""),
+        "tags": tags,
+    }
+    record["risk_analysis"] = {
+        "has_risk": has_risk,
+        "flags": risk_flags,
+        "level": risk_level,
+    }
+    record["gitops_trace"] = {
+        "run_id": trace_context.get("run_id", ""),
+        "generated_at": now_iso(),
+        "actor": trace_context.get("actor", "unknown"),
+        "env": trace_context.get("env", "dev"),
+        "source": {
+            "path": record.get("file", ""),
+            "sha256": content_hash,
+        },
+        "git": {
+            "commit": trace_context.get("git_commit", ""),
+            "ref": trace_context.get("git_ref", ""),
+        },
+    }
 
 
 def write_audit_event(event: Dict[str, Any], audit_path: Path) -> None:
@@ -444,7 +497,8 @@ def generate_record(
     sentiment_classifier: Optional[Any],
     redact: bool,
     hash_salt: str,
-    env: str
+    env: str,
+    trace_context: Dict[str, str]
 ) -> Dict[str, Any]:
     """Procesa un archivo y devuelve un registro semántico conforme al esquema.
     
@@ -537,9 +591,15 @@ def generate_record(
     
     record["relevance_score"] = round(min(1.0, relevance), 3)
 
-    if redact:
-        return redact_record(record, doc, hash_salt, env)
+    hash_source = redact_text(text, doc)
+    content_hash = hash_text(hash_source, hash_salt)
 
+    if redact:
+        redacted_record = redact_record(record, doc, hash_salt, env)
+        attach_insight_sections(redacted_record, content_hash, trace_context)
+        return redacted_record
+
+    attach_insight_sections(record, content_hash, trace_context)
     return record
 
 
@@ -547,7 +607,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description='Análisis cognitivo avanzado')
     parser.add_argument('--input', default='outputs/raw', help='Directorio con archivos de texto')
     parser.add_argument('--output', default='outputs/insights/analysis.json', help='Archivo JSON de salida')
-    parser.add_argument('--schema', default='schemas/semantic-schema.yaml', help='Ruta al esquema semántico')
+    parser.add_argument('--schema', default='schemas/insight.schema.json', help='Ruta al esquema de insights')
     parser.add_argument('--verbose', '-v', action='store_true', help='Mostrar logs detallados')
     args = parser.parse_args()
 
@@ -591,6 +651,16 @@ def main() -> None:
     run_id = str(uuid.uuid4())
     start_time = time.time()
     actor = os.getenv("USER") or os.getenv("USERNAME") or "unknown"
+    git_commit = os.getenv("GIT_COMMIT") or os.getenv("GITHUB_SHA") or ""
+    git_ref = os.getenv("GIT_BRANCH") or os.getenv("GITHUB_REF_NAME") or ""
+    trace_context = {
+        "run_id": run_id,
+        "actor": actor,
+        "env": env,
+        "git_commit": git_commit,
+        "git_ref": git_ref,
+        "schema_version": "1.0",
+    }
 
     write_audit_event(
         {
@@ -620,7 +690,8 @@ def main() -> None:
                         sentiment_classifier,
                         redact_enabled,
                         hash_salt,
-                        env
+                        env,
+                        trace_context
                     )
                 )
                 file_count += 1

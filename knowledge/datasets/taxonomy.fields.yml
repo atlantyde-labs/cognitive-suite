@@ -1,0 +1,12 @@
+project_v2_fields:
+  single_select:
+    - Status
+    - Area
+    - Skill
+    - Compute
+    - Level
+    - Role
+  number:
+    - XP
+defaults:
+  Status: Backlog

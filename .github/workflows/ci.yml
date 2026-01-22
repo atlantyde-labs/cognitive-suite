@@ -47,9 +47,12 @@ jobs:
               - 'wrappers/**'
               - 'vectorstore/**'
               - 'schemas/**'
+              - 'knowledge/**'
+              - 'datasets/**'
               - 'scripts/**'
               - 'ops/**'
               - 'requirements.txt'
+              - 'requirements-ci.txt'
               - 'TESTING_GUIDE.md'
               - 'test-bootstrap.sh'
 
@@ -59,6 +62,10 @@ jobs:
               - '.dockerignore'
               - 'frontend/Dockerfile'
               - '**/Dockerfile'
+              - 'ingestor/**'
+              - 'pipeline/**'
+              - 'schemas/**'
+              - 'test-bootstrap.sh'
 
             gitops:
               - 'gitops/**'

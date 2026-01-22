@@ -29,6 +29,7 @@ python cogctl.py status
 import argparse
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -55,7 +56,7 @@ def cmd_ingest(args: argparse.Namespace) -> None:
     print(f'📥 Ingestando: {args.file}...')
     try:
         subprocess.run([
-            'python',
+            sys.executable,
             str(BASE_DIR / 'ingestor' / 'ingest.py'),
             str(target),
             '--output',
@@ -72,11 +73,11 @@ def cmd_analyze(args: argparse.Namespace) -> None:
     INSIGHTS_DIR.mkdir(parents=True, exist_ok=True)
     try:
         subprocess.run([
-            'python',
+            sys.executable,
             str(BASE_DIR / 'pipeline' / 'analyze.py'),
             '--input', str(RAW_DIR),
             '--output', str(INSIGHTS_DIR / 'analysis.json'),
-            '--schema', str(BASE_DIR / 'schemas' / 'cognitive-schema.yaml')
+            '--schema', str(BASE_DIR / 'schemas' / 'insight.schema.json')
         ], check=True)
     except subprocess.CalledProcessError as e:
         print(f'❌ Error en el análisis: {e}')
