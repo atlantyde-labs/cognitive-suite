@@ -104,7 +104,7 @@ jobs:
       - name: Apply Project fields from labels (native run + gh api graphql)
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-          PROJECT_URL: ${{ secrets.PROJECT_URL }}   # e.g. https://github.com/orgs/atlantyde-labs/projects/2
+          PROJECT_URL: 'https://github.com/orgs/atlantyde-labs/projects/2'  #{{ secrets.PROJECT_URL }}   # e.g. https://github.com/orgs/atlantyde-labs/projects/2
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
           KIND: ${{ steps.ctx.outputs.kind }}
