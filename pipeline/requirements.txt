@@ -144,17 +144,17 @@ thinc==8.3.10
     # via spacy
 threadpoolctl==3.6.0
     # via scikit-learn
-tokenizers==0.22.2
+tokenizers==0.20.3
     # via transformers
-torch==2.9.0+cpu
+torch==2.5.1+cpu
     # via
     #   -r pipeline/requirements.in
     #   sentence-transformers
     #   torchaudio
     #   torchvision
-torchaudio==2.9.0+cpu
+torchaudio==2.5.1+cpu
     # via -r pipeline/requirements.in
-torchvision==0.24.0+cpu
+torchvision==0.20.1+cpu
     # via -r pipeline/requirements.in
 tqdm==4.67.1
     # via
@@ -162,7 +162,7 @@ tqdm==4.67.1
     #   sentence-transformers
     #   spacy
     #   transformers
-transformers==4.57.6
+transformers==4.46.3
     # via
     #   -r pipeline/requirements.in
     #   sentence-transformers

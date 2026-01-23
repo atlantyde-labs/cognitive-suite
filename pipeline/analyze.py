@@ -752,7 +752,7 @@ def main() -> None:
     
     # Resumen final
     print("\n" + "="*60)
-    print(f"✅ Análisis completado")
+    print("✅ Análisis completado")
     print(f"   📊 Archivos procesados: {file_count}")
     if error_count > 0:
         print(f"   ⚠️  Errores: {error_count}")

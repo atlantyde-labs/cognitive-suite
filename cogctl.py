@@ -28,7 +28,6 @@ python cogctl.py status
 """
 
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -99,7 +98,7 @@ def cmd_status(args: argparse.Namespace) -> None:
 def cmd_verify(args: argparse.Namespace) -> None:
     """Valida la evidencia generada durante un Lab."""
     print("🔍 Validando Lab 01 - Línea base de pipeline seguro...")
-    
+
     # Check analysis.json
     analysis_file = INSIGHTS_DIR / 'analysis.json'
     if not analysis_file.exists():

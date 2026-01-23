@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file=frontend/requirements.txt frontend/requirements.in
 #
-altair==6.0.0
+altair==5.5.0
     # via streamlit
 attrs==25.4.0
     # via
@@ -102,7 +102,7 @@ six==1.17.0
     # via python-dateutil
 smmap==5.0.2
     # via gitdb
-streamlit==1.53.0
+streamlit==1.41.0
     # via -r frontend/requirements.in
 tenacity==9.1.2
     # via streamlit

@@ -56,9 +56,9 @@ markdown_extensions:
 
 nav:
   - Inicio: index.md
-    - Desafío de Talento:
-        - Introducción: portal/talent-challenge-labs.md
-        - "Lab 01: Pipeline Seguro": portal/lab-01-deep-dive.md
+  - Desafío de Talento:
+      - Introducción: portal/talent-challenge-labs.md
+      - "Lab 01: Pipeline Seguro": portal/lab-01-deep-dive.md
   - Guías:
       - Instalación: installation.md
       - Plan de adopción: adoption-plan.md
