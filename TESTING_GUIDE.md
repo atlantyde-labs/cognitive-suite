@@ -41,6 +41,28 @@ Limpieza:
 docker compose -f docker-compose.local-demo.yml down
 ```
 
+## 🧾 Plantilla de evidencias (copiar/pegar en PR)
+
+Usa esta plantilla y redacta cualquier token o secreto.
+
+```md
+## Evidencias de ejecución (demo/lite GHCR)
+- Fecha UTC:
+- Auth GHCR (si aplica): `docker login ghcr.io` / `sudo docker login ghcr.io`
+  - Nota: con `sudo` puede guardar credenciales sin cifrar en `/root/.docker/config.json`.
+- Tag usado: `COGNITIVE_IMAGE_TAG=...`
+- Comandos ejecutados:
+  - `docker compose -f docker-compose.local-demo.yml pull`
+  - `docker compose -f docker-compose.local-demo.yml up -d`
+  - `docker compose -f docker-compose.local-demo.yml up -d --force-recreate ingestor pipeline`
+  - `python3 -m json.tool outputs/insights/analysis.json`
+  - `docker compose -f docker-compose.local-demo.yml down`
+- Resultado:
+  - `outputs/insights/analysis.json` generado: sí/no
+  - UI: `http://localhost:8501`
+  - Logs/errores relevantes:
+```
+
 ## Requisitos Previos
 
 ```bash
