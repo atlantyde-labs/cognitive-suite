@@ -19,6 +19,11 @@ services:
       - ./outputs:/data/outputs
       - ./schemas:/schemas
       - ./outputs:/outputs
+    environment:
+      - COGNITIVE_ENV=${COGNITIVE_ENV:-dev}
+      - COGNITIVE_REDACT=${COGNITIVE_REDACT:-0}
+      - COGNITIVE_HASH_SALT=${COGNITIVE_HASH_SALT:-}
+      - COGNITIVE_AUDIT_LOG=${COGNITIVE_AUDIT_LOG:-/data/outputs/audit/analysis.jsonl}
     depends_on:
       ingestor:
         condition: service_completed_successfully
