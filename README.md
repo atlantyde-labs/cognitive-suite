@@ -1,10 +1,10 @@
-# 🧠 Cognitive GitOps Suite
-Learning by Doing · Cooperativismo · Soberanía Cognitiva
-
 [![CI](https://github.com/atlantyde-labs/cognitive-suite/actions/workflows/ci.yml/badge.svg)](https://github.com/atlantyde-labs/cognitive-suite/actions)
 [![License: EUPL](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](LICENSE)
 [![Learning By Doing](https://img.shields.io/badge/learning-by_doing-orange)](#ruta-de-aprendizaje-gamificada)
 [![Cooperative Ready](https://img.shields.io/badge/model-cooperative-green)](#modelo-cooperativo)
+
+# 🧠 Cognitive GitOps Suite
+Learning by Doing · Cooperativismo · Soberanía Digital y Cognitiva
 
 > **No venimos solo a construir software.  
 > Entrenamos criterio humano para cooperar con sistemas inteligentes.**
@@ -27,12 +27,12 @@ GitHub Actions.
 - Tip 3: Prioriza seguridad, privacidad y cumplimiento normativo como base para soberanía digital europea.
 
 ## Índice
+- [Quick Start (demo local con GHCR)](#quick-start-demo-local-ghcr)
+- [Modo Early Adopters (CLI local)](#modo-early-adopters-cli-local)
+- [Artefactos generados y dónde mirarlos](#artefactos-generados-y-donde-mirarlos)
 - [¿Qué es Cognitive GitOps Suite?](#que-es-cognitive-gitops-suite)
 - [Por qué este proyecto existe](#por-que-este-proyecto-existe)
-- [Modo Early Adopters (todo en local)](#modo-early-adopters-todo-en-local)
-- [Artefactos generados y dónde mirarlos](#artefactos-generados-y-donde-mirarlos)
 - [Flujos de ejecución](#flujos-de-ejecucion)
-- [Uso local (demo/lite)](#uso-local-demo-lite)
 - [Esquemas y validación](#esquemas-y-validacion)
 - [Estructura del repositorio](#estructura-del-repositorio)
 - [Ruta de Aprendizaje Gamificada](#ruta-de-aprendizaje-gamificada)
@@ -43,36 +43,61 @@ GitHub Actions.
 - [Modelo cooperativo](#modelo-cooperativo)
 - [Licencia](#licencia)
 
-<a id="que-es-cognitive-gitops-suite"></a>
-## 🌍 ¿Qué es Cognitive GitOps Suite?
+<a id="quick-start-demo-local-ghcr"></a>
+## ⚡ Quick Start (demo local con GHCR)
 
-**Cognitive GitOps Suite** es un **laboratorio open-source de aprendizaje práctico** para personas que quieren:
+Ideal para probar sin build local. Nota: si los paquetes de GHCR son privados,
+necesitas un PAT con `read:packages` para descargar los artefactos. Evita pegar
+tokens en claro.
 
-- Aprender a **pensar con IA**, no solo usarla.
-- Construir **pipelines cognitivos reproducibles**.
-- Cooperar en lugar de competir.
-- Prepararse para un futuro tecnológico, legal y social que ya está aquí.
+```bash
+# Si hace falta acceso a GHCR (usa sudo si tu Docker lo requiere)
+docker login ghcr.io
+# o
+sudo docker login ghcr.io
 
-Este proyecto nace en el ecosistema **ATLANTYDE / ATLANTYQA** como infraestructura
-de **capital cognitivo compartido** para cooperativas, comunidades y talento técnico
-que quiere aprender haciendo.
+# Opcional: fija tag (release, rc, commit)
+export COGNITIVE_IMAGE_TAG=latest
 
-<a id="por-que-este-proyecto-existe"></a>
-## 🧭 Por qué este proyecto existe (contexto real)
+# Arranca la demo/lite
+docker compose -f docker-compose.local-demo.yml pull
+docker compose -f docker-compose.local-demo.yml up -d
+```
 
-El contexto real ahora mismo:
-- Automatización masiva.
-- IA como infraestructura básica.
-- Desplazamiento de roles tradicionales.
-- Necesidad urgente de **criterio humano entrenado**.
+Checklist rapido:
+- UI en `http://localhost:8501`.
+- Resultado en `outputs/insights/analysis.json`.
+- Puedes usar `data/input/demo_input.json` como ejemplo.
 
-👉 **La respuesta no es más herramientas.  
-Es mejor aprendizaje, mejor cooperación y soberanía tecnológica.**
+Recarga ingesta/análisis tras añadir archivos:
+```bash
+docker compose -f docker-compose.local-demo.yml up -d --force-recreate ingestor pipeline
+```
 
-Este repo es un **campo de entrenamiento cognitivo**.
+Modo full (si quieres modelos completos):
+```bash
+COGNITIVE_SKIP_MODELS=0 COGNITIVE_FAST_MODE=0 \
+TRANSFORMERS_OFFLINE=0 HF_HUB_OFFLINE=0 \
+docker compose -f docker-compose.local-demo.yml up -d
+```
 
-<a id="modo-early-adopters-todo-en-local"></a>
-## ⚡ Modo Early Adopters (todo en local)
+GitOps opcional:
+```bash
+GIT_REPO_URL=git@github.com:TU_USUARIO/mi-cerebro-digital.git \
+GIT_BRANCH=main \
+docker compose -f docker-compose.local-demo.yml --profile gitops up -d
+```
+
+Checklist PR (demo/lite, GHCR):
+- `docker login ghcr.io` si hace falta acceso (usa `sudo` si el daemon lo requiere).
+- `export COGNITIVE_IMAGE_TAG=latest` (o tu tag).
+- `docker compose -f docker-compose.local-demo.yml pull`.
+- `docker compose -f docker-compose.local-demo.yml up -d`.
+- Añade un archivo en `data/input/` y relanza `ingestor`/`pipeline` con `--force-recreate`.
+- Valida `outputs/insights/analysis.json` con `python3 -m json.tool` y la UI; limpieza: `docker compose -f docker-compose.local-demo.yml down`.
+
+<a id="modo-early-adopters-cli-local"></a>
+## ⚡ Modo Early Adopters (CLI local)
 
 Arranca en 5 minutos, pensado para aprender haciendo:
 
@@ -116,40 +141,36 @@ sin depender de infraestructura externa:
 - `outputs/` → directorio de resultados (raw + insights según el flujo).
 - `dist/` → paquetes generados (p. ej. `.deb`) cuando empaquetas.
 
+<a id="que-es-cognitive-gitops-suite"></a>
+## 🌍 ¿Qué es Cognitive GitOps Suite?
+
+**Cognitive GitOps Suite** es un **laboratorio open-source de aprendizaje práctico** para personas que quieren:
+
+- Aprender a **pensar con IA**, no solo usarla.
+- Construir **pipelines cognitivos reproducibles**.
+- Cooperar en lugar de competir.
+- Prepararse para un futuro tecnológico, legal y social que ya está aquí.
+
+Este proyecto nace en el ecosistema **ATLANTYDE / ATLANTYQA** como infraestructura
+de **capital cognitivo compartido** para cooperativas, comunidades y talento técnico
+que quiere aprender haciendo.
+
+<a id="por-que-este-proyecto-existe"></a>
+## 🧭 Por qué este proyecto existe (contexto real)
+
+El contexto real ahora mismo:
+- Automatización masiva.
+- IA como infraestructura básica.
+- Desplazamiento de roles tradicionales.
+- Necesidad urgente de **criterio humano entrenado**.
+
+👉 **La respuesta no es más herramientas.  
+Es mejor aprendizaje, mejor cooperación y soberanía tecnológica.**
+
+Este repo es un **campo de entrenamiento cognitivo**.
+
 <a id="flujos-de-ejecucion"></a>
 ## 🔁 Flujos de ejecución
-
-<a id="uso-local-demo-lite"></a>
-### Uso local (demo/lite con GHCR)
-
-Ideal para probar sin build local. Con Docker y Docker Compose:
-
-```bash
-# Opcional: fija tag (release, rc, commit)
-export COGNITIVE_IMAGE_TAG=latest
-
-# Arranca la demo/lite
-docker compose -f docker-compose.local-demo.yml up -d
-```
-
-Checklist rapido:
-- UI en `http://localhost:8501`.
-- Resultado en `outputs/insights/analysis.json`.
-- Mete un PDF/TXT en `data/input/` y relanza si quieres refrescar.
-
-Modo full (si quieres modelos completos):
-```bash
-COGNITIVE_SKIP_MODELS=0 COGNITIVE_FAST_MODE=0 \
-TRANSFORMERS_OFFLINE=0 HF_HUB_OFFLINE=0 \
-docker compose -f docker-compose.local-demo.yml up -d
-```
-
-GitOps opcional:
-```bash
-GIT_REPO_URL=git@github.com:TU_USUARIO/mi-cerebro-digital.git \
-GIT_BRANCH=main \
-docker compose -f docker-compose.local-demo.yml --profile gitops up -d
-```
 
 ### Prueba de extremo a extremo (Docker Compose)
 
@@ -231,7 +252,25 @@ Necesita `jsonschema>=4.18` (ver `requirements.txt`/`requirements-ci.txt`).
 ### 🟢 Nivel 1 — Explorador Cognitivo
 - [ ] Ejecutar `init → ingest → analyze`.
 - [ ] Leer `outputs/insights/analysis.json`.
-- [ ] Abrir un Issue con etiqueta `learning-task`.
+- [ ] Abrir un Issue con etiqueta `learning-task`.## Evidencias de ejecución (demo/lite GHCR)
+- Fecha UTC (del run): 2026-01-23T11:47:23Z
+- Auth GHCR:
+  - `sudo docker login ghcr.io -u kabehz` ✅ (warning: creds sin cifrar en `/root/.docker/config.json`)
+- Pull:
+  - `cognitive-pipeline:latest` ✅
+  - `cognitive-frontend:latest` ✅
+  - `cognitive-ingestor:latest` ✅
+- Up:
+  - `ingestor` ejecuta y termina ✅
+  - `pipeline` recreado ✅
+- Validación:
+  - `outputs/insights/analysis.json` generado ✅
+  - `python -m json.tool outputs/insights/analysis.json` ✅
+  - 2 registros (`demo_input`, `sample`)
+- Down:
+  - contenedores eliminados ✅
+  - red en proceso de eliminación ✅
+
 
 🏅 Badge sugerido: `cognitive-explorer`
 
