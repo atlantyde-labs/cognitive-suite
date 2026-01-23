@@ -1,0 +1,40 @@
+name: Draft Release (Branch Push)
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: release-draft-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      ref: ${{ steps.tag.outputs.ref }}
+    steps:
+      - id: tag
+        run: |
+          ref_name="${GITHUB_REF_NAME}"
+          slug="$(echo "$ref_name" | tr '/_' '-' | tr -cd '[:alnum:]-')"
+          short="${GITHUB_SHA::7}"
+          echo "tag=draft-${slug}-${short}" >> "$GITHUB_OUTPUT"
+          echo "ref=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+  draft:
+    needs: prepare
+    uses: ./.github/workflows/release-draft.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+      ref: ${{ needs.prepare.outputs.ref }}
+      push_to_ghcr: "true"
+      push_latest: "false"
+      draft: "true"
+      prerelease: "false"

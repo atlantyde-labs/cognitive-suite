@@ -22,6 +22,43 @@ on:
         description: "Attach source archives"
         required: false
         default: "true"
+      draft:
+        description: "Create as draft"
+        required: false
+        default: "true"
+      prerelease:
+        description: "Mark as prerelease"
+        required: false
+        default: "false"
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      ref:
+        required: false
+        default: "main"
+        type: string
+      push_to_ghcr:
+        required: false
+        default: "true"
+        type: string
+      push_latest:
+        required: false
+        default: "true"
+        type: string
+      include_source_archives:
+        required: false
+        default: "true"
+        type: string
+      draft:
+        required: false
+        default: "true"
+        type: string
+      prerelease:
+        required: false
+        default: "false"
+        type: string
 
 permissions:
   contents: write
@@ -62,7 +99,7 @@ jobs:
 
       - name: Build all service images
         run: |
-          docker compose build
+          COMPOSE_PROFILES=gitops docker compose build
 
       - name: Tag images for GHCR
         run: |
@@ -95,13 +132,14 @@ jobs:
         run: |
           bash scripts/export-release.sh dist/source
 
-      - name: Create draft release
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag }}
           name: ${{ inputs.tag }}
           target_commitish: ${{ inputs.ref }}
-          draft: true
+          draft: ${{ inputs.draft == 'true' }}
+          prerelease: ${{ inputs.prerelease == 'true' }}
           files: |
             dist/docker/*.tar.gz
             dist/source/*.zip

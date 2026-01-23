@@ -27,6 +27,21 @@
   description: "Critical path / high risk / requiere revisión senior"
 
 # -------------------------
+# Release / semver
+# -------------------------
+- name: release-major
+  color: "b60205"
+  description: "Semver major bump on merge"
+
+- name: release-minor
+  color: "0e8a16"
+  description: "Semver minor bump on merge"
+
+- name: release-patch
+  color: "1d76db"
+  description: "Semver patch bump on merge"
+
+# -------------------------
 # Skills técnicos
 # -------------------------
 - name: skill-python
@@ -155,4 +170,3 @@
 - name: ci-boott
   color: "b60205"
   description: "Legacy alias (usar contrib-review + compute-medium)"
-

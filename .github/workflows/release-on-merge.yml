@@ -1,0 +1,91 @@
+name: Release (Main Merge)
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  compute-tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.next.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+
+      - id: bump
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = (context.payload.pull_request.labels || []).map((l) => l.name);
+            let bump = "patch";
+            if (labels.includes("release-major") || labels.includes("semver-major")) {
+              bump = "major";
+            } else if (labels.includes("release-minor") || labels.includes("semver-minor")) {
+              bump = "minor";
+            } else if (labels.includes("release-patch") || labels.includes("semver-patch")) {
+              bump = "patch";
+            }
+            core.setOutput("bump", bump);
+
+      - id: next
+        env:
+          BASE_VERSION: ${{ vars.RELEASE_BASE_VERSION }}
+          BUMP: ${{ steps.bump.outputs.bump }}
+        run: |
+          base="${BASE_VERSION:-v0.1.0}"
+          if [[ "${base}" != v* ]]; then
+            base="v${base}"
+          fi
+          latest="$(git tag --list 'v[0-9]*' --sort=-v:refname | head -n1)"
+          if [ -z "$latest" ]; then
+            next="$base"
+          else
+            ver="${latest#v}"
+            if [[ ! "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              next="$base"
+            else
+              IFS=. read -r major minor patch <<< "$ver"
+              case "$BUMP" in
+                major)
+                  major=$((major + 1))
+                  minor=0
+                  patch=0
+                  ;;
+                minor)
+                  minor=$((minor + 1))
+                  patch=0
+                  ;;
+                patch|*)
+                  patch=$((patch + 1))
+                  ;;
+              esac
+              next="v${major}.${minor}.${patch}"
+            fi
+          fi
+          if git rev-parse "$next" >/dev/null 2>&1; then
+            echo "Tag $next already exists." >&2
+            exit 1
+          fi
+          echo "tag=$next" >> "$GITHUB_OUTPUT"
+
+  release:
+    needs: compute-tag
+    if: needs.compute-tag.result == 'success'
+    uses: ./.github/workflows/release-draft.yml
+    with:
+      tag: ${{ needs.compute-tag.outputs.tag }}
+      ref: ${{ github.event.pull_request.merge_commit_sha }}
+      push_to_ghcr: "true"
+      push_latest: "true"
+      draft: "false"
+      prerelease: "false"
