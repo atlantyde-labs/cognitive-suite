@@ -33,7 +33,7 @@ jobs:
       - name: Run lightweight tests (if present)
         run: |
           if [[ -d tests ]] || compgen -G "**/test_*.py" > /dev/null; then
-            pytest -q
+            pytest -q --exit-zero-if-no-tests
           else
             echo "No tests detected. Skipping."
           fi

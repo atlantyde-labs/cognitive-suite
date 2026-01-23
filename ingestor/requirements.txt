@@ -57,15 +57,15 @@ sympy==1.14.0
     # via torch
 tiktoken==0.12.0
     # via openai-whisper
-torch==2.5.1+cpu
+torch==2.6.0+cpu
     # via
     #   -r ingestor/requirements.in
     #   openai-whisper
     #   torchaudio
     #   torchvision
-torchaudio==2.5.1+cpu
+torchaudio==2.6.0+cpu
     # via -r ingestor/requirements.in
-torchvision==0.20.1+cpu
+torchvision==0.21.0+cpu
     # via -r ingestor/requirements.in
 tqdm==4.67.1
     # via openai-whisper
