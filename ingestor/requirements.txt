@@ -39,7 +39,7 @@ numpy==2.2.6
     #   numba
     #   openai-whisper
     #   torchvision
-openai-whisper==20250625
+openai-whisper==20240930
     # via -r ingestor/requirements.in
 pillow==12.1.0
     # via torchvision
@@ -53,7 +53,7 @@ regex==2026.1.15
     # via tiktoken
 requests==2.32.5
     # via tiktoken
-sympy==1.14.0
+sympy==1.13.3
     # via torch
 tiktoken==0.12.0
     # via openai-whisper

@@ -93,13 +93,13 @@ preshed==3.0.12
     # via
     #   spacy
     #   thinc
-pydantic==2.12.5
+pydantic==2.5.0
     # via
     #   confection
     #   spacy
     #   thinc
     #   weasel
-pydantic-core==2.41.5
+pydantic-core==2.14.1
     # via pydantic
 pyyaml==6.0.3
     # via
@@ -126,7 +126,7 @@ sentence-transformers==5.2.0
     # via -r pipeline/requirements.in
 smart-open==7.5.0
     # via weasel
-spacy==3.8.11
+spacy==3.7.5
     # via -r pipeline/requirements.in
 spacy-legacy==3.0.12
     # via spacy
@@ -138,9 +138,9 @@ srsly==2.5.2
     #   spacy
     #   thinc
     #   weasel
-sympy==1.14.0
+sympy==1.13.3
     # via torch
-thinc==8.3.10
+thinc==8.2.1
     # via spacy
 threadpoolctl==3.6.0
     # via scikit-learn

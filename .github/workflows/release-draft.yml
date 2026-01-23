@@ -77,7 +77,7 @@ jobs:
               repo: context.repo.repo,
               username: context.actor,
             });
-            if (data.permission !== "admin") {
+            if (data.permission !== "admin" && data.permission !== "write") {
               core.setFailed(
                 `Owner-only workflow. Actor ${context.actor} has ${data.permission} permission.`
               );
