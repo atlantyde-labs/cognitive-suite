@@ -57,6 +57,7 @@ jobs:
         run: |
           BOOTSTRAP_ENV_FILE=.env.bootstrap \
           BOOTSTRAP_REDACT=1 \
+          BOOTSTRAP_DEBUG=1 \
           BOOTSTRAP_COMPOSE_FILE=docker-compose.playground.yml \
           BOOTSTRAP_TIMEOUT_SECS=900 \
           bash test-bootstrap.sh

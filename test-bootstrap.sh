@@ -45,9 +45,27 @@ PY
   echo "🔒 Redacción habilitada (COGNITIVE_ENV=$COGNITIVE_ENV, COGNITIVE_REDACT=$COGNITIVE_REDACT, COGNITIVE_HASH_SALT=***)"
 fi
 
+if [ "${BOOTSTRAP_DEBUG:-0}" = "1" ]; then
+  export COGNITIVE_VERBOSE="${COGNITIVE_VERBOSE:-1}"
+fi
+
 # Iniciar contenedores
 COMPOSE_FILE="${BOOTSTRAP_COMPOSE_FILE:-docker-compose.yml}"
 docker compose -f "$COMPOSE_FILE" up -d --build
+
+LOG_PID=""
+if [ "${BOOTSTRAP_DEBUG:-0}" = "1" ]; then
+  echo "🧪 Debug habilitado: mostrando logs de ingestor y pipeline."
+  docker compose -f "$COMPOSE_FILE" logs -f --no-color --timestamps ingestor pipeline &
+  LOG_PID=$!
+fi
+
+cleanup_logs() {
+  if [ -n "$LOG_PID" ] && kill -0 "$LOG_PID" 2>/dev/null; then
+    kill "$LOG_PID" || true
+  fi
+}
+trap cleanup_logs EXIT
 
 echo "⏳ Esperando análisis..."
 # GitHub-hosted runners limit jobs to 6h; keep default aligned and allow override.

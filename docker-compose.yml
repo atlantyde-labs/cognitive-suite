@@ -24,6 +24,7 @@ services:
       - COGNITIVE_REDACT=${COGNITIVE_REDACT:-0}
       - COGNITIVE_HASH_SALT=${COGNITIVE_HASH_SALT:-}
       - COGNITIVE_AUDIT_LOG=${COGNITIVE_AUDIT_LOG:-/data/outputs/audit/analysis.jsonl}
+      - COGNITIVE_VERBOSE=${COGNITIVE_VERBOSE:-0}
     depends_on:
       ingestor:
         condition: service_completed_successfully

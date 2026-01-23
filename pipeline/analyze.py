@@ -631,7 +631,8 @@ def main() -> None:
     args = parser.parse_args()
 
     # Ajustar nivel de logging según flag verbose
-    if args.verbose:
+    verbose_env = os.getenv("COGNITIVE_VERBOSE", "").strip().lower() in {"1", "true", "yes"}
+    if args.verbose or verbose_env:
         logger.setLevel(logging.DEBUG)
         logging.getLogger("transformers").setLevel(logging.WARNING)
     else:
