@@ -1,0 +1,56 @@
+# Local demo/lite using GHCR images. Default settings skip heavy models.
+services:
+  ingestor:
+    image: ghcr.io/atlantyde-labs/cognitive-suite/cognitive-ingestor:${COGNITIVE_IMAGE_TAG:-latest}
+    user: "${COGNITIVE_UID:-1000}:${COGNITIVE_GID:-1000}"
+    volumes:
+      - ./data/input:/data/input
+      - ./outputs:/data/outputs
+    # Process files from /data/input and write raw outputs to /data/outputs/raw
+    command: ["/data/input", "--output", "/data/outputs/raw"]
+
+  pipeline:
+    image: ghcr.io/atlantyde-labs/cognitive-suite/cognitive-pipeline:${COGNITIVE_IMAGE_TAG:-latest}
+    user: "${COGNITIVE_UID:-1000}:${COGNITIVE_GID:-1000}"
+    volumes:
+      - ./outputs:/data/outputs
+      - ./schemas:/schemas
+      - ./outputs:/outputs
+    environment:
+      - COGNITIVE_ENV=${COGNITIVE_ENV:-local}
+      - COGNITIVE_REDACT=${COGNITIVE_REDACT:-0}
+      - COGNITIVE_HASH_SALT=${COGNITIVE_HASH_SALT:-}
+      - COGNITIVE_AUDIT_LOG=${COGNITIVE_AUDIT_LOG:-/data/outputs/audit/analysis.jsonl}
+      - COGNITIVE_VERBOSE=${COGNITIVE_VERBOSE:-0}
+      - COGNITIVE_SKIP_MODELS=${COGNITIVE_SKIP_MODELS:-1}
+      - COGNITIVE_FAST_MODE=${COGNITIVE_FAST_MODE:-1}
+      - TRANSFORMERS_OFFLINE=${TRANSFORMERS_OFFLINE:-1}
+      - HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-1}
+    depends_on:
+      ingestor:
+        condition: service_completed_successfully
+    # Analyze ingested texts and write insights to JSON
+    command: [
+      "--input",
+      "/data/outputs/raw",
+      "--output",
+      "/data/outputs/insights/analysis.json"
+    ]
+
+  frontend:
+    image: ghcr.io/atlantyde-labs/cognitive-suite/cognitive-frontend:${COGNITIVE_IMAGE_TAG:-latest}
+    user: "${COGNITIVE_UID:-1000}:${COGNITIVE_GID:-1000}"
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./outputs:/outputs
+
+  gitops:
+    image: ghcr.io/atlantyde-labs/cognitive-suite/cognitive-gitops:${COGNITIVE_IMAGE_TAG:-latest}
+    profiles:
+      - gitops
+    environment:
+      - GIT_REPO_URL=${GIT_REPO_URL:-git@github.com:TU_USUARIO/mi-cerebro-digital.git}
+      - GIT_BRANCH=${GIT_BRANCH:-main}
+    volumes:
+      - ./outputs:/outputs

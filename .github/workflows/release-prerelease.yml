@@ -1,0 +1,41 @@
+name: Pre-release (PR Open)
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: release-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      ref: ${{ steps.tag.outputs.ref }}
+    steps:
+      - id: tag
+        run: |
+          pr="${{ github.event.pull_request.number }}"
+          sha="${{ github.event.pull_request.head.sha }}"
+          short="${sha:0:7}"
+          echo "tag=pr-${pr}-${short}" >> "$GITHUB_OUTPUT"
+          echo "ref=${sha}" >> "$GITHUB_OUTPUT"
+
+  prerelease:
+    needs: prepare
+    if: needs.prepare.result == 'success'
+    uses: ./.github/workflows/release-draft.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+      ref: ${{ needs.prepare.outputs.ref }}
+      push_to_ghcr: "true"
+      push_latest: "false"
+      draft: "false"
+      prerelease: "true"

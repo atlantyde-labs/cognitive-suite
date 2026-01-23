@@ -32,6 +32,7 @@ GitHub Actions.
 - [Modo Early Adopters (todo en local)](#modo-early-adopters-todo-en-local)
 - [Artefactos generados y dónde mirarlos](#artefactos-generados-y-donde-mirarlos)
 - [Flujos de ejecución](#flujos-de-ejecucion)
+- [Uso local (demo/lite)](#uso-local-demo-lite)
 - [Esquemas y validación](#esquemas-y-validacion)
 - [Estructura del repositorio](#estructura-del-repositorio)
 - [Ruta de Aprendizaje Gamificada](#ruta-de-aprendizaje-gamificada)
@@ -118,6 +119,38 @@ sin depender de infraestructura externa:
 <a id="flujos-de-ejecucion"></a>
 ## 🔁 Flujos de ejecución
 
+<a id="uso-local-demo-lite"></a>
+### Uso local (demo/lite con GHCR)
+
+Ideal para probar sin build local. Con Docker y Docker Compose:
+
+```bash
+# Opcional: fija tag (release, rc, commit)
+export COGNITIVE_IMAGE_TAG=latest
+
+# Arranca la demo/lite
+docker compose -f docker-compose.local-demo.yml up -d
+```
+
+Checklist rapido:
+- UI en `http://localhost:8501`.
+- Resultado en `outputs/insights/analysis.json`.
+- Mete un PDF/TXT en `data/input/` y relanza si quieres refrescar.
+
+Modo full (si quieres modelos completos):
+```bash
+COGNITIVE_SKIP_MODELS=0 COGNITIVE_FAST_MODE=0 \
+TRANSFORMERS_OFFLINE=0 HF_HUB_OFFLINE=0 \
+docker compose -f docker-compose.local-demo.yml up -d
+```
+
+GitOps opcional:
+```bash
+GIT_REPO_URL=git@github.com:TU_USUARIO/mi-cerebro-digital.git \
+GIT_BRANCH=main \
+docker compose -f docker-compose.local-demo.yml --profile gitops up -d
+```
+
 ### Prueba de extremo a extremo (Docker Compose)
 
 Para validar el stack completo en local con Docker Compose:
@@ -185,6 +218,7 @@ Necesita `jsonschema>=4.18` (ver `requirements.txt`/`requirements-ci.txt`).
 - `dev/` – Scripts de bootstrap para desarrolladores.
 - `ops/` – Scripts para DevOps y operaciones.
 - `docker-compose.yml` – Orquestación de servicios para desarrollo.
+- `docker-compose.local-demo.yml` – Demo/lite local con imágenes de GHCR.
 - `docker-compose.prod.yml` – Orquestación resiliente para producción.
 - `.github/workflows/ci.yml` – Workflow de CI para GitHub.
 
