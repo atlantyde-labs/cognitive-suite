@@ -151,6 +151,14 @@ GIT_BRANCH=main \
 docker compose -f docker-compose.local-demo.yml --profile gitops up -d
 ```
 
+Checklist PR (demo/lite, GHCR):
+- `docker login ghcr.io` si hace falta acceso (usa `sudo` si el daemon lo requiere).
+- `export COGNITIVE_IMAGE_TAG=latest` (o tu tag).
+- `docker compose -f docker-compose.local-demo.yml pull`.
+- `docker compose -f docker-compose.local-demo.yml up -d`.
+- Añade un archivo en `data/input/` y relanza `ingestor`/`pipeline` con `--force-recreate`.
+- Valida `outputs/insights/analysis.json` con `python3 -m json.tool` y la UI; limpieza: `docker compose -f docker-compose.local-demo.yml down`.
+
 ### Prueba de extremo a extremo (Docker Compose)
 
 Para validar el stack completo en local con Docker Compose:
@@ -338,3 +346,7 @@ Contribuir aquí significa: aprender · enseñar · construir futuro compartido.
 ## ✅ Licencia
 
 Este proyecto está licenciado bajo los términos definidos en `LICENSE`.
+
+
+# Login en GHCR (recomendado con sudo si usas sudo docker)
+echo "$GHCR_PAT" | sudo docker login ghcr.io -u kabehz --password-stdin

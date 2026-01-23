@@ -1,5 +1,46 @@
 # 🧪 Guía de Testing
 
+## ✅ Checklist rápida para PR (demo/lite vía GHCR)
+
+Pensada para validar una PR abierta sin compilar imágenes localmente.
+
+```bash
+# Si hace falta acceso a GHCR (usa sudo si tu Docker lo requiere)
+docker login ghcr.io
+# o
+sudo docker login ghcr.io
+
+# Si tu Docker requiere sudo, antepónlo a los comandos siguientes.
+
+# Opcional: fija tag (release, rc, commit)
+export COGNITIVE_IMAGE_TAG=latest
+
+# Arranca el stack demo/lite
+docker compose -f docker-compose.local-demo.yml pull
+docker compose -f docker-compose.local-demo.yml up -d
+
+# Añade un TXT/PDF en data/input/ y relanza la ingesta + análisis
+# Ejemplo: cp data/input/demo_input.json data/input/demo_input.json
+docker compose -f docker-compose.local-demo.yml up -d --force-recreate ingestor pipeline
+
+# Valida el resultado
+python3 -m json.tool outputs/insights/analysis.json
+
+# UI disponible en http://localhost:8501
+```
+
+Opcional (modo full):
+```bash
+COGNITIVE_SKIP_MODELS=0 COGNITIVE_FAST_MODE=0 \
+TRANSFORMERS_OFFLINE=0 HF_HUB_OFFLINE=0 \
+docker compose -f docker-compose.local-demo.yml up -d --force-recreate ingestor pipeline
+```
+
+Limpieza:
+```bash
+docker compose -f docker-compose.local-demo.yml down
+```
+
 ## Requisitos Previos
 
 ```bash

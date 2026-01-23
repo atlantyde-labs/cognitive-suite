@@ -11,6 +11,6 @@ Describe qué se ha cambiado y por qué. Incluye referencia a issues o tareas cu
 ## Checklist de PR
 
 - [ ] Se han pasado los tests y linters (CI).
+- [ ] He ejecutado el checklist demo/lite (`TESTING_GUIDE.md`) o he justificado si no aplica.
 - [ ] La documentación se ha actualizado (README, docs/...).
 - [ ] Las revisiones obligatorias se han asignado automáticamente mediante CODEOWNERS.
-
