@@ -49,13 +49,11 @@ Esta guia define un desafio estructurado para que los adoptantes tempranos revel
 
 ## Ejemplos de Labs
 
-### Lab 01 - Linea base de pipeline seguro
-- Dificultad: L1
-- Objetivo: ejecutar pipeline con redaccion y logs de auditoria.
-- **Guía Detallada**: [lab-01-deep-dive.md](file:///c:/Users/jose/.gemini/antigravity/scratch/docs/portal/lab-01-deep-dive.md)
-- Salidas requeridas: analysis.json, entradas de log de auditoria.
-- Evidencia: `outputs/audit/analysis.jsonl` + PR GitOps.
-- Recompensa: 50 puntos + insignia `secure-runner`.
+### Misiones Disponibles
+
+#### Lab 01 - Línea Base de Pipeline Seguro (Expert Level)
+Este Lab ha sido actualizado a un nivel de experto, incluyendo validación automática de IA y controles de privacidad avanzados.
+👉 **Comenzar Misión**: [Lab 01 Deep Dive](file:///c:/Users/jose/AppData/Roaming/Code/User/globalStorage/google.coder-bot/brain/faa54a41-8368-462c-af2a-f90e70b46244/lab-01-deep-dive.md)
 
 ### Lab 02 - Sync GitOps con outputs redactados
 - Dificultad: L2

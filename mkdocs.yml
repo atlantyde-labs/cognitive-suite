@@ -56,17 +56,9 @@ markdown_extensions:
 
 nav:
   - Inicio: index.md
-  - Comienza aquí:
-      - Inicio rápido: portal/quickstart.md
-      - Ruta de aprendizaje: portal/learning-path.md
-      - Identidad y ecosistema: portal/identity-ecosystem.md
-      - Métricas: portal/metrics.md
-      - GitOps + Streamlit: portal/learning-gitops-streamlit.md
-      - Labs de desafío de talento:
-          - Visión general: portal/talent-challenge-labs.md
-          - Lab 01 Deep Dive: portal/lab-01-deep-dive.md
-      - Bootstrap de Streamlit: portal/bootstrap-streamlit.md
-      - Contribuir: portal/contributing.md
+  - Desafío de Talento:
+      - Introducción: portal/talent-challenge-labs.md
+      - Lab 01: Pipeline Seguro: portal/lab-01-deep-dive.md
   - Guías:
       - Instalación: installation.md
       - Plan de adopción: adoption-plan.md
@@ -105,17 +97,9 @@ nav:
           - Nota de endurecimiento: internal/examples/hardening-note.md
   - English:
       - Home: en/index.md
-      - Start Here:
-          - Quickstart: en/portal/quickstart.md
-          - Learning Path: en/portal/learning-path.md
-          - Identity and Ecosystem: en/portal/identity-ecosystem.md
-          - Metrics: en/portal/metrics.md
-          - GitOps + Streamlit: en/portal/learning-gitops-streamlit.md
-          - Talent Challenge Labs:
-              - Overview: en/portal/talent-challenge-labs.md
-              - Lab 01 Deep Dive: en/portal/lab-01-deep-dive.md
-          - Bootstrap Streamlit: en/portal/bootstrap-streamlit.md
-          - Contributing: en/portal/contributing.md
+  - Talent Challenge:
+      - Overview: en/portal/talent-challenge-labs.md
+      - Lab 01: Secure Pipeline: en/portal/lab-01-deep-dive.md
       - Guides:
           - Installation: en/installation.md
           - Adoption Plan: en/adoption-plan.md
