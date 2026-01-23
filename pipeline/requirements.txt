@@ -79,7 +79,7 @@ numpy==2.2.6
     #   thinc
     #   torchvision
     #   transformers
-packaging==25.0
+packaging==24.2
     # via
     #   faiss-cpu
     #   huggingface-hub
