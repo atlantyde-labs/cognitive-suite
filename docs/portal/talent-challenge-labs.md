@@ -52,7 +52,7 @@ Esta guia define un desafio estructurado para que los adoptantes tempranos revel
 ### Lab 01 - Linea base de pipeline seguro
 - Dificultad: L1
 - Objetivo: ejecutar pipeline con redaccion y logs de auditoria.
-- **Guía Detallada**: [lab-01-deep-dive.md](file:///c:/Users/jose/.gemini/antigravity/scratch/docs/portal/lab-01-deep-dive.md)
+- **Guía Detallada**: [lab-01-deep-dive.md](lab-01-deep-dive.md)
 - Salidas requeridas: analysis.json, entradas de log de auditoria.
 - Evidencia: `outputs/audit/analysis.jsonl` + PR GitOps.
 - Recompensa: 50 puntos + insignia `secure-runner`.
