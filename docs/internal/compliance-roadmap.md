@@ -7,7 +7,7 @@
 - Definir allowlist/denylist para llamadas de red salientes.
 - Crear log de auditoría mínimo para ejecuciones de análisis (quién/cuándo/qué input).
 
-## Fase 1 - Beta multi-tenant
+## Fase 1 - Prueba multi-tenant
 - Implementar autenticación + RBAC para UI y API.
 - Separar tenants por storage y límites de acceso.
 - Añadir cifrado en reposo y en tránsito (TLS para UI/API).

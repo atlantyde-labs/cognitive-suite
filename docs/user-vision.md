@@ -36,7 +36,7 @@ Panel de control para la persistencia y trazabilidad.
 
 1.  **Local-First / Offline**: El diseño debe inspirar confianza. "Tus datos no salen de tu infraestructura". No hay llamadas a APIs externas por defecto.
 2.  **Feedback GitOps**: Cada acción debe tener un rastro de sincronización claro.
-3.  **Aesthetic High-End**: La interfaz debe ser limpia, moderna y funcional (estética tipo "Enterprise/Military Grade").
+3.  **Estética de alto nivel**: La interfaz debe ser limpia, moderna y funcional (estética tipo "calidad corporativa/militar").
 
 ---
 

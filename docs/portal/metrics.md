@@ -94,7 +94,7 @@ misión, infraestructura soberana, expansión territorial y comunidad fundadora.
 ---
 
 ### ✅ Community Growth (salud del colectivo)
-- **Definición:** contribuyentes activos/mes y ratio de “returning contributors”.
+- **Definición:** contribuyentes activos/mes y proporción de “returning contributors”.
 - **Por qué importa:** la cooperativa vive de continuidad, no de picos.
 
 ---
