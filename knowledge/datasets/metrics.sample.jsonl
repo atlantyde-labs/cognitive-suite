@@ -1,0 +1,5 @@
+{"name": "time_to_first_contribution_minutes", "value": 30, "source": "issues+pr timeline", "note": "objetivo: bajar fricción onboarding"}
+{"name": "ci_success_rate", "value": 0.92, "source": "actions", "note": "por rama y por workflow"}
+{"name": "learning_tasks_completed", "value": 12, "source": "issues labels=learning-task", "note": "gamificación"}
+{"name": "docs_portal_health", "value": 1, "source": "pages deploy status", "note": "0/1"}
+{"name": "automation_coverage", "value": 0.7, "source": "workflows enabled", "note": "ratio de flujos activos vs planificados"}

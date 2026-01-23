@@ -38,3 +38,32 @@ jobs:
             ghcr.io/${{ github.repository }}/cognitive-frontend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Prepare bootstrap env
+        run: |
+          echo "Runner UID/GID: $(id -u)/$(id -g)"
+          python - <<'PY'
+          import secrets
+          from pathlib import Path
+
+          salt = secrets.token_hex(16)
+          Path(".env.bootstrap").write_text(
+              f"COGNITIVE_HASH_SALT={salt}\n"
+              "COGNITIVE_ENV=prod\n"
+              "COGNITIVE_REDACT=1\n"
+          )
+          PY
+
+      - name: Docker compose E2E (playground)
+        run: |
+          BOOTSTRAP_ENV_FILE=.env.bootstrap \
+          BOOTSTRAP_REDACT=1 \
+          BOOTSTRAP_DEBUG=1 \
+          BOOTSTRAP_COMPOSE_FILE=docker-compose.playground.yml \
+          BOOTSTRAP_TIMEOUT_SECS=900 \
+          bash test-bootstrap.sh
+
+      - name: Docker compose teardown
+        if: always()
+        run: |
+          docker compose down -v --remove-orphans

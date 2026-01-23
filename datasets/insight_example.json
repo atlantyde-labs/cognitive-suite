@@ -1,0 +1,184 @@
+[
+  {
+    "uuid": "58ec2a0d-3e61-42b7-846b-3bbc5d3a9106",
+    "file": "outputs/raw/sample.txt",
+    "title": "sample",
+    "content_type": "txt",
+    "word_count": 44,
+    "char_count": 302,
+    "intent_tags": [
+      "idea",
+      "riesgo",
+      "legal",
+      "proyecto",
+      "viabilidad"
+    ],
+    "sentiment": {
+      "label": "NEGATIVE",
+      "score": 0.0
+    },
+    "entities": [
+      [
+        "PER",
+        "Resumen"
+      ],
+      [
+        "MISC",
+        "Ley Organica"
+      ],
+      [
+        "ORG",
+        "Codigo Penal"
+      ],
+      [
+        "ORG",
+        "El Tribunal Supremo"
+      ],
+      [
+        "LOC",
+        "Juzgado Central"
+      ],
+      [
+        "MISC",
+        "Riesgo:"
+      ],
+      [
+        "MISC",
+        "Idea"
+      ],
+      [
+        "MISC",
+        "GitOps"
+      ]
+    ],
+    "summary": "Resumen legal: La Ley Organica 10/1995 del Codigo Penal establece el Articulo 15 sobre responsabilidad. El Tribunal Supremo y el Juzgado Central analizaron el delito de fraude. Riesgo: posible sancion por incumplimiento del reglamento. Idea: proyecto de portal de cumplimiento con trazabilidad GitOps.",
+    "redacted": false,
+    "redaction": {
+      "enabled": false,
+      "env": "dev"
+    },
+    "idea_summary": "Resumen legal: La Ley Organica 10/1995 del Codigo Penal establece el Articulo 15 sobre responsabilidad. El Tribunal Supremo y el Juzgado Central analizaron el delito de fraude. Riesgo: posible sancion por incumplimiento del reglamento. Idea: proyecto de portal de cumplimiento con trazabilidad GitOps.",
+    "risk_flags": [
+      [
+        "LEGAL",
+        "Codigo Penal"
+      ]
+    ],
+    "legal_reference": [
+      [
+        "LEGAL",
+        "Ley Organica"
+      ],
+      [
+        "LEGAL",
+        "Codigo Penal"
+      ],
+      [
+        "LEGAL",
+        "El Tribunal Supremo"
+      ],
+      [
+        "LEGAL",
+        "Juzgado Central"
+      ]
+    ],
+    "author_signature": "",
+    "relevance_score": 0.85,
+    "schema_version": "1.0",
+    "cognitive_entities": {
+      "entities": [
+        [
+          "PER",
+          "Resumen"
+        ],
+        [
+          "MISC",
+          "Ley Organica"
+        ],
+        [
+          "ORG",
+          "Codigo Penal"
+        ],
+        [
+          "ORG",
+          "El Tribunal Supremo"
+        ],
+        [
+          "LOC",
+          "Juzgado Central"
+        ],
+        [
+          "MISC",
+          "Riesgo:"
+        ],
+        [
+          "MISC",
+          "Idea"
+        ],
+        [
+          "MISC",
+          "GitOps"
+        ]
+      ],
+      "legal_reference": [
+        [
+          "LEGAL",
+          "Ley Organica"
+        ],
+        [
+          "LEGAL",
+          "Codigo Penal"
+        ],
+        [
+          "LEGAL",
+          "El Tribunal Supremo"
+        ],
+        [
+          "LEGAL",
+          "Juzgado Central"
+        ]
+      ],
+      "risk_flags": [
+        [
+          "LEGAL",
+          "Codigo Penal"
+        ]
+      ]
+    },
+    "idea_analysis": {
+      "has_idea": true,
+      "summary": "Resumen legal: La Ley Organica 10/1995 del Codigo Penal establece el Articulo 15 sobre responsabilidad. El Tribunal Supremo y el Juzgado Central analizaron el delito de fraude. Riesgo: posible sancion por incumplimiento del reglamento. Idea: proyecto de portal de cumplimiento con trazabilidad GitOps.",
+      "tags": [
+        "idea",
+        "riesgo",
+        "legal",
+        "proyecto",
+        "viabilidad"
+      ]
+    },
+    "risk_analysis": {
+      "has_risk": true,
+      "flags": [
+        [
+          "LEGAL",
+          "Codigo Penal"
+        ]
+      ],
+      "level": "medium"
+    },
+    "gitops_trace": {
+      "run_id": "a758f102-99a1-47c6-ae7f-57aac575e0b4",
+      "generated_at": "2026-01-22T20:54:05.438317+00:00",
+      "actor": "sample",
+      "env": "dev",
+      "source": {
+        "path": "outputs/raw/sample.txt",
+        "sha256": "6cabe0d16da049e98d27a3304cd48dec9dfad11f164181ec09d5511d08f2b75b"
+      },
+      "git": {
+        "commit": "",
+        "ref": ""
+      }
+    }
+  }
+]

@@ -20,6 +20,12 @@ jobs:
           pip install -r requirements.txt
           pip install pytest || true
 
+      - name: Install CI deps
+        run: |
+          if [ -f requirements-ci.txt ]; then
+            pip install -r requirements-ci.txt
+          fi
+
       - name: Compile all python
         run: |
           python -m compileall -q cogctl.py ingestor pipeline wrappers vectorstore schemas scripts ops || true
@@ -30,6 +36,14 @@ jobs:
             pytest -q
           else
             echo "No tests detected. Skipping."
+          fi
+
+      - name: Validate knowledge datasets
+        run: |
+          if [ -f scripts/validate-knowledge.py ]; then
+            python scripts/validate-knowledge.py
+          else
+            echo "Knowledge validator not present. Skipping."
           fi
 
       - name: CLI smoke (help)

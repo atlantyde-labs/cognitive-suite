@@ -3,7 +3,8 @@ services:
     build:
       context: .
       dockerfile: ingestor/Dockerfile
-    image: cognitive/ingestor:latest
+      target: playground
+    image: cognitive/ingestor:playground
     user: "${COGNITIVE_UID:-1000}:${COGNITIVE_GID:-1000}"
     volumes:
       - ./data/input:/data/input
@@ -15,7 +16,8 @@ services:
     build:
       context: .
       dockerfile: pipeline/Dockerfile
-    image: cognitive/pipeline:latest
+      target: playground
+    image: cognitive/pipeline:playground
     user: "${COGNITIVE_UID:-1000}:${COGNITIVE_GID:-1000}"
     volumes:
       - ./outputs:/data/outputs
@@ -27,6 +29,10 @@ services:
       - COGNITIVE_HASH_SALT=${COGNITIVE_HASH_SALT:-}
       - COGNITIVE_AUDIT_LOG=${COGNITIVE_AUDIT_LOG:-/data/outputs/audit/analysis.jsonl}
       - COGNITIVE_VERBOSE=${COGNITIVE_VERBOSE:-0}
+      - COGNITIVE_SKIP_MODELS=1
+      - COGNITIVE_FAST_MODE=1
+      - TRANSFORMERS_OFFLINE=1
+      - HF_HUB_OFFLINE=1
     depends_on:
       ingestor:
         condition: service_completed_successfully
@@ -48,9 +54,7 @@ services:
       - "8501:8501"
     volumes:
       - ./outputs:/outputs
-    # El comando por defecto se define en el Dockerfile para ejecutar
-    # Streamlit. Puede sobreescribirse para usar la interfaz de
-    # consola (app.py) o la TUI rich (tui.py).
+    # El comando por defecto se define en el Dockerfile para ejecutar Streamlit.
 
   gitops:
     build:

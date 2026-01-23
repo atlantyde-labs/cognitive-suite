@@ -47,18 +47,26 @@ jobs:
               - 'wrappers/**'
               - 'vectorstore/**'
               - 'schemas/**'
+              - 'knowledge/**'
+              - 'datasets/**'
               - 'scripts/**'
               - 'ops/**'
               - 'requirements.txt'
+              - 'requirements-ci.txt'
               - 'TESTING_GUIDE.md'
               - 'test-bootstrap.sh'
 
             docker:
               - 'docker-compose.yml'
               - 'docker-compose.prod.yml'
+              - 'docker-compose.playground.yml'
               - '.dockerignore'
               - 'frontend/Dockerfile'
               - '**/Dockerfile'
+              - 'ingestor/**'
+              - 'pipeline/**'
+              - 'schemas/**'
+              - 'test-bootstrap.sh'
 
             gitops:
               - 'gitops/**'

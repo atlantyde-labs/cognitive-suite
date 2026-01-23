@@ -1,0 +1,65 @@
+name: Docker Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      push_to_ghcr:
+        description: "Push images to GHCR"
+        required: false
+        default: "true"
+      retention_days:
+        description: "Artifact retention days"
+        required: false
+        default: "14"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build all service images
+        run: |
+          docker compose build
+
+      - name: Tag images for GHCR
+        run: |
+          for img in ingestor pipeline frontend gitops; do
+            docker tag cognitive/$img:latest ghcr.io/${{ github.repository }}/cognitive-$img:${{ github.sha }}
+            docker tag cognitive/$img:latest ghcr.io/${{ github.repository }}/cognitive-$img:latest
+          done
+
+      - name: Push images to GHCR
+        if: ${{ inputs.push_to_ghcr == 'true' }}
+        run: |
+          for img in ingestor pipeline frontend gitops; do
+            docker push ghcr.io/${{ github.repository }}/cognitive-$img:${{ github.sha }}
+            docker push ghcr.io/${{ github.repository }}/cognitive-$img:latest
+          done
+
+      - name: Export Docker images
+        run: |
+          mkdir -p dist/docker
+          for img in ingestor pipeline frontend gitops; do
+            docker save cognitive/$img:latest | gzip -c > dist/docker/cognitive-$img-${{ github.sha }}.tar.gz
+          done
+
+      - name: Upload Docker artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images-${{ github.sha }}
+          path: dist/docker/*.tar.gz
+          retention-days: ${{ inputs.retention_days }}

@@ -1,10 +1,10 @@
-# 🧪 Guía de Testing - PR: Mejorar análisis cognitivo
+# 🧪 Guía de Testing
 
 ## Requisitos Previos
 
 ```bash
-# Instalaciones necesarias (si no están ya instaladas)
-pip install spacy transformers fitz
+# Dependencias base (si no están ya instaladas)
+pip install -r requirements.txt
 python -m spacy download es_core_news_sm
 ```
 
@@ -213,4 +213,4 @@ Note que "legal" aparece en test (Código Penal) pero no en relato ✅
 
 ## Notas Finales
 
-Este es un MVP funcional. Las limitaciones están documentadas en el commit y PR para futuras mejoras.
+Este es un MVP funcional. Las limitaciones están documentadas para futuras mejoras.

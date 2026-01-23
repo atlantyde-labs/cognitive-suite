@@ -4,10 +4,10 @@
 
 # Output files
 /outputs/*
-!/outputs/insights/
 
 /qdrant_storage/
-/__pycache__/
+__pycache__/
+*.pyc
 /*.zip
 *.env
 

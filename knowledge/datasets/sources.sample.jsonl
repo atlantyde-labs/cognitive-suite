@@ -1,0 +1,4 @@
+{"type": "repo", "ref": "https://github.com/atlantyde-labs/cognitive-suite", "note": "Repo principal"}
+{"type": "workflow_run", "ref": "https://github.com/atlantyde-labs/cognitive-suite/actions/runs/21029181528/job/60460805108", "note": "CI docker compose build"}
+{"type": "url", "ref": "https://github.com/orgs/atlantyde-labs/projects/2", "note": "Org Project v2"}
+{"type": "zip", "ref": "cognitive-suite_upgrade_patch_v4.zip", "note": "Patch v4 mkdocs+gamificación"}

@@ -19,5 +19,5 @@ These roles define the personal AI systems that accompany the user during Labs.
 - Highlights policy violations or missing tests.
 
 ## Career Agent
-- Recommends next Lab based on performance.
+- Recommends next Lab according to performance.
 - Tracks skill progression and strengths.

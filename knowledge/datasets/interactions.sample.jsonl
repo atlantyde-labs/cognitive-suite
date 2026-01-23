@@ -1,0 +1,2 @@
+{"id": "ix-001", "ts": "2026-01-22T00:00:00Z", "actor": "user", "intent": "fix_ci", "summary": "Solicita optimizar CI por fallo 'No space left on device'", "tags": ["ci", "docker", "ml"]}
+{"id": "ix-002", "ts": "2026-01-22T00:00:00Z", "actor": "assistant", "intent": "fix_ci", "summary": "Propone separar CI ligero vs runtime ML pesado y añadir smoke+contracts", "outputs": [{"name": "requirements-ci.txt", "type": "dataset", "path": "requirements-ci.txt"}]}

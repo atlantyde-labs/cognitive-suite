@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cognitive-suite:insight",
+  "title": "Cognitive Insight Output",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": true,
+    "required": [
+      "uuid",
+      "file",
+      "title",
+      "content_type",
+      "word_count",
+      "char_count",
+      "intent_tags",
+      "summary",
+      "gitops_trace"
+    ],
+    "properties": {
+      "schema_version": {
+        "type": "string"
+      },
+      "uuid": {
+        "type": "string"
+      },
+      "file": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      },
+      "content_type": {
+        "type": "string"
+      },
+      "word_count": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "char_count": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "intent_tags": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "sentiment": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "label",
+          "score"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          }
+        }
+      },
+      "entities": {
+        "$ref": "#/$defs/entity_list"
+      },
+      "summary": {
+        "type": "string"
+      },
+      "idea_summary": {
+        "type": "string"
+      },
+      "risk_flags": {
+        "$ref": "#/$defs/entity_list"
+      },
+      "legal_reference": {
+        "$ref": "#/$defs/entity_list"
+      },
+      "author_signature": {
+        "type": "string"
+      },
+      "relevance_score": {
+        "type": "number"
+      },
+      "redacted": {
+        "type": "boolean"
+      },
+      "redaction": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "cognitive_entities": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "entities": {
+            "$ref": "#/$defs/entity_list"
+          },
+          "legal_reference": {
+            "$ref": "#/$defs/entity_list"
+          },
+          "risk_flags": {
+            "$ref": "#/$defs/entity_list"
+          }
+        }
+      },
+      "idea_analysis": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "has_idea": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "risk_analysis": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "has_risk": {
+            "type": "boolean"
+          },
+          "flags": {
+            "$ref": "#/$defs/entity_list"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ]
+          }
+        }
+      },
+      "gitops_trace": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "run_id",
+          "generated_at",
+          "actor",
+          "env",
+          "source",
+          "git"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "generated_at": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "env": {
+            "type": "string"
+          },
+          "source": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string"
+              }
+            }
+          },
+          "git": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "commit",
+              "ref"
+            ],
+            "properties": {
+              "commit": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "entity_pair": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "items": false
+    },
+    "entity_list": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entity_pair"
+      }
+    }
+  }
+}

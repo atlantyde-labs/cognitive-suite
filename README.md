@@ -53,6 +53,34 @@ El directorio `.github/workflows/ci.yml` define un flujo que:
 
 Este workflow se ejecuta en cada `push` o `pull_request` contra `main`.
 
+### Prueba de extremo a extremo (Docker Compose)
+
+Para validar el stack completo con Docker Compose:
+
+```bash
+bash test-bootstrap.sh
+```
+
+El script espera el resultado en `outputs/insights/analysis.json`. El timeout por
+defecto es `21600` segundos (6 horas), alineado con el máximo de ejecución de
+los runners públicos de GitHub Actions. Si quieres reducirlo:
+
+```bash
+BOOTSTRAP_TIMEOUT_SECS=900 bash test-bootstrap.sh
+```
+
+### Esquemas y validación
+
+El output principal de análisis sigue el esquema `schemas/insight.schema.json`
+(JSON Schema 2020-12). Para validar los datasets de `knowledge/` y el ejemplo de
+insight incluido:
+
+```bash
+python scripts/validate-knowledge.py
+```
+
+Requiere `jsonschema>=4.18` (ver `requirements.txt`/`requirements-ci.txt`).
+
 ## 📂 Estructura
 
 - `ingestor/` – Conversión de PDF, DOCX, TXT y otros formatos a texto.
@@ -214,6 +242,7 @@ Ejercicio inicial:
 ## 🧩 Cómo contribuir
 
 📄 Lee: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+🧪 Tests: [`TESTING_GUIDE.md`](TESTING_GUIDE.md)
 
 Y para entrar rápido:
 - Abre un Issue con `good first issue` o `learning-task`

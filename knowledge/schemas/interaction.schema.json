@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cognitive-suite:knowledge:interaction",
+  "title": "Interaction Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "ts",
+    "actor",
+    "intent",
+    "summary"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "unique interaction id (uuid recommended)"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "string",
+      "enum": [
+        "user",
+        "assistant",
+        "system"
+      ]
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "design_architecture",
+        "generate_bundle",
+        "fix_ci",
+        "docs_portal",
+        "gitops_workflow",
+        "security_compliance",
+        "research_web",
+        "other"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "source.schema.json"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "$ref": "artifact.schema.json"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

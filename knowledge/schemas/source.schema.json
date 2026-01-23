@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cognitive-suite:knowledge:source",
+  "title": "Source",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "ref"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "repo",
+        "file",
+        "zip",
+        "log",
+        "url",
+        "issue",
+        "pr",
+        "workflow_run",
+        "doc"
+      ]
+    },
+    "ref": {
+      "type": "string",
+      "description": "location pointer (path/URL/id)"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "note": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
