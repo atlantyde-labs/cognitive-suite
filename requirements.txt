@@ -257,7 +257,7 @@ tokenizers==0.22.2
     # via transformers
 toml==0.10.2
     # via streamlit
-torch==2.9.0+cpu
+torch==2.5.1+cpu
     # via
     #   -r requirements.in
     #   openai-whisper
@@ -277,11 +277,11 @@ tqdm==4.67.1
     #   sentence-transformers
     #   spacy
     #   transformers
-transformers==4.57.6
+transformers==4.46.3
     # via
     #   -r requirements.in
     #   sentence-transformers
-triton==3.5.1
+# triton removed due to Windows/CI compatibility issues
     # via openai-whisper
 typer-slim==0.21.1
     # via
@@ -324,5 +324,5 @@ wrapt==2.0.1
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
 
-accelerate==1.12.0
+accelerate==1.1.1
     # via -r requirements.in

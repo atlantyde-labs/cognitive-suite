@@ -49,12 +49,11 @@ This guide defines a structured challenge for early adopters to surface talent s
 
 ## Example Labs
 
-### Lab 01 - Secure pipeline baseline
-- Difficulty: L1
-- Objective: run pipeline with redaction and audit logs.
-- Required outputs: analysis.json, audit log entries.
-- Evidence: `outputs/audit/analysis.jsonl` + GitOps PR.
-- Reward: 50 points + badge `secure-runner`.
+### Available Missions
+
+#### Lab 01 - Secure Pipeline Baseline (Expert Level)
+This Lab has been upgraded to an expert level, including automatic AI validation and advanced privacy controls.
+👉 **Start Mission**: [Lab 01 Deep Dive](file:///c:/Users/jose/AppData/Roaming/Code/User/globalStorage/google.coder-bot/brain/faa54a41-8368-462c-af2a-f90e70b46244/lab-01-deep-dive.md)
 
 ### Lab 02 - GitOps redacted sync
 - Difficulty: L2

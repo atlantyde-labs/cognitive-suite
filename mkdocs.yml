@@ -56,9 +56,9 @@ markdown_extensions:
 
 nav:
   - Inicio: index.md
-  - Desafío de Talento:
-      - Introducción: portal/talent-challenge-labs.md
-      - Lab 01: Pipeline Seguro: portal/lab-01-deep-dive.md
+    - Desafío de Talento:
+        - Introducción: portal/talent-challenge-labs.md
+        - "Lab 01: Pipeline Seguro": portal/lab-01-deep-dive.md
   - Guías:
       - Instalación: installation.md
       - Plan de adopción: adoption-plan.md
@@ -95,11 +95,11 @@ nav:
           - Ejemplo de registro de evidencias: internal/examples/control-evidence-log-example.md
           - Ejemplo de prueba de restauración: internal/examples/restore-test-report.md
           - Nota de endurecimiento: internal/examples/hardening-note.md
-  - English:
+  - "🌎 English":
       - Home: en/index.md
-  - Talent Challenge:
-      - Overview: en/portal/talent-challenge-labs.md
-      - Lab 01: Secure Pipeline: en/portal/lab-01-deep-dive.md
+      - Talent Challenge:
+          - Overview: en/portal/talent-challenge-labs.md
+          - "Lab 01: Secure Pipeline": en/portal/lab-01-deep-dive.md
       - Guides:
           - Installation: en/installation.md
           - Adoption Plan: en/adoption-plan.md
