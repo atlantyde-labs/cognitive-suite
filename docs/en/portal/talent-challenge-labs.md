@@ -52,6 +52,7 @@ This guide defines a structured challenge for early adopters to surface talent s
 ### Lab 01 - Secure pipeline baseline
 - Difficulty: L1
 - Objective: run pipeline with redaction and audit logs.
+- **Detailed Guide**: [lab-01-deep-dive.md](lab-01-deep-dive.md)
 - Required outputs: analysis.json, audit log entries.
 - Evidence: `outputs/audit/analysis.jsonl` + GitOps PR.
 - Reward: 50 points + badge `secure-runner`.
