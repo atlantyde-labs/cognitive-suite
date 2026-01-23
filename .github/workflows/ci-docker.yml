@@ -41,6 +41,7 @@ jobs:
 
       - name: Prepare bootstrap env
         run: |
+          echo "Runner UID/GID: $(id -u)/$(id -g)"
           python - <<'PY'
           import secrets
           from pathlib import Path

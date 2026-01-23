@@ -4,7 +4,7 @@ set -euo pipefail
 echo "🔍 Iniciando prueba local de Cognitive GitOps Suite..."
 
 # Preparar estructura
-mkdir -p data/input outputs/raw outputs/insights schemas qdrant_storage
+mkdir -p data/input outputs/raw outputs/insights outputs/audit schemas qdrant_storage
 
 RESULT_FILE="outputs/insights/analysis.json"
 rm -f "$RESULT_FILE"
@@ -23,6 +23,10 @@ if [ -n "${BOOTSTRAP_ENV_FILE:-}" ]; then
   source "$BOOTSTRAP_ENV_FILE"
   set +a
 fi
+
+# Alinear UID/GID con el host para evitar errores de permisos en volúmenes.
+export COGNITIVE_UID="${COGNITIVE_UID:-$(id -u)}"
+export COGNITIVE_GID="${COGNITIVE_GID:-$(id -g)}"
 
 # Forzar redacción si se solicita (no imprime el secreto).
 if [ "${BOOTSTRAP_REDACT:-0}" = "1" ]; then

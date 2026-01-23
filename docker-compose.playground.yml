@@ -5,6 +5,7 @@ services:
       dockerfile: ingestor/Dockerfile
       target: playground
     image: cognitive/ingestor:playground
+    user: "${COGNITIVE_UID:-1000}:${COGNITIVE_GID:-1000}"
     volumes:
       - ./data/input:/data/input
       - ./outputs:/data/outputs
@@ -17,6 +18,7 @@ services:
       dockerfile: pipeline/Dockerfile
       target: playground
     image: cognitive/pipeline:playground
+    user: "${COGNITIVE_UID:-1000}:${COGNITIVE_GID:-1000}"
     volumes:
       - ./outputs:/data/outputs
       - ./schemas:/schemas
@@ -47,6 +49,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
     image: cognitive/frontend:latest
+    user: "${COGNITIVE_UID:-1000}:${COGNITIVE_GID:-1000}"
     ports:
       - "8501:8501"
     volumes:
