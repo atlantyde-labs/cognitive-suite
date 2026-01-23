@@ -6,6 +6,9 @@ echo "🔍 Iniciando prueba local de Cognitive GitOps Suite..."
 # Preparar estructura
 mkdir -p data/input outputs/raw outputs/insights schemas qdrant_storage
 
+RESULT_FILE="outputs/insights/analysis.json"
+rm -f "$RESULT_FILE"
+
 # Copiar input de prueba
 echo '{ "content": "El proyecto de microK8s europeo promueve la soberanía digital. Riesgos regulatorios pueden incluir el incumplimiento del RGPD. Ideas innovadoras incluyen orquestación distribuida con GitOps legalmente trazable." }' > data/input/demo_input.json
 
@@ -27,16 +30,25 @@ if [ "${BOOTSTRAP_REDACT:-0}" = "1" ]; then
   export COGNITIVE_REDACT="${COGNITIVE_REDACT:-1}"
   export COGNITIVE_AUDIT_LOG="${COGNITIVE_AUDIT_LOG:-/data/outputs/audit/analysis.jsonl}"
   if [ -z "${COGNITIVE_HASH_SALT:-}" ]; then
-    echo "❌ COGNITIVE_HASH_SALT debe estar definido para redacción."
-    exit 1
+    if [ "${BOOTSTRAP_GENERATE_SALT:-0}" = "1" ]; then
+      COGNITIVE_HASH_SALT="$(python3 - <<'PY'
+import secrets
+print(secrets.token_hex(16))
+PY
+)"
+      export COGNITIVE_HASH_SALT
+    else
+      echo "❌ COGNITIVE_HASH_SALT debe estar definido para redacción."
+      exit 1
+    fi
   fi
   echo "🔒 Redacción habilitada (COGNITIVE_ENV=$COGNITIVE_ENV, COGNITIVE_REDACT=$COGNITIVE_REDACT, COGNITIVE_HASH_SALT=***)"
 fi
 
 # Iniciar contenedores
-docker compose up -d --build
+COMPOSE_FILE="${BOOTSTRAP_COMPOSE_FILE:-docker-compose.yml}"
+docker compose -f "$COMPOSE_FILE" up -d --build
 
-RESULT_FILE="outputs/insights/analysis.json"
 echo "⏳ Esperando análisis..."
 # GitHub-hosted runners limit jobs to 6h; keep default aligned and allow override.
 timeout_secs="${BOOTSTRAP_TIMEOUT_SECS:-21600}"
@@ -48,6 +60,23 @@ done
 
 if [ -f "$RESULT_FILE" ]; then
   echo "✅ Resultado disponible en $RESULT_FILE"
+  if [ "${BOOTSTRAP_REDACT:-0}" = "1" ]; then
+    python3 - <<'PY'
+import json
+from pathlib import Path
+
+path = Path("outputs/insights/analysis.json")
+data = json.loads(path.read_text(encoding="utf-8"))
+if not data:
+    raise SystemExit("Redaction check failed: empty insights output")
+record = data[0]
+if not record.get("redacted") or not record.get("redaction", {}).get("enabled"):
+    raise SystemExit("Redaction check failed: record not redacted")
+if not record.get("redaction", {}).get("hash_salt_set"):
+    raise SystemExit("Redaction check failed: hash_salt_set false")
+print("✅ Redacción verificada en insights.")
+PY
+  fi
   cat "$RESULT_FILE"
 else
   echo "❌ Insight aún no generado tras ${timeout_secs}s."

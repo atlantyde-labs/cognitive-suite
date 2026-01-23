@@ -59,6 +59,7 @@ jobs:
             docker:
               - 'docker-compose.yml'
               - 'docker-compose.prod.yml'
+              - 'docker-compose.playground.yml'
               - '.dockerignore'
               - 'frontend/Dockerfile'
               - '**/Dockerfile'

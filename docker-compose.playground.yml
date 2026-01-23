@@ -1,0 +1,66 @@
+services:
+  ingestor:
+    build:
+      context: .
+      dockerfile: ingestor/Dockerfile
+      target: playground
+    image: cognitive/ingestor:playground
+    volumes:
+      - ./data/input:/data/input
+      - ./outputs:/data/outputs
+    # Procesar todos los archivos de /data/input y volcar resultados en /data/outputs/raw
+    command: ["/data/input", "--output", "/data/outputs/raw"]
+
+  pipeline:
+    build:
+      context: .
+      dockerfile: pipeline/Dockerfile
+      target: playground
+    image: cognitive/pipeline:playground
+    volumes:
+      - ./outputs:/data/outputs
+      - ./schemas:/schemas
+      - ./outputs:/outputs
+    environment:
+      - COGNITIVE_ENV=${COGNITIVE_ENV:-dev}
+      - COGNITIVE_REDACT=${COGNITIVE_REDACT:-0}
+      - COGNITIVE_HASH_SALT=${COGNITIVE_HASH_SALT:-}
+      - COGNITIVE_AUDIT_LOG=${COGNITIVE_AUDIT_LOG:-/data/outputs/audit/analysis.jsonl}
+      - COGNITIVE_SKIP_MODELS=1
+      - COGNITIVE_FAST_MODE=1
+      - TRANSFORMERS_OFFLINE=1
+      - HF_HUB_OFFLINE=1
+    depends_on:
+      ingestor:
+        condition: service_completed_successfully
+    # Analizar los textos ingeridos y generar insights en JSON
+    command: [
+      "--input",
+      "/data/outputs/raw",
+      "--output",
+      "/data/outputs/insights/analysis.json"
+    ]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: cognitive/frontend:latest
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./outputs:/outputs
+    # El comando por defecto se define en el Dockerfile para ejecutar Streamlit.
+
+  gitops:
+    build:
+      context: .
+      dockerfile: gitops/Dockerfile
+    image: cognitive/gitops:latest
+    profiles:
+      - gitops
+    environment:
+      - GIT_REPO_URL=git@github.com:TU_USUARIO/mi-cerebro-digital.git
+      - GIT_BRANCH=main
+    volumes:
+      - ./outputs:/outputs

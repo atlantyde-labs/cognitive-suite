@@ -80,6 +80,15 @@ CARD_RE = re.compile(r"\b(?:\d[ -]*?){13,19}\b")
 CURRENCY_RE = re.compile(r"\b\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\s?(?:€|\$|USD|EUR)")
 
 
+def should_skip_models() -> bool:
+    """Indica si se deben omitir cargas de modelos pesados (modo playground/CI)."""
+    for key in ("COGNITIVE_SKIP_MODELS", "COGNITIVE_FAST_MODE"):
+        value = os.getenv(key, "").strip().lower()
+        if value in {"1", "true", "yes"}:
+            return True
+    return False
+
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -266,6 +275,10 @@ def load_spacy_model() -> Optional[Any]:
 
     Devuelve `None` si no se puede cargar ningún modelo.
     """
+    if should_skip_models():
+        logger.warning("COGNITIVE_SKIP_MODELS habilitado; se omite la carga de spaCy.")
+        return None
+
     if spacy is None:
         logger.warning("spaCy no está instalado. La extracción de entidades estará deshabilitada.")
         return None
@@ -294,6 +307,10 @@ def load_sentiment_classifier() -> Optional[Any]:
     NOTA: `distilbert-base-uncased-finetuned-sst-2-english` está limitado a inglés.
     Usamos un modelo multilingüe para mejor precisión en textos españoles.
     """
+    if should_skip_models():
+        logger.warning("COGNITIVE_SKIP_MODELS habilitado; se omite la carga de transformers.")
+        return None
+
     if hf_pipeline is None:
         logger.warning("transformers no está instalado. Se usará clasificación heurística.")
         return None
