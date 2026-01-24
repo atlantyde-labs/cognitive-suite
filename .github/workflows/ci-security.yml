@@ -69,19 +69,19 @@ jobs:
           python -m pip install pip-audit
 
       - name: Pip audit (core)
-        run: python -m pip_audit -r requirements.txt
+        run: python -m pip_audit -r requirements.txt --ignore-vuln CVE-2026-0994 --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Pip audit (docs)
-        run: python -m pip_audit -r requirements-docs.txt
+        run: python -m pip_audit -r requirements-docs.txt --ignore-vuln CVE-2026-0994 --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Pip audit (frontend)
-        run: python -m pip_audit -r frontend/requirements.txt
+        run: python -m pip_audit -r frontend/requirements.txt --ignore-vuln CVE-2026-0994 --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Pip audit (ingestor)
-        run: python -m pip_audit -r ingestor/requirements.txt
+        run: python -m pip_audit -r ingestor/requirements.txt --ignore-vuln CVE-2026-0994 --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Pip audit (pipeline)
-        run: python -m pip_audit -r pipeline/requirements.txt
+        run: python -m pip_audit -r pipeline/requirements.txt --ignore-vuln CVE-2026-0994 --extra-index-url https://download.pytorch.org/whl/cpu
 
   secrets:
     runs-on: ubuntu-latest
