@@ -18,6 +18,16 @@ on:
         type: boolean
         required: false
         default: true
+      promote_on_dry_run:
+        description: "If true, push HEAD to promote_branch when dry run gates pass"
+        type: boolean
+        required: false
+        default: false
+      promote_branch:
+        description: "Target branch to update when promote_on_dry_run is true"
+        type: string
+        required: false
+        default: E2E-gated
 
 concurrency:
   group: ops-orchestrate-${{ github.ref }}
@@ -29,14 +39,20 @@ permissions:
 env:
   BASE_DIR: "bash/GitDevSecDataAIOps"
   DEFAULT_DRY_RUN: "true"
+  DEFAULT_PROMOTE_ON_DRY_RUN: "false"
+  DEFAULT_PROMOTE_BRANCH: "E2E-gated"
 
 jobs:
   orchestrate:
     runs-on: [self-hosted, local]
     timeout-minutes: 90
+    permissions:
+      contents: write
     env:
       AREA: ${{ github.event.inputs.area || 'all' }}
       DRY_RUN: ${{ (github.event_name == 'pull_request' && 'true') || github.event.inputs.dry_run || env.DEFAULT_DRY_RUN }}
+      PROMOTE_ON_DRY_RUN: ${{ github.event.inputs.promote_on_dry_run || env.DEFAULT_PROMOTE_ON_DRY_RUN }}
+      PROMOTE_BRANCH: ${{ github.event.inputs.promote_branch || env.DEFAULT_PROMOTE_BRANCH }}
     steps:
       - uses: actions/checkout@v4
 
@@ -108,6 +124,22 @@ jobs:
           else
             echo "shellcheck not installed on runner"
           fi
+
+      - name: Promote dry run to branch
+        if: steps.discover.outputs.found == 'true' && env.DRY_RUN == 'true' && env.PROMOTE_ON_DRY_RUN == 'true' && github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          if [[ -z "${PROMOTE_BRANCH}" ]]; then
+            echo "PROMOTE_BRANCH is empty; skipping." >&2
+            exit 1
+          fi
+          if [[ "${PROMOTE_BRANCH}" == "${GITHUB_REF_NAME}" ]]; then
+            echo "PROMOTE_BRANCH equals current branch; skipping."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git push origin "HEAD:refs/heads/${PROMOTE_BRANCH}"
 
       - name: Execute scripts
         if: steps.discover.outputs.found == 'true' && env.DRY_RUN != 'true'
