@@ -1,6 +1,7 @@
 name: Ops Orchestration E2E
 
 on:
+  # Ajusta aqui los disparadores si cambias la rama o quieres otros eventos.
   push:
     branches: [ E2E ]
   pull_request:
@@ -8,22 +9,10 @@ on:
   workflow_dispatch:
     inputs:
       area:
-        description: "Category to orchestrate"
-        type: choice
+        description: "Category to orchestrate (directory under bash/GitDevSecDataAIOps) or 'all'"
+        type: string
         required: true
         default: all
-        options:
-          - all
-          - sso
-          - platforms
-          - open-source-projects
-          - tooling
-          - libraries
-          - tech
-          - extension-code
-          - trends
-          - apps
-          - proxmox
       dry_run:
         description: "Only lint and list scripts"
         type: boolean
@@ -37,13 +26,17 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  BASE_DIR: "bash/GitDevSecDataAIOps"
+  DEFAULT_DRY_RUN: "true"
+
 jobs:
   orchestrate:
     runs-on: [self-hosted, local]
     timeout-minutes: 90
     env:
       AREA: ${{ github.event.inputs.area || 'all' }}
-      DRY_RUN: ${{ (github.event_name == 'pull_request' && 'true') || github.event.inputs.dry_run || 'false' }}
+      DRY_RUN: ${{ (github.event_name == 'pull_request' && 'true') || github.event.inputs.dry_run || env.DEFAULT_DRY_RUN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -51,24 +44,31 @@ jobs:
         id: discover
         run: |
           set -euo pipefail
-          BASE="bash/GitDevSecDataAIOps"
+          BASE="${BASE_DIR:-bash/GitDevSecDataAIOps}"
           AREA="${AREA:-all}"
 
-          case "${AREA}" in
-            all)
-              patterns=(
-                sso platforms open-source-projects tooling libraries
-                tech extension-code trends apps proxmox
-              )
-              ;;
-            sso|platforms|open-source-projects|tooling|libraries|tech|extension-code|trends|apps|proxmox)
-              patterns=("${AREA}")
-              ;;
-            *)
+          if [[ ! -d "${BASE}" ]]; then
+            echo "Base directory not found: ${BASE}" >&2
+            exit 1
+          fi
+
+          mapfile -t categories < <(find "${BASE}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+          if [[ "${#categories[@]}" -eq 0 ]]; then
+            echo "No categories found under ${BASE}"
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if [[ "${AREA}" == "all" ]]; then
+            patterns=("${categories[@]}")
+          else
+            if ! printf '%s\n' "${categories[@]}" | grep -qx "${AREA}"; then
               echo "Unknown area: ${AREA}" >&2
+              echo "Available categories: ${categories[*]}" >&2
               exit 1
-              ;;
-          esac
+            fi
+            patterns=("${AREA}")
+          fi
 
           files=()
           for pat in "${patterns[@]}"; do
@@ -89,6 +89,13 @@ jobs:
           printf '%s\n' "${files[@]}" > /tmp/ops-scripts.txt
           echo "found=true" >> "${GITHUB_OUTPUT}"
           echo "count=${#files[@]}" >> "${GITHUB_OUTPUT}"
+
+      - name: Dry run summary
+        if: steps.discover.outputs.found == 'true' && env.DRY_RUN == 'true'
+        run: |
+          set -euo pipefail
+          echo "Dry run enabled. Scripts selected:"
+          cat /tmp/ops-scripts.txt
 
       - name: Lint scripts
         if: steps.discover.outputs.found == 'true'
