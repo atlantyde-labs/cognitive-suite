@@ -8,31 +8,31 @@
 - `git` y `gh` instalados (opcional, se puede usar `git` directo)
 - Acceso a Internet solo para clonar/pull (si `LOCAL_FIRST=true`, bloqueará endpoints externos no permitidos)
 
-## 1) Crear el archivo `/tmp/started-kit.env`
+## 1) Crear el archivo `/tmp/started-kit.env` (rutas locales con placeholders)
 
 ```bash
 cat <<'ENV' > /tmp/started-kit.env
 REPO_URL="https://github.com/atlantyde-labs/cognitive-suite.git"
 BRANCH="chore/scripts-testing"
-DEST_DIR="/home/kabehz/cognitive-suite"
+DEST_DIR="$HOME/cognitive-suite"
 USE_GH="true"
 RUN_BOOTSTRAP="true"
 
-BOOTSTRAP_ENV="/home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env"
-BOOTSTRAP_PATH="/home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.sh"
+BOOTSTRAP_ENV="$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env"
+BOOTSTRAP_PATH="$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.sh"
 ENV
 ```
 
 > Si no quieres usar `gh`, pon `USE_GH="false"`.
 
-## 2) Preparar `/home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env`
+## 2) Preparar `$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env`
 
 Si aún no existe, el starter lo creará desde `bootstrap.env.example`. Ajusta con estos valores seguros:
 
 ```bash
-cat <<'ENV' > /home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env
-REPO_DIR="/home/kabehz/cognitive-suite"
-SUITE_ENV="/home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/deploy-all-secret-suite.env"
+cat <<'ENV' > "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env"
+REPO_DIR="$HOME/cognitive-suite"
+SUITE_ENV="$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/deploy-all-secret-suite.env"
 
 COPY_EXAMPLES="true"
 FIX_PERMS="true"
@@ -51,7 +51,7 @@ ENV
 ## 3) Ejecutar el starter (pull + bootstrap)
 
 ```bash
-bash /home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/started-kit-deployments-cli-ops.sh /tmp/started-kit.env
+bash "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/started-kit-deployments-cli-ops.sh" /tmp/started-kit.env
 ```
 
 Esto:
@@ -61,7 +61,7 @@ Esto:
 
 ## 4) Ajustar el orquestador (API + SSH)
 
-En `deploy-all-secret-suite.env`:
+En `deploy-all-secret-suite.env` (puedes usar placeholders locales):
 
 ```bash
 API_ONLY="true"
@@ -74,19 +74,25 @@ En `deploy-gitea-lxc-api.env`:
 
 ```bash
 BOOTSTRAP_SSH="true"
-# Si usas DHCP, debes definirlo manualmente
+# Si usas DHCP, define el host manualmente (placeholder)
 BOOTSTRAP_SSH_HOST="<IP_DEL_LXC>"
 BOOTSTRAP_SSH_USER="root"
 BOOTSTRAP_SSH_PORT="22"
-BOOTSTRAP_SSH_KEY="/home/kabehz/.ssh/id_rsa"
+BOOTSTRAP_SSH_KEY="$HOME/.ssh/id_rsa"
+```
+
+Opcional: obtener atributos locales automáticamente al cargar el env (si lo deseas):
+
+```bash
+GITEA_DOMAIN="$(hostname -f)"
 ```
 
 ## 5) Ejecutar en modo APPLY (solo cuando todo esté validado)
 
 ```bash
 APPLY=true CONFIRM_APPLY=YES \
-  bash /home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.sh \
-  /home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env
+  bash "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.sh" \
+  "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env"
 ```
 
 ## 6) Ventana de reinicio controlada (si hace falta)
@@ -94,19 +100,19 @@ APPLY=true CONFIRM_APPLY=YES \
 Permitir reinicio temporal:
 
 ```bash
-sudo bash /home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/platforms/ops-systems/allow-reboot-now.sh
+sudo bash "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/platforms/ops-systems/allow-reboot-now.sh"
 ```
 
 Cerrar ventana manualmente:
 
 ```bash
-sudo bash /home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/platforms/ops-systems/close-reboot-override.sh
+sudo bash "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/platforms/ops-systems/close-reboot-override.sh"
 ```
 
 Consultar estado:
 
 ```bash
-sudo bash /home/kabehz/cognitive-suite/bash/GitDevSecDataAIOps/platforms/ops-systems/reboot-guard-status.sh
+sudo bash "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/platforms/ops-systems/reboot-guard-status.sh"
 ```
 
 ---

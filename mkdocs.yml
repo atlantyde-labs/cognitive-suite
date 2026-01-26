@@ -93,6 +93,7 @@ nav:
       - Respuesta a incidentes: internal/incident-response-playbook.md
       - Revisión de accesos: internal/access-review.md
       - Registro de evidencias: internal/control-evidence-log.md
+      - Learning by Doing (Proxmox): internal/learning-by-doing-proxmox.md
       - Ejemplos:
           - Ejemplo DPIA: internal/examples/dpia-example.md
           - Ejemplo RoPA: internal/examples/ropa-example.md
