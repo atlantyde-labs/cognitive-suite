@@ -374,6 +374,18 @@ ENV_FILE="${RUNNER_ENV}" DRY_RUN=true bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/
 record_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/install-gitea-runner-systemd.sh"
 DRY_RUN=true bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/install-gitea-runner-systemd.sh" "${RUNNER_ENV}"
 
+AIRGAP_SAFE_ENV="${TMP_DIR}/airgap-safe.env"
+cat <<EOF > "${AIRGAP_SAFE_ENV}"
+DRY_RUN="true"
+ENABLE_REBOOT_GUARD="false"
+PREPARE_AIRGAP="false"
+APPLY_AIRGAP="false"
+PRE_PUBLISH_CHECKS="false"
+SYNC_PUBLIC="false"
+HITL_REQUIRED="false"
+EOF
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/airgap-safe-ops.sh" "${AIRGAP_SAFE_ENV}"
+
 if [[ -n "${EVIDENCE_DIR:-}" ]]; then
   mkdir -p "${EVIDENCE_DIR}"
   printf '%s\n' "${EXECUTED_SCRIPTS[@]}" | sort -u > "${EVIDENCE_DIR}/mock-e2e-scripts.txt"
