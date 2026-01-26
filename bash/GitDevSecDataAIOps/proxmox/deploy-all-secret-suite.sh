@@ -30,6 +30,9 @@ LOCAL_FIRST=${LOCAL_FIRST:-"true"}
 ALLOW_EXTERNAL=${ALLOW_EXTERNAL:-"false"}
 DRY_RUN=${DRY_RUN:-"false"}
 
+DRY_RUN_REPORT=${DRY_RUN_REPORT:-"false"}
+DRY_RUN_REPORT_PATH=${DRY_RUN_REPORT_PATH:-"./outputs/dry-run-report.json"}
+
 RUN_DEPLOY_GITEA=${RUN_DEPLOY_GITEA:-"false"}
 RUN_HARDEN=${RUN_HARDEN:-"false"}
 RUN_COMPLIANCE_LABELS=${RUN_COMPLIANCE_LABELS:-"false"}
@@ -60,6 +63,8 @@ GITHUB_IMPORT_ENV=${GITHUB_IMPORT_ENV:-""}
 GITLAB_ENV=${GITLAB_ENV:-""}
 USER_MAP_VALIDATE_ENV=${USER_MAP_VALIDATE_ENV:-""}
 SECRETS_ENV=${SECRETS_ENV:-""}
+
+REPORT_ENTRIES=()
 
 require_file() {
   local path=$1
@@ -109,9 +114,50 @@ require_external_allowed() {
   fi
 }
 
+record_report() {
+  if [[ "${DRY_RUN_REPORT}" != "true" ]]; then
+    return
+  fi
+  local step=$1
+  local env_file=$2
+  local status=$3
+  local note=$4
+  local ts
+  ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  local entry
+  entry=$(printf '{"timestamp":"%s","step":"%s","env_file":"%s","dry_run":%s,"status":"%s","note":"%s"}' \
+    "${ts}" "${step}" "${env_file}" "${DRY_RUN}" "${status}" "${note}")
+  REPORT_ENTRIES+=("${entry}")
+}
+
+flush_report() {
+  if [[ "${DRY_RUN_REPORT}" != "true" ]]; then
+    return
+  fi
+  local lines
+  lines=$(printf '%s\n' "${REPORT_ENTRIES[@]}")
+  local report_dir
+  report_dir=$(dirname "${DRY_RUN_REPORT_PATH}")
+  mkdir -p "${report_dir}"
+  local report
+  report=$(REPORT_LINES="${lines}" python3 - <<'PY'
+import json
+import os
+
+raw = os.environ.get("REPORT_LINES", "")
+lines = [l.strip() for l in raw.splitlines() if l.strip()]
+print(json.dumps({"entries":[json.loads(l) for l in lines]}, ensure_ascii=True, indent=2))
+PY
+  )
+  echo "${report}" > "${DRY_RUN_REPORT_PATH}"
+  log "Dry-run report written to ${DRY_RUN_REPORT_PATH}"
+}
+
 run_script() {
   local script=$1
   local env_file=$2
+  local step=$3
+
   log "Running ${script}"
   if [[ "${DRY_RUN}" == "true" ]]; then
     if [[ -n "${env_file}" ]]; then
@@ -119,12 +165,14 @@ run_script() {
     else
       env FORCE_DRY_RUN=true "${script}"
     fi
+    record_report "${step}" "${env_file}" "dry-run" "executed"
   else
     if [[ -n "${env_file}" ]]; then
       "${script}" "${env_file}"
     else
       "${script}"
     fi
+    record_report "${step}" "${env_file}" "applied" "executed"
   fi
 }
 
@@ -150,86 +198,87 @@ fi
 # Deploy Gitea on Proxmox LXC
 if [[ "${RUN_DEPLOY_GITEA}" == "true" ]]; then
   require_file "${GITEA_LXC_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/proxmox/deploy-gitea-lxc.sh" "${GITEA_LXC_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/proxmox/deploy-gitea-lxc.sh" "${GITEA_LXC_ENV}" "deploy_gitea"
 fi
 
 # Hardening
 if [[ "${RUN_HARDEN}" == "true" ]]; then
   require_file "${HARDEN_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/gitea-hardening.sh" "${HARDEN_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/gitea-hardening.sh" "${HARDEN_ENV}" "hardening"
 fi
 
 # Compliance labels/milestones
 if [[ "${RUN_COMPLIANCE_LABELS}" == "true" ]]; then
   require_file "${COMPLIANCE_LABELS_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/create-compliance-labels-milestones.sh" "${COMPLIANCE_LABELS_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/create-compliance-labels-milestones.sh" "${COMPLIANCE_LABELS_ENV}" "compliance_labels"
 fi
 
 # Repo type labels/milestones
 if [[ "${RUN_REPO_TYPE_LABELS}" == "true" ]]; then
   require_file "${REPO_TYPE_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/repo-type-labels-milestones.sh" "${REPO_TYPE_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/repo-type-labels-milestones.sh" "${REPO_TYPE_ENV}" "repo_type_labels"
 fi
 
 # Validate SSO/MFA API
 if [[ "${RUN_VALIDATE_SSO_MFA}" == "true" ]]; then
   require_file "${SSO_MFA_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/validate-sso-mfa-api.sh" "${SSO_MFA_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/validate-sso-mfa-api.sh" "${SSO_MFA_ENV}" "validate_sso_mfa"
 fi
 
 # Compliance report
 if [[ "${RUN_COMPLIANCE_REPORT}" == "true" ]]; then
   require_file "${COMPLIANCE_REPORT_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/eu-compliance-report.sh" "${COMPLIANCE_REPORT_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/eu-compliance-report.sh" "${COMPLIANCE_REPORT_ENV}" "compliance_report"
 fi
 
 # GitHub migrations (external)
 if [[ "${RUN_GITHUB_BOOTSTRAP}" == "true" ]]; then
   require_external_allowed "GitHub bootstrap"
   require_file "${GITHUB_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/github-to-gitea-bootstrap.sh" "${GITHUB_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/github-to-gitea-bootstrap.sh" "${GITHUB_ENV}" "github_bootstrap"
 fi
 
 if [[ "${RUN_GITHUB_SYNC}" == "true" ]]; then
   require_external_allowed "GitHub sync"
   require_file "${GITHUB_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/github-to-gitea-sync.sh" "${GITHUB_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/github-to-gitea-sync.sh" "${GITHUB_ENV}" "github_sync"
 fi
 
 if [[ "${RUN_GITHUB_EXPORT}" == "true" ]]; then
   require_external_allowed "GitHub export issues/PRs"
   require_file "${GITHUB_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/github-issues-prs-export.sh" "${GITHUB_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/github-issues-prs-export.sh" "${GITHUB_ENV}" "github_export"
 fi
 
 if [[ "${RUN_GITHUB_IMPORT}" == "true" ]]; then
   require_file "${GITHUB_IMPORT_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/github-to-gitea-import-issues-prs.sh" "${GITHUB_IMPORT_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/github-to-gitea-import-issues-prs.sh" "${GITHUB_IMPORT_ENV}" "github_import"
 fi
 
 # GitLab migrations (external)
 if [[ "${RUN_GITLAB_BOOTSTRAP}" == "true" ]]; then
   require_external_allowed "GitLab bootstrap"
   require_file "${GITLAB_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/gitlab-to-gitea-bootstrap.sh" "${GITLAB_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/gitlab-to-gitea-bootstrap.sh" "${GITLAB_ENV}" "gitlab_bootstrap"
 fi
 
 if [[ "${RUN_GITLAB_SYNC}" == "true" ]]; then
   require_external_allowed "GitLab sync"
   require_file "${GITLAB_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/gitlab-to-gitea-sync.sh" "${GITLAB_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/gitlab-to-gitea-sync.sh" "${GITLAB_ENV}" "gitlab_sync"
 fi
 
 # Validate user map
 if [[ "${RUN_VALIDATE_USER_MAP}" == "true" ]]; then
   require_file "${USER_MAP_VALIDATE_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/validate-gitea-user-map.sh" "${USER_MAP_VALIDATE_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/migrations/validate-gitea-user-map.sh" "${USER_MAP_VALIDATE_ENV}" "validate_user_map"
 fi
 
 # Secrets rehydration
 if [[ "${RUN_SECRETS}" == "true" ]]; then
   require_file "${SECRETS_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/tooling/secrets/rehydrate-secrets.sh" "${SECRETS_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/tooling/secrets/rehydrate-secrets.sh" "${SECRETS_ENV}" "rehydrate_secrets"
 fi
 
+flush_report
 log "All requested steps completed."
