@@ -13,6 +13,7 @@ fi
 
 ROOTS=${ROOTS:-"."}
 OUTPUT_PATH=${OUTPUT_PATH:-"outputs/model-inventory.json"}
+WHITELIST_PATH=${WHITELIST_PATH:-"outputs/model-whitelist.json"}
 ALERTS_PATH=${ALERTS_PATH:-"outputs/model-alerts.json"}
 HASH_MODE=${HASH_MODE:-"none"}
 DEFAULT_SENSITIVITY=${DEFAULT_SENSITIVITY:-"INTERNAL"}
@@ -21,11 +22,13 @@ QUARANTINE_MODE=${QUARANTINE_MODE:-"none"}
 VAULT_DIR=${VAULT_DIR:-""}
 DRY_RUN=${DRY_RUN:-"false"}
 FAIL_ON_VIOLATION=${FAIL_ON_VIOLATION:-"false"}
+PRESERVE_PATHS=${PRESERVE_PATHS:-"false"}
 
 args=(
   "$(dirname "$0")/model_inventory.py"
   --roots "${ROOTS}"
   --output "${OUTPUT_PATH}"
+  --whitelist-output "${WHITELIST_PATH}"
   --hash "${HASH_MODE}"
   --default-sensitivity "${DEFAULT_SENSITIVITY}"
   --alerts-output "${ALERTS_PATH}"
@@ -42,6 +45,9 @@ if [[ "${QUARANTINE_MODE}" != "none" ]]; then
 fi
 if [[ "${DRY_RUN}" == "true" ]]; then
   args+=(--dry-run)
+fi
+if [[ "${PRESERVE_PATHS}" == "true" ]]; then
+  args+=(--preserve-paths)
 fi
 if [[ "${FAIL_ON_VIOLATION}" == "true" ]]; then
   args+=(--fail-on-violation)

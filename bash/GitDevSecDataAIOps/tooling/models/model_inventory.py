@@ -103,6 +103,19 @@ def is_under(path: Path, roots: List[Path]) -> bool:
     return False
 
 
+def compute_relative(path: Path, roots: List[Path]) -> Path:
+    for root in roots:
+        try:
+            rel = path.relative_to(root)
+            base = root.as_posix().strip("/").replace("/", "_") or root.name
+            return Path(base) / rel
+        except ValueError:
+            continue
+    if path.is_absolute():
+        return Path(*path.parts[1:])
+    return path
+
+
 def collect_artifacts(roots: List[Path], hash_mode: str, default_sensitivity: str) -> List[Dict]:
     artifacts = []
     for root in roots:
@@ -139,9 +152,19 @@ def collect_artifacts(roots: List[Path], hash_mode: str, default_sensitivity: st
     return artifacts
 
 
-def move_or_copy(src: Path, dest_dir: Path, mode: str, dry_run: bool) -> str:
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    dest = dest_dir / src.name
+def move_or_copy(
+    src: Path,
+    dest_dir: Path,
+    mode: str,
+    dry_run: bool,
+    preserve_paths: bool,
+    roots: List[Path],
+) -> str:
+    if preserve_paths:
+        dest = dest_dir / compute_relative(src, roots)
+    else:
+        dest = dest_dir / src.name
+    dest.parent.mkdir(parents=True, exist_ok=True)
     if dry_run:
         return f"dry-run:{mode}:{dest}"
     if mode == "move":
@@ -157,13 +180,15 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--roots", default=".", help="Comma-separated roots to scan")
     parser.add_argument("--output", default="outputs/model-inventory.json")
+    parser.add_argument("--whitelist-output", default="outputs/model-whitelist.json")
+    parser.add_argument("--alerts-output", default="outputs/model-alerts.json")
     parser.add_argument("--hash", choices=["none", "sha256"], default="none")
     parser.add_argument("--default-sensitivity", default="INTERNAL")
     parser.add_argument("--allowed-secret-roots", default="", help="Comma-separated roots allowed for SECRET artifacts")
     parser.add_argument("--quarantine-mode", choices=["none", "copy", "move"], default="none")
     parser.add_argument("--vault-dir", default="", help="Target directory for quarantine")
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--alerts-output", default="outputs/model-alerts.json")
+    parser.add_argument("--preserve-paths", action="store_true")
     parser.add_argument("--fail-on-violation", action="store_true")
     args = parser.parse_args()
 
@@ -174,6 +199,8 @@ def main() -> int:
 
     violations = []
     actions = []
+    allowed = []
+    allowlist_configured = bool(allowed_secret_roots)
 
     for item in artifacts:
         path = Path(item["path"])
@@ -185,11 +212,25 @@ def main() -> int:
                 "reason": "SECRET artifact outside allowed roots",
             })
             if args.quarantine_mode != "none" and args.vault_dir:
-                action = move_or_copy(path, Path(args.vault_dir), args.quarantine_mode, args.dry_run)
+                action = move_or_copy(
+                    path,
+                    Path(args.vault_dir),
+                    args.quarantine_mode,
+                    args.dry_run,
+                    args.preserve_paths,
+                    roots,
+                )
                 actions.append({
                     "path": item["path"],
                     "action": action,
                 })
+        else:
+            allowed.append({
+                "path": item["path"],
+                "kind": item["kind"],
+                "origin": item["origin"],
+                "sensitivity": item["sensitivity"],
+            })
 
     summary = {}
     for item in artifacts:
@@ -207,6 +248,16 @@ def main() -> int:
     with open(args.output, "w", encoding="utf-8") as fh:
         json.dump(payload, fh, ensure_ascii=True, indent=2)
 
+    whitelist = {
+        "generated_at": payload["generated_at"],
+        "allowlist_configured": allowlist_configured,
+        "allowed_secret_roots": [str(r) for r in allowed_secret_roots],
+        "allowed": allowed,
+    }
+    os.makedirs(os.path.dirname(args.whitelist_output) or ".", exist_ok=True)
+    with open(args.whitelist_output, "w", encoding="utf-8") as fh:
+        json.dump(whitelist, fh, ensure_ascii=True, indent=2)
+
     alerts = {
         "generated_at": payload["generated_at"],
         "violations": violations,
@@ -217,6 +268,7 @@ def main() -> int:
         json.dump(alerts, fh, ensure_ascii=True, indent=2)
 
     print(f"Inventory written to {args.output} ({len(artifacts)} items)")
+    print(f"Whitelist written to {args.whitelist_output} ({len(allowed)} allowed)")
     print(f"Alerts written to {args.alerts_output} ({len(violations)} violations)")
 
     if args.fail_on_violation and violations:

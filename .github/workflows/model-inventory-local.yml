@@ -20,6 +20,11 @@ on:
         description: "Quarantine target directory"
         required: false
         default: "/var/lib/secret-models/quarantine"
+      preserve_paths:
+        description: "Preserve folder structure in quarantine"
+        type: boolean
+        required: false
+        default: true
       fail_on_violation:
         description: "Fail workflow if violations detected"
         type: boolean
@@ -47,6 +52,7 @@ jobs:
           QUARANTINE_MODE: ${{ github.event.inputs.quarantine_mode }}
           VAULT_DIR: ${{ github.event.inputs.vault_dir }}
           FAIL_ON_VIOLATION: ${{ github.event.inputs.fail_on_violation }}
+          PRESERVE_PATHS: ${{ github.event.inputs.preserve_paths }}
           HASH_MODE: ${{ github.event.inputs.hash_mode }}
         run: |
           set -euo pipefail
@@ -54,6 +60,7 @@ jobs:
           args=(
             --roots "${ROOTS}"
             --output "${OUT}"
+            --whitelist-output outputs/model-whitelist.json
             --hash "${HASH_MODE}"
             --default-sensitivity "INTERNAL"
             --alerts-output outputs/model-alerts.json
@@ -69,6 +76,9 @@ jobs:
           fi
           if [[ "${FAIL_ON_VIOLATION}" == "true" ]]; then
             args+=(--fail-on-violation)
+          fi
+          if [[ "${PRESERVE_PATHS}" == "true" ]]; then
+            args+=(--preserve-paths)
           fi
           python3 bash/GitDevSecDataAIOps/tooling/models/model_inventory.py "${args[@]}"
           echo "Inventory written to ${OUT} (local only)"
