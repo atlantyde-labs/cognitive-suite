@@ -63,34 +63,64 @@ map_owner() {
   echo "${gh_owner}"
 }
 
-map_user() {
-  local gh_user=$1
-  if [[ -z "${gh_user}" ]]; then
-    echo ""
-    return
-  fi
+declare -A USER_MAP_TABLE
+
+load_user_map() {
   if [[ -n "${USER_MAP}" ]]; then
     local mapping
     IFS=',' read -r -a mapping <<< "${USER_MAP}"
     for pair in "${mapping[@]}"; do
       local k=${pair%%=*}
       local v=${pair#*=}
-      if [[ "${k}" == "${gh_user}" ]]; then
-        echo "${v}"
-        return
+      if [[ -n "${k}" && -n "${v}" ]]; then
+        USER_MAP_TABLE["${k}"]="${v}"
       fi
     done
   fi
+
   if [[ -n "${USER_MAP_FILE}" && -f "${USER_MAP_FILE}" ]]; then
-    local mapped
-    mapped=$(awk -F '=' -v k="${gh_user}" '$1 == k {print $2}' "${USER_MAP_FILE}")
-    if [[ -n "${mapped}" ]]; then
-      echo "${mapped}"
-      return
-    fi
+    while IFS= read -r line; do
+      [[ -z "${line}" ]] && continue
+      [[ "${line}" == \#* ]] && continue
+
+      if [[ "${line}" == *","* ]]; then
+        local gh_user gitea_user
+        IFS=',' read -r gh_user gitea_user _ <<< "${line}"
+        if [[ "${gh_user}" == "github_user" ]]; then
+          continue
+        fi
+        gh_user=$(echo "${gh_user}" | xargs)
+        gitea_user=$(echo "${gitea_user}" | xargs)
+        if [[ -n "${gh_user}" && -n "${gitea_user}" ]]; then
+          USER_MAP_TABLE["${gh_user}"]="${gitea_user}"
+        fi
+      else
+        local gh_user gitea_user
+        IFS='=' read -r gh_user gitea_user <<< "${line}"
+        gh_user=$(echo "${gh_user}" | xargs)
+        gitea_user=$(echo "${gitea_user}" | xargs)
+        if [[ -n "${gh_user}" && -n "${gitea_user}" ]]; then
+          USER_MAP_TABLE["${gh_user}"]="${gitea_user}"
+        fi
+      fi
+    done < "${USER_MAP_FILE}"
+  fi
+}
+
+map_user() {
+  local gh_user=$1
+  if [[ -z "${gh_user}" ]]; then
+    echo ""
+    return
+  fi
+  if [[ -n "${USER_MAP_TABLE[${gh_user}]:-}" ]]; then
+    echo "${USER_MAP_TABLE[${gh_user}]}"
+    return
   fi
   echo ""
 }
+
+load_user_map
 
 api_get() {
   local path=$1
