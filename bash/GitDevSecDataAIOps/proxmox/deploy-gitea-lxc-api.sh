@@ -53,6 +53,27 @@ GITEA_MEMORY=${GITEA_MEMORY:-"4096"}
 GITEA_CORES=${GITEA_CORES:-"2"}
 GITEA_DISK=${GITEA_DISK:-"40"}
 GITEA_IP=${GITEA_IP:-"dhcp"}
+GITEA_HTTP_PORT=${GITEA_HTTP_PORT:-"3000"}
+GITEA_SSH_PORT=${GITEA_SSH_PORT:-"2222"}
+GITEA_DOMAIN=${GITEA_DOMAIN:-"gitea.local"}
+GITEA_VERSION=${GITEA_VERSION:-"1.22.2"}
+GITEA_DATA_DIR=${GITEA_DATA_DIR:-"/opt/gitea/data"}
+
+GITEA_DB_TYPE=${GITEA_DB_TYPE:-"sqlite3"}
+GITEA_DB_HOST=${GITEA_DB_HOST:-""}
+GITEA_DB_NAME=${GITEA_DB_NAME:-"gitea"}
+GITEA_DB_USER=${GITEA_DB_USER:-"gitea"}
+GITEA_DB_PASS=${GITEA_DB_PASS:-""}
+
+BOOTSTRAP_SSH=${BOOTSTRAP_SSH:-"false"}
+BOOTSTRAP_SSH_HOST=${BOOTSTRAP_SSH_HOST:-""}
+BOOTSTRAP_SSH_USER=${BOOTSTRAP_SSH_USER:-"root"}
+BOOTSTRAP_SSH_PORT=${BOOTSTRAP_SSH_PORT:-"22"}
+BOOTSTRAP_SSH_KEY=${BOOTSTRAP_SSH_KEY:-""}
+BOOTSTRAP_SSH_STRICT=${BOOTSTRAP_SSH_STRICT:-"true"}
+BOOTSTRAP_SSH_CONNECT_TIMEOUT=${BOOTSTRAP_SSH_CONNECT_TIMEOUT:-"10"}
+BOOTSTRAP_SSH_WAIT_SECS=${BOOTSTRAP_SSH_WAIT_SECS:-"60"}
+BOOTSTRAP_SSH_SLEEP=${BOOTSTRAP_SSH_SLEEP:-"5"}
 
 require_cmd jq
 require_cmd curl
@@ -159,6 +180,153 @@ start_container() {
   api_post "/nodes/${PVE_NODE}/lxc/${GITEA_CTID}/status/start"
 }
 
+resolve_bootstrap_host() {
+  if [[ -n "${BOOTSTRAP_SSH_HOST}" ]]; then
+    return
+  fi
+  if [[ "${GITEA_IP}" != "dhcp" ]]; then
+    BOOTSTRAP_SSH_HOST="${GITEA_IP%%/*}"
+  fi
+  if [[ -z "${BOOTSTRAP_SSH_HOST}" ]]; then
+    fail "BOOTSTRAP_SSH_HOST is required when BOOTSTRAP_SSH=true and GITEA_IP=dhcp"
+  fi
+}
+
+build_ssh_opts() {
+  SSH_OPTS=(
+    -p "${BOOTSTRAP_SSH_PORT}"
+    -o BatchMode=yes
+    -o ConnectTimeout="${BOOTSTRAP_SSH_CONNECT_TIMEOUT}"
+  )
+  if [[ -n "${BOOTSTRAP_SSH_KEY}" ]]; then
+    SSH_OPTS+=(-i "${BOOTSTRAP_SSH_KEY}" -o IdentitiesOnly=yes)
+  fi
+  if [[ "${BOOTSTRAP_SSH_STRICT}" != "true" ]]; then
+    SSH_OPTS+=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null)
+  fi
+}
+
+wait_for_ssh() {
+  local max_attempts=1
+  if [[ "${BOOTSTRAP_SSH_WAIT_SECS}" =~ ^[0-9]+$ ]] && [[ "${BOOTSTRAP_SSH_SLEEP}" =~ ^[0-9]+$ ]]; then
+    if (( BOOTSTRAP_SSH_SLEEP > 0 )); then
+      max_attempts=$((BOOTSTRAP_SSH_WAIT_SECS / BOOTSTRAP_SSH_SLEEP))
+      if (( max_attempts < 1 )); then
+        max_attempts=1
+      fi
+    fi
+  fi
+  local attempt=1
+  while (( attempt <= max_attempts )); do
+    if ssh "${SSH_OPTS[@]}" "${BOOTSTRAP_SSH_USER}@${BOOTSTRAP_SSH_HOST}" "true" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep "${BOOTSTRAP_SSH_SLEEP}"
+    attempt=$((attempt + 1))
+  done
+  return 1
+}
+
+bootstrap_gitea() {
+  if [[ "${BOOTSTRAP_SSH}" != "true" ]]; then
+    return
+  fi
+
+  require_cmd ssh
+  resolve_bootstrap_host
+  build_ssh_opts
+
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    log "[dry-run] would bootstrap via SSH to ${BOOTSTRAP_SSH_USER}@${BOOTSTRAP_SSH_HOST}:${BOOTSTRAP_SSH_PORT}"
+    return
+  fi
+
+  if ! wait_for_ssh; then
+    fail "SSH not reachable at ${BOOTSTRAP_SSH_USER}@${BOOTSTRAP_SSH_HOST}:${BOOTSTRAP_SSH_PORT}"
+  fi
+
+  log "Bootstrapping Gitea via SSH to ${BOOTSTRAP_SSH_USER}@${BOOTSTRAP_SSH_HOST}:${BOOTSTRAP_SSH_PORT}"
+
+  local root_url
+  root_url=${GITEA_ROOT_URL:-"http://${GITEA_DOMAIN}:${GITEA_HTTP_PORT}/"}
+
+  local env_assignments=(
+    "GITEA_DOMAIN=$(printf %q "${GITEA_DOMAIN}")"
+    "GITEA_ROOT_URL=$(printf %q "${root_url}")"
+    "GITEA_HTTP_PORT=$(printf %q "${GITEA_HTTP_PORT}")"
+    "GITEA_SSH_PORT=$(printf %q "${GITEA_SSH_PORT}")"
+    "GITEA_VERSION=$(printf %q "${GITEA_VERSION}")"
+    "GITEA_DATA_DIR=$(printf %q "${GITEA_DATA_DIR}")"
+    "GITEA_DB_TYPE=$(printf %q "${GITEA_DB_TYPE}")"
+    "GITEA_DB_HOST=$(printf %q "${GITEA_DB_HOST}")"
+    "GITEA_DB_NAME=$(printf %q "${GITEA_DB_NAME}")"
+    "GITEA_DB_USER=$(printf %q "${GITEA_DB_USER}")"
+    "GITEA_DB_PASS=$(printf %q "${GITEA_DB_PASS}")"
+  )
+
+  # shellcheck disable=SC2029
+  ssh "${SSH_OPTS[@]}" "${BOOTSTRAP_SSH_USER}@${BOOTSTRAP_SSH_HOST}" \
+    "export ${env_assignments[*]}; bash -s" <<'REMOTE'
+set -euo pipefail
+export DEBIAN_FRONTEND=noninteractive
+
+apt-get update
+apt-get install -y --no-install-recommends ca-certificates curl gnupg lsb-release docker.io docker-compose-plugin
+systemctl enable --now docker
+
+install -d /opt/gitea
+install -d "${GITEA_DATA_DIR}"
+
+cat <<'YAML' > /opt/gitea/docker-compose.yml
+services:
+  gitea:
+    image: gitea/gitea:${GITEA_VERSION}
+    container_name: gitea
+    restart: unless-stopped
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__server__DOMAIN=${GITEA_DOMAIN}
+      - GITEA__server__ROOT_URL=${GITEA_ROOT_URL}
+      - GITEA__server__SSH_DOMAIN=${GITEA_DOMAIN}
+      - GITEA__server__HTTP_PORT=${GITEA_HTTP_PORT}
+      - GITEA__server__SSH_PORT=${GITEA_SSH_PORT}
+      - GITEA__database__DB_TYPE=${GITEA_DB_TYPE}
+      - GITEA__database__HOST=${GITEA_DB_HOST}
+      - GITEA__database__NAME=${GITEA_DB_NAME}
+      - GITEA__database__USER=${GITEA_DB_USER}
+      - GITEA__database__PASSWD=${GITEA_DB_PASS}
+    volumes:
+      - ${GITEA_DATA_DIR}:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "${GITEA_HTTP_PORT}:3000"
+      - "${GITEA_SSH_PORT}:22"
+YAML
+
+cat <<'SERVICE' > /etc/systemd/system/gitea-compose.service
+[Unit]
+Description=Gitea (docker compose)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/gitea
+RemainAfterExit=true
+ExecStart=/usr/bin/docker compose up -d
+ExecStop=/usr/bin/docker compose down
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+systemctl daemon-reload
+systemctl enable --now gitea-compose.service
+REMOTE
+}
+
 if [[ "${DRY_RUN}" == "true" ]]; then
   log "Dry run enabled. Writes will be skipped; read-only checks still run."
 fi
@@ -172,4 +340,10 @@ else
   start_container
 fi
 
-log "API provisioning finished. Run deploy-gitea-lxc.sh on the Proxmox host to configure Gitea inside the LXC."
+bootstrap_gitea
+
+if [[ "${BOOTSTRAP_SSH}" == "true" ]]; then
+  log "Gitea bootstrap complete. URL: http://${GITEA_DOMAIN}:${GITEA_HTTP_PORT}"
+else
+  log "API provisioning finished. Run deploy-gitea-lxc.sh on the Proxmox host to configure Gitea inside the LXC."
+fi
