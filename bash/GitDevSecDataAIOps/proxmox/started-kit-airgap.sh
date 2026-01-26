@@ -29,6 +29,8 @@ BOOTSTRAP_ENV=${BOOTSTRAP_ENV:-"${DEST_DIR}/bash/GitDevSecDataAIOps/proxmox/boot
 BOOTSTRAP_PATH=${BOOTSTRAP_PATH:-"${DEST_DIR}/bash/GitDevSecDataAIOps/proxmox/bootstrap.sh"}
 SYNC_MODE=${SYNC_MODE:-"rsync"}
 RSYNC_ARGS=${RSYNC_ARGS:-"-a --delete"}
+HASH_MANIFEST=${HASH_MANIFEST:-""}
+HASH_REQUIRED=${HASH_REQUIRED:-"false"}
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || fail "Missing required command: $1"
@@ -55,6 +57,43 @@ elif [[ "${SYNC_MODE}" == "tar" ]]; then
 else
   fail "Unsupported SYNC_MODE: ${SYNC_MODE}"
 fi
+
+verify_hashes() {
+  if [[ -z "${HASH_MANIFEST}" ]]; then
+    if [[ "${HASH_REQUIRED}" == "true" ]]; then
+      fail "HASH_MANIFEST is required but not set"
+    fi
+    log "Hash manifest not configured; skipping integrity check"
+    return
+  fi
+
+  local manifest_path="${HASH_MANIFEST}"
+  if [[ "${HASH_MANIFEST}" != /* ]]; then
+    manifest_path="${SOURCE_DIR}/${HASH_MANIFEST}"
+  fi
+
+  if [[ ! -f "${manifest_path}" ]]; then
+    fail "Hash manifest not found: ${manifest_path}"
+  fi
+
+  case "${manifest_path}" in
+    "${SOURCE_DIR}"/*) ;;
+    *) fail "Hash manifest must live under SOURCE_DIR" ;;
+  esac
+
+  local manifest_rel="${manifest_path#"${SOURCE_DIR}"/}"
+  log "Verifying hash manifest ${manifest_rel}"
+
+  if command -v sha256sum >/dev/null 2>&1; then
+    (cd "${SOURCE_DIR}" && sha256sum -c "${manifest_rel}")
+  elif command -v shasum >/dev/null 2>&1; then
+    (cd "${SOURCE_DIR}" && shasum -a 256 -c "${manifest_rel}")
+  else
+    fail "No sha256 tool found (sha256sum or shasum required)"
+  fi
+}
+
+verify_hashes
 
 if [[ "${RUN_BOOTSTRAP}" == "true" ]]; then
   if [[ ! -x "${BOOTSTRAP_PATH}" ]]; then

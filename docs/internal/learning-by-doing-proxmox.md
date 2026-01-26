@@ -74,11 +74,20 @@ BOOTSTRAP_PATH="$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.
 
 SYNC_MODE="rsync"
 RSYNC_ARGS="-a --delete"
+HASH_MANIFEST="SHA256SUMS"
+HASH_REQUIRED="true"
 ENV
 ```
 
 ```bash
 bash "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/started-kit-airgap.sh" /tmp/started-kit-airgap.env
+```
+
+Antes de mover el repo al USB, genera el manifiesto en el equipo origen:
+
+```bash
+cd /ruta/al/repo
+find . -type f -not -path './.git/*' -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
 ```
 
 ## 4) Ajustar el orquestador (API + SSH)
