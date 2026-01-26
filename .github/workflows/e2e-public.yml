@@ -87,6 +87,18 @@ jobs:
             REPO="${GITHUB_REPOSITORY}" \
             bash bash/GitDevSecDataAIOps/tooling/forensics/gh-actions-forensics.sh
 
+      - name: Ops state machine (mocked)
+        run: |
+          set -euo pipefail
+          OUTPUT_DIR=outputs/ci-evidence/ops-state \
+            REQUIRE_CLEAN_GIT="true" \
+            REQUIRE_GITLEAKS="false" \
+            REQUIRE_DETECT_SECRETS="false" \
+            HITL_REQUIRED="false" \
+            REQUIRE_APPROVALS="false" \
+            RUN_ORCHESTRATOR_DRY_RUN="false" \
+            bash bash/GitDevSecDataAIOps/tooling/ops-state/ops-state-machine.sh
+
       - name: Write evidence summary
         run: |
           set -euo pipefail

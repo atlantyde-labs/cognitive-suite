@@ -342,6 +342,21 @@ COSIGN_PUBLIC_KEY_HASH="${COSIGN_HASH}"
 EOF
 run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/started-kit-airgap.sh" "${AIRGAP_ENV}"
 
+# Ops state machine (local, mocked)
+record_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/ops-state/ops-state-machine.sh"
+OPS_STATE_ENV="${TMP_DIR}/ops-state.env"
+cat <<EOF > "${OPS_STATE_ENV}"
+REPO_DIR="${ROOT_DIR}"
+OUTPUT_DIR="${TMP_DIR}/ops-state"
+REQUIRE_CLEAN_GIT="false"
+REQUIRE_GITLEAKS="false"
+REQUIRE_DETECT_SECRETS="false"
+HITL_REQUIRED="false"
+REQUIRE_APPROVALS="false"
+RUN_ORCHESTRATOR_DRY_RUN="false"
+EOF
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/ops-state/ops-state-machine.sh" "${OPS_STATE_ENV}"
+
 # Gitea runner scripts (dry-run)
 RUNNER_ENV="${TMP_DIR}/runner.env"
 cat <<EOF > "${RUNNER_ENV}"

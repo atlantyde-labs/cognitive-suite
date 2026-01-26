@@ -10,6 +10,7 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   preflight:
@@ -60,3 +61,27 @@ jobs:
         run: |
           docker compose -f docker-compose.yml config -q || true
           docker compose -f docker-compose.prod.yml config -q || true
+
+  approval-gate:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Require 2 approvals
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO_SLUG: ${{ github.repository }}
+          REQUIRED_APPROVALS: "2"
+        run: |
+          set -euo pipefail
+          if [ -z "${GITHUB_TOKEN:-}" ]; then
+            echo "GITHUB_TOKEN not available" >&2
+            exit 1
+          fi
+          approvals=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${REPO_SLUG}/pulls/${PR_NUMBER}/reviews?per_page=100" \
+            | jq -r '[.[] | select(.state=="APPROVED") | .user.login] | unique | length')
+          if [ "${approvals}" -lt "${REQUIRED_APPROVALS}" ]; then
+            echo "Need ${REQUIRED_APPROVALS} approvals; got ${approvals}" >&2
+            exit 1
+          fi
