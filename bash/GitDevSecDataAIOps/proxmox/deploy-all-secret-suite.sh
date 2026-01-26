@@ -34,6 +34,7 @@ DRY_RUN_REPORT=${DRY_RUN_REPORT:-"false"}
 DRY_RUN_REPORT_PATH=${DRY_RUN_REPORT_PATH:-"./outputs/dry-run-report.json"}
 
 RUN_DEPLOY_GITEA=${RUN_DEPLOY_GITEA:-"false"}
+API_ONLY=${API_ONLY:-"false"}
 RUN_HARDEN=${RUN_HARDEN:-"false"}
 RUN_COMPLIANCE_LABELS=${RUN_COMPLIANCE_LABELS:-"false"}
 RUN_REPO_TYPE_LABELS=${RUN_REPO_TYPE_LABELS:-"false"}
@@ -52,6 +53,7 @@ RUN_VALIDATE_USER_MAP=${RUN_VALIDATE_USER_MAP:-"false"}
 RUN_SECRETS=${RUN_SECRETS:-"false"}
 
 GITEA_LXC_ENV=${GITEA_LXC_ENV:-""}
+GITEA_LXC_API_ENV=${GITEA_LXC_API_ENV:-""}
 HARDEN_ENV=${HARDEN_ENV:-""}
 COMPLIANCE_LABELS_ENV=${COMPLIANCE_LABELS_ENV:-""}
 REPO_TYPE_ENV=${REPO_TYPE_ENV:-""}
@@ -241,8 +243,16 @@ fi
 
 # Deploy Gitea on Proxmox LXC
 if [[ "${RUN_DEPLOY_GITEA}" == "true" ]]; then
-  require_file "${GITEA_LXC_ENV}"
-  run_script "${root_dir}/bash/GitDevSecDataAIOps/proxmox/deploy-gitea-lxc.sh" "${GITEA_LXC_ENV}" "deploy_gitea"
+  if [[ "${API_ONLY}" == "true" ]]; then
+    if [[ -z "${GITEA_LXC_API_ENV}" ]]; then
+      GITEA_LXC_API_ENV="${GITEA_LXC_ENV}"
+    fi
+    require_file "${GITEA_LXC_API_ENV}"
+    run_script "${root_dir}/bash/GitDevSecDataAIOps/proxmox/deploy-gitea-lxc-api.sh" "${GITEA_LXC_API_ENV}" "deploy_gitea_api"
+  else
+    require_file "${GITEA_LXC_ENV}"
+    run_script "${root_dir}/bash/GitDevSecDataAIOps/proxmox/deploy-gitea-lxc.sh" "${GITEA_LXC_ENV}" "deploy_gitea"
+  fi
 fi
 
 # Hardening
