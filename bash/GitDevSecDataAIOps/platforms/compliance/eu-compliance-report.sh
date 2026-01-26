@@ -43,6 +43,13 @@ BACKUP_MAX_AGE_DAYS=${BACKUP_MAX_AGE_DAYS:-"2"}
 
 COMPLIANCE_REPORT_PATH=${COMPLIANCE_REPORT_PATH:-""}
 
+SSO_STATUS_ENDPOINT=${SSO_STATUS_ENDPOINT:-""}
+MFA_STATUS_ENDPOINT=${MFA_STATUS_ENDPOINT:-""}
+SSO_MFA_API_TOKEN=${SSO_MFA_API_TOKEN:-""}
+SSO_MFA_API_HEADER=${SSO_MFA_API_HEADER:-"Authorization: Bearer ${SSO_MFA_API_TOKEN}"}
+SSO_STATUS_JQ=${SSO_STATUS_JQ:-".sso_enabled // .enabled"}
+MFA_STATUS_JQ=${MFA_STATUS_JQ:-".mfa_enforced // .enabled"}
+
 if [[ -n "${GITEA_LXC_CTID}" ]]; then
   require_cmd pct
 fi
@@ -63,6 +70,44 @@ get_app_ini_value() {
   fi
   run_cmd "grep -E '^${key} *= *' '${GITEA_APP_INI}' 2>/dev/null | tail -n1 | awk -F= '{gsub(/^[ \t]+|[ \t]+$/,\"\",$2); print $2}'" || true
 }
+
+fetch_flag() {
+  local endpoint=$1
+  local filter=$2
+  if [[ -z "${endpoint}" ]]; then
+    echo ""
+    return
+  fi
+
+  local header_args=()
+  if [[ -n "${SSO_MFA_API_TOKEN}" ]]; then
+    header_args=(-H "${SSO_MFA_API_HEADER}")
+  fi
+
+  local json
+  if ! json=$(curl -fsSL "${header_args[@]}" "${endpoint}"); then
+    echo ""
+    return
+  fi
+
+  local value
+  value=$(echo "${json}" | jq -r "${filter}" 2>/dev/null || true)
+  if [[ "${value}" == "true" || "${value}" == "false" ]]; then
+    echo "${value}"
+  else
+    echo ""
+  fi
+}
+
+api_sso=$(fetch_flag "${SSO_STATUS_ENDPOINT}" "${SSO_STATUS_JQ}")
+if [[ -n "${api_sso}" ]]; then
+  SSO_ENABLED="${api_sso}"
+fi
+
+api_mfa=$(fetch_flag "${MFA_STATUS_ENDPOINT}" "${MFA_STATUS_JQ}")
+if [[ -n "${api_mfa}" ]]; then
+  MFA_ENFORCED="${api_mfa}"
+fi
 
 check_encryption_at_rest() {
   if [[ -z "${GITEA_DATA_DIR}" ]]; then

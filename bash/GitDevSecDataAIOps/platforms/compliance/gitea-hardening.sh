@@ -21,6 +21,7 @@ require_cmd() {
 GITEA_APP_INI=${GITEA_APP_INI:-""}
 GITEA_LXC_CTID=${GITEA_LXC_CTID:-""}
 SETTINGS_FILE=${SETTINGS_FILE:-""}
+HARDENING_PROFILE=${HARDENING_PROFILE:-""}
 BACKUP_SUFFIX=${BACKUP_SUFFIX:-".bak"}
 RESTART_CMD=${RESTART_CMD:-""}
 DRY_RUN=${DRY_RUN:-"false"}
@@ -29,8 +30,17 @@ if [[ -z "${GITEA_APP_INI}" ]]; then
   echo "GITEA_APP_INI is required" >&2
   exit 1
 fi
+if [[ -z "${SETTINGS_FILE}" ]]; then
+  script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+  if [[ "${HARDENING_PROFILE}" == "high" ]]; then
+    SETTINGS_FILE="${script_dir}/gitea-hardening-high.ini"
+  elif [[ "${HARDENING_PROFILE}" == "strict" ]]; then
+    SETTINGS_FILE="${script_dir}/gitea-hardening-strict.ini"
+  fi
+fi
+
 if [[ -z "${SETTINGS_FILE}" || ! -f "${SETTINGS_FILE}" ]]; then
-  echo "SETTINGS_FILE not found" >&2
+  echo "SETTINGS_FILE not found and no HARDENING_PROFILE resolved" >&2
   exit 1
 fi
 
