@@ -10,6 +10,7 @@ on:
 permissions:
   contents: read
   security-events: write
+  actions: read
 
 jobs:
   security:
@@ -26,7 +27,7 @@ jobs:
       - name: Install tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck ripgrep
+          sudo apt-get install -y shellcheck ripgrep jq
 
       - name: Shellcheck scripts
         run: |
@@ -76,6 +77,15 @@ jobs:
           mkdir -p outputs/ci-evidence
           EVIDENCE_DIR=outputs/ci-evidence \
             bash bash/GitDevSecDataAIOps/tooling/tests/mock-e2e.sh | tee outputs/ci-evidence/mock-e2e.log
+
+      - name: Actions forensics snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          OUTPUT_DIR=outputs/ci-evidence/actions-forensics \
+            REPO="${GITHUB_REPOSITORY}" \
+            bash bash/GitDevSecDataAIOps/tooling/forensics/gh-actions-forensics.sh
 
       - name: Write evidence summary
         run: |
