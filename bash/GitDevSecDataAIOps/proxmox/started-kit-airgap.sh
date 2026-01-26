@@ -35,7 +35,9 @@ SIGNATURE_FILE=${SIGNATURE_FILE:-""}
 SIGNATURE_REQUIRED=${SIGNATURE_REQUIRED:-"false"}
 SIGNATURE_TOOL=${SIGNATURE_TOOL:-""}
 COSIGN_PUBLIC_KEY=${COSIGN_PUBLIC_KEY:-""}
+COSIGN_PUBLIC_KEY_HASH=${COSIGN_PUBLIC_KEY_HASH:-""}
 GPG_HOMEDIR=${GPG_HOMEDIR:-""}
+GPG_FINGERPRINT=${GPG_FINGERPRINT:-""}
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || fail "Missing required command: $1"
@@ -151,6 +153,19 @@ verify_signature() {
       if [[ -z "${COSIGN_PUBLIC_KEY}" ]]; then
         fail "COSIGN_PUBLIC_KEY is required for cosign verification"
       fi
+      if [[ -n "${COSIGN_PUBLIC_KEY_HASH}" ]]; then
+        local key_hash=""
+        if command -v sha256sum >/dev/null 2>&1; then
+          key_hash=$(sha256sum "${COSIGN_PUBLIC_KEY}" | awk '{print $1}')
+        elif command -v shasum >/dev/null 2>&1; then
+          key_hash=$(shasum -a 256 "${COSIGN_PUBLIC_KEY}" | awk '{print $1}')
+        else
+          fail "No sha256 tool found to verify COSIGN_PUBLIC_KEY_HASH"
+        fi
+        if [[ "${key_hash}" != "${COSIGN_PUBLIC_KEY_HASH}" ]]; then
+          fail "COSIGN_PUBLIC_KEY_HASH mismatch"
+        fi
+      fi
       log "Verifying signature with cosign"
       cosign verify-blob --key "${COSIGN_PUBLIC_KEY}" --signature "${sig_path}" "${manifest_path}"
       ;;
@@ -159,8 +174,16 @@ verify_signature() {
       log "Verifying signature with gpg"
       if [[ -n "${GPG_HOMEDIR}" ]]; then
         GNUPGHOME="${GPG_HOMEDIR}" gpg --batch --verify "${sig_path}" "${manifest_path}"
+        if [[ -n "${GPG_FINGERPRINT}" ]]; then
+          GNUPGHOME="${GPG_HOMEDIR}" gpg --batch --status-fd=1 --verify "${sig_path}" "${manifest_path}" 2>/dev/null \
+            | grep -q "VALIDSIG ${GPG_FINGERPRINT}" || fail "GPG fingerprint mismatch"
+        fi
       else
         gpg --batch --verify "${sig_path}" "${manifest_path}"
+        if [[ -n "${GPG_FINGERPRINT}" ]]; then
+          gpg --batch --status-fd=1 --verify "${sig_path}" "${manifest_path}" 2>/dev/null \
+            | grep -q "VALIDSIG ${GPG_FINGERPRINT}" || fail "GPG fingerprint mismatch"
+        fi
       fi
       ;;
     *)

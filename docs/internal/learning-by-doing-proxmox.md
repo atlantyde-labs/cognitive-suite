@@ -112,6 +112,35 @@ gpg --output SHA256SUMS.sig --detach-sign SHA256SUMS
 cp SHA256SUMS SHA256SUMS.sig /media/usb/
 ```
 
+### Generación automática en entorno privado (air‑gap bundle)
+
+Usa el script de preparación para generar `SHA256SUMS`, firma y copiar claves públicas:
+
+```bash
+cat <<'ENV' > /tmp/prepare-airgap.env
+SOURCE_DIR="$HOME/cognitive-suite"
+OUTPUT_DIR="/media/usb/cognitive-suite"
+MANIFEST_NAME="SHA256SUMS"
+SIGNATURE_NAME="SHA256SUMS.sig"
+SIGNATURE_TOOL="cosign"
+COPY_REPO="false"
+
+COSIGN_KEY="$HOME/.keys/cosign.key"
+COSIGN_PUB="$HOME/.keys/cosign.pub"
+GENERATE_COSIGN_KEYS="false"
+ENV
+```
+
+```bash
+bash "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/prepare-airgap-bundle.sh" /tmp/prepare-airgap.env
+```
+
+Esto escribe en el USB:
+- `SHA256SUMS`
+- `SHA256SUMS.sig`
+- `cosign.pub`
+- `cosign.pub.sha256` (hash “pinned” para verificación adicional)
+
 ## 4) Ajustar el orquestador (API + SSH)
 
 En `deploy-all-secret-suite.env` (puedes usar placeholders locales):
