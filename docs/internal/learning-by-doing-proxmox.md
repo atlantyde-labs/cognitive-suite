@@ -76,6 +76,10 @@ SYNC_MODE="rsync"
 RSYNC_ARGS="-a --delete"
 HASH_MANIFEST="SHA256SUMS"
 HASH_REQUIRED="true"
+SIGNATURE_FILE="SHA256SUMS.sig"
+SIGNATURE_REQUIRED="true"
+SIGNATURE_TOOL="cosign"
+COSIGN_PUBLIC_KEY="/media/usb/cosign.pub"
 ENV
 ```
 
@@ -88,6 +92,24 @@ Antes de mover el repo al USB, genera el manifiesto en el equipo origen:
 ```bash
 cd /ruta/al/repo
 find . -type f -not -path './.git/*' -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+```
+
+Firma el manifiesto para máxima garantía (elige una opción):
+
+Cosign (recomendado, clave pública copiada al USB):
+
+```bash
+cosign sign-blob --key cosign.key --output-signature SHA256SUMS.sig SHA256SUMS
+cp cosign.pub /media/usb/
+cp SHA256SUMS /media/usb/
+cp SHA256SUMS.sig /media/usb/
+```
+
+GPG (alternativa):
+
+```bash
+gpg --output SHA256SUMS.sig --detach-sign SHA256SUMS
+cp SHA256SUMS SHA256SUMS.sig /media/usb/
 ```
 
 ## 4) Ajustar el orquestador (API + SSH)

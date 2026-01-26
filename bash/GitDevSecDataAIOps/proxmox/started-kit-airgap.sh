@@ -31,6 +31,11 @@ SYNC_MODE=${SYNC_MODE:-"rsync"}
 RSYNC_ARGS=${RSYNC_ARGS:-"-a --delete"}
 HASH_MANIFEST=${HASH_MANIFEST:-""}
 HASH_REQUIRED=${HASH_REQUIRED:-"false"}
+SIGNATURE_FILE=${SIGNATURE_FILE:-""}
+SIGNATURE_REQUIRED=${SIGNATURE_REQUIRED:-"false"}
+SIGNATURE_TOOL=${SIGNATURE_TOOL:-""}
+COSIGN_PUBLIC_KEY=${COSIGN_PUBLIC_KEY:-""}
+GPG_HOMEDIR=${GPG_HOMEDIR:-""}
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || fail "Missing required command: $1"
@@ -93,7 +98,79 @@ verify_hashes() {
   fi
 }
 
+verify_signature() {
+  if [[ -z "${SIGNATURE_FILE}" ]]; then
+    if [[ "${SIGNATURE_REQUIRED}" == "true" ]]; then
+      fail "SIGNATURE_FILE is required but not set"
+    fi
+    log "Signature file not configured; skipping signature check"
+    return
+  fi
+
+  if [[ -z "${HASH_MANIFEST}" ]]; then
+    fail "HASH_MANIFEST is required to verify signatures"
+  fi
+
+  local manifest_path="${HASH_MANIFEST}"
+  if [[ "${HASH_MANIFEST}" != /* ]]; then
+    manifest_path="${SOURCE_DIR}/${HASH_MANIFEST}"
+  fi
+
+  local sig_path="${SIGNATURE_FILE}"
+  if [[ "${SIGNATURE_FILE}" != /* ]]; then
+    sig_path="${SOURCE_DIR}/${SIGNATURE_FILE}"
+  fi
+
+  if [[ ! -f "${sig_path}" ]]; then
+    fail "Signature file not found: ${sig_path}"
+  fi
+
+  case "${sig_path}" in
+    "${SOURCE_DIR}"/*) ;;
+    *) fail "Signature file must live under SOURCE_DIR" ;;
+  esac
+
+  local tool="${SIGNATURE_TOOL}"
+  if [[ -z "${tool}" ]]; then
+    if command -v cosign >/dev/null 2>&1 && [[ -n "${COSIGN_PUBLIC_KEY}" ]]; then
+      tool="cosign"
+    elif command -v gpg >/dev/null 2>&1; then
+      tool="gpg"
+    else
+      if [[ "${SIGNATURE_REQUIRED}" == "true" ]]; then
+        fail "No signature tool available (cosign or gpg)"
+      fi
+      log "No signature tool available; skipping signature check"
+      return
+    fi
+  fi
+
+  case "${tool}" in
+    cosign)
+      require_cmd cosign
+      if [[ -z "${COSIGN_PUBLIC_KEY}" ]]; then
+        fail "COSIGN_PUBLIC_KEY is required for cosign verification"
+      fi
+      log "Verifying signature with cosign"
+      cosign verify-blob --key "${COSIGN_PUBLIC_KEY}" --signature "${sig_path}" "${manifest_path}"
+      ;;
+    gpg)
+      require_cmd gpg
+      log "Verifying signature with gpg"
+      if [[ -n "${GPG_HOMEDIR}" ]]; then
+        GNUPGHOME="${GPG_HOMEDIR}" gpg --batch --verify "${sig_path}" "${manifest_path}"
+      else
+        gpg --batch --verify "${sig_path}" "${manifest_path}"
+      fi
+      ;;
+    *)
+      fail "Unsupported SIGNATURE_TOOL: ${tool}"
+      ;;
+  esac
+}
+
 verify_hashes
+verify_signature
 
 if [[ "${RUN_BOOTSTRAP}" == "true" ]]; then
   if [[ ! -x "${BOOTSTRAP_PATH}" ]]; then
