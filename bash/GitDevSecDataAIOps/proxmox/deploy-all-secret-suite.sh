@@ -66,6 +66,7 @@ SECRETS_ENV=${SECRETS_ENV:-""}
 
 REPORT_ENTRIES=()
 REPORT_CONFIG_HASH=""
+REPORT_SCRIPT_HASHES=()
 
 require_file() {
   local path=$1
@@ -144,27 +145,48 @@ compute_config_hash() {
   fi
 }
 
+compute_script_hash() {
+  local path=$1
+  if [[ -z "${path}" || ! -f "${path}" ]]; then
+    return
+  fi
+  local hash=""
+  if command -v sha256sum >/dev/null 2>&1; then
+    hash=$(sha256sum "${path}" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    hash=$(shasum -a 256 "${path}" | awk '{print $1}')
+  fi
+  if [[ -n "${hash}" ]]; then
+    REPORT_SCRIPT_HASHES+=("{\"path\":\"${path}\",\"sha256\":\"${hash}\"}")
+  fi
+}
+
 flush_report() {
   if [[ "${DRY_RUN_REPORT}" != "true" ]]; then
     return
   fi
   compute_config_hash
+  local scripts_json
+  scripts_json=$(printf '%s\n' "${REPORT_SCRIPT_HASHES[@]}")
   local lines
   lines=$(printf '%s\n' "${REPORT_ENTRIES[@]}")
   local report_dir
   report_dir=$(dirname "${DRY_RUN_REPORT_PATH}")
   mkdir -p "${report_dir}"
   local report
-  report=$(REPORT_LINES="${lines}" REPORT_CONFIG_HASH="${REPORT_CONFIG_HASH}" python3 - <<'PY'
+  report=$(REPORT_LINES="${lines}" REPORT_CONFIG_HASH="${REPORT_CONFIG_HASH}" REPORT_SCRIPT_HASHES="${scripts_json}" python3 - <<'PY'
 import json
 import os
 
 raw = os.environ.get("REPORT_LINES", "")
 config_hash = os.environ.get("REPORT_CONFIG_HASH", "")
+scripts_raw = os.environ.get("REPORT_SCRIPT_HASHES", "")
 lines = [l.strip() for l in raw.splitlines() if l.strip()]
 payload = {"entries":[json.loads(l) for l in lines]}
 if config_hash:
     payload["config_sha256"] = config_hash
+if scripts_raw:
+    payload["scripts"] = [json.loads(l) for l in scripts_raw.splitlines() if l.strip()]
 print(json.dumps(payload, ensure_ascii=True, indent=2))
 PY
   )
@@ -178,6 +200,9 @@ run_script() {
   local step=$3
 
   log "Running ${script}"
+  if [[ "${DRY_RUN_REPORT}" == "true" ]]; then
+    compute_script_hash "${script}"
+  fi
   if [[ "${DRY_RUN}" == "true" ]]; then
     if [[ -n "${env_file}" ]]; then
       env FORCE_DRY_RUN=true "${script}" "${env_file}"
