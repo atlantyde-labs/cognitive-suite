@@ -1,0 +1,50 @@
+name: Fine-tune Dataset (Local)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dataset_path:
+        description: "Path to JSONL dataset"
+        required: true
+        default: datasets/atlantityqa_cognitive_suite_ft_v2.jsonl
+      split_by_sensitivity:
+        description: "Split by metadata.sensitivity"
+        type: boolean
+        required: false
+        default: true
+      to_prompt:
+        description: "Convert to prompt/completion"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: [self-hosted, local]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate and prepare dataset
+        env:
+          DATASET: ${{ github.event.inputs.dataset_path }}
+          SPLIT: ${{ github.event.inputs.split_by_sensitivity }}
+          TO_PROMPT: ${{ github.event.inputs.to_prompt }}
+        run: |
+          set -euo pipefail
+          OUT_DIR=/tmp/ft_outputs
+          mkdir -p "${OUT_DIR}"
+
+          cmd=(python3 bash/GitDevSecDataAIOps/tooling/fine-tune/ft_prepare.py "${DATASET}")
+          if [[ "${SPLIT}" == "true" ]]; then
+            cmd+=(--split-by-sensitivity)
+          fi
+          if [[ "${TO_PROMPT}" == "true" ]]; then
+            cmd+=(--to-prompt)
+          fi
+          cmd+=(--out-dir "${OUT_DIR}")
+
+          "${cmd[@]}"
+          echo "Outputs in ${OUT_DIR} (local runner)."
