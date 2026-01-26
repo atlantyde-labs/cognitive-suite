@@ -38,9 +38,6 @@ permissions:
 
 env:
   BASE_DIR: "bash/GitDevSecDataAIOps"
-  DEFAULT_DRY_RUN: "true"
-  DEFAULT_PROMOTE_ON_DRY_RUN: "false"
-  DEFAULT_PROMOTE_BRANCH: "E2E-gated"
 
 jobs:
   orchestrate:
@@ -49,10 +46,10 @@ jobs:
     permissions:
       contents: write
     env:
-      AREA: ${{ github.event.inputs.area || 'all' }}
-      DRY_RUN: ${{ (github.event_name == 'pull_request' && 'true') || github.event.inputs.dry_run || env.DEFAULT_DRY_RUN }}
-      PROMOTE_ON_DRY_RUN: ${{ github.event.inputs.promote_on_dry_run || env.DEFAULT_PROMOTE_ON_DRY_RUN }}
-      PROMOTE_BRANCH: ${{ github.event.inputs.promote_branch || env.DEFAULT_PROMOTE_BRANCH }}
+      AREA: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.area || 'all' }}
+      DRY_RUN: ${{ github.event_name == 'pull_request' && 'true' || github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'true' }}
+      PROMOTE_ON_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.promote_on_dry_run || 'false' }}
+      PROMOTE_BRANCH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.promote_branch || 'E2E-gated' }}
     steps:
       - uses: actions/checkout@v4
 
