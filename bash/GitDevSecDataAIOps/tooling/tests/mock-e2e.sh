@@ -2,7 +2,7 @@
 set -euo pipefail
 umask 077
 
-ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
+ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../" && pwd)
 TMP_DIR=$(mktemp -d)
 MOCK_BIN="${TMP_DIR}/mock-bin"
 mkdir -p "${MOCK_BIN}"
@@ -79,6 +79,23 @@ if [[ "${url}" == *"/lxc" ]] && [[ "${method}" == "GET" ]]; then
 fi
 
 echo "{\"data\":{}}"
+EOF
+
+write_stub docker <<'EOF'
+case "${1:-}" in
+  ps)
+    exit 0
+    ;;
+  run)
+    exit 0
+    ;;
+  rm)
+    exit 0
+    ;;
+  *)
+    exit 0
+    ;;
+esac
 EOF
 
 write_stub cosign <<'EOF'
@@ -182,6 +199,19 @@ export PATH="${MOCK_BIN}:${PATH}"
 
 echo "[mock-e2e] temp=${TMP_DIR}"
 
+EXECUTED_SCRIPTS=()
+
+record_script() {
+  EXECUTED_SCRIPTS+=("$1")
+}
+
+run_script() {
+  local script=$1
+  shift
+  record_script "${script}"
+  bash "${script}" "$@"
+}
+
 # Reboot guard scripts
 RG_ENV="${TMP_DIR}/reboot-guard.env"
 cat <<EOF > "${RG_ENV}"
@@ -194,10 +224,12 @@ RG_WINDOW_END="23:59"
 RG_CHECK_INTERVAL="1"
 EOF
 
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/allow-reboot-now.sh" "${RG_ENV}"
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/reboot-guard-status.sh" "${RG_ENV}"
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/close-reboot-override.sh" "${RG_ENV}"
-timeout 2 bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/reboot-guard.sh" ENV_FILE="${RG_ENV}" || true
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/allow-reboot-now.sh" "${RG_ENV}"
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/reboot-guard-status.sh" "${RG_ENV}"
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/close-reboot-override.sh" "${RG_ENV}"
+record_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/reboot-guard.sh"
+ENV_FILE="${RG_ENV}" timeout 2 bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/reboot-guard.sh" || true
+record_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/install-reboot-guard.sh"
 DRY_RUN=true bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/platforms/ops-systems/install-reboot-guard.sh" "${RG_ENV}"
 
 # Proxmox API deploy (dry-run)
@@ -215,7 +247,11 @@ DRY_RUN="true"
 BOOTSTRAP_SSH="true"
 BOOTSTRAP_SSH_HOST="127.0.0.1"
 EOF
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/deploy-gitea-lxc-api.sh" "${API_ENV}"
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/deploy-gitea-lxc-api.sh" "${API_ENV}"
+
+# Proxmox API client (smoke)
+record_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/pve-api-client.sh"
+bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/pve-api-client.sh" "${API_ENV}" GET /nodes >/dev/null
 
 # Orchestrator dry-run with minimal suite env
 SUITE_ENV="${TMP_DIR}/suite.env"
@@ -242,7 +278,7 @@ RUN_SECRETS="false"
 RUN_REBOOT_GUARD="false"
 EOF
 
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/deploy-all-secret-suite.sh" "${SUITE_ENV}"
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/deploy-all-secret-suite.sh" "${SUITE_ENV}"
 
 # Bootstrap (dry-run)
 BOOTSTRAP_ENV="${TMP_DIR}/bootstrap.env"
@@ -254,7 +290,7 @@ FIX_PERMS="false"
 CHECK_PLACEHOLDERS="false"
 APPLY="false"
 EOF
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/bootstrap.sh" "${BOOTSTRAP_ENV}"
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/bootstrap.sh" "${BOOTSTRAP_ENV}"
 
 # Started-kit deployments (local clone)
 if ! git -C "${ROOT_DIR}" show-ref --verify --quiet refs/heads/chore/scripts-testing; then
@@ -268,7 +304,7 @@ DEST_DIR="${TMP_DIR}/clone"
 USE_GH="false"
 RUN_BOOTSTRAP="false"
 EOF
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/started-kit-deployments-cli-ops.sh" "${STARTED_ENV}"
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/started-kit-deployments-cli-ops.sh" "${STARTED_ENV}"
 
 # Prepare air-gap bundle + verify
 AIRGAP_DIR="${TMP_DIR}/airgap"
@@ -287,7 +323,7 @@ COSIGN_KEY="${AIRGAP_DIR}/cosign.key"
 COSIGN_PUB="${AIRGAP_DIR}/cosign.pub"
 GENERATE_COSIGN_KEYS="false"
 EOF
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/prepare-airgap-bundle.sh" "${PREP_ENV}"
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/prepare-airgap-bundle.sh" "${PREP_ENV}"
 
 COSIGN_HASH=$(sha256sum "${AIRGAP_DIR}/cosign.pub" | awk '{print $1}')
 AIRGAP_ENV="${TMP_DIR}/started-airgap.env"
@@ -304,6 +340,47 @@ SIGNATURE_TOOL="cosign"
 COSIGN_PUBLIC_KEY="${AIRGAP_DIR}/cosign.pub"
 COSIGN_PUBLIC_KEY_HASH="${COSIGN_HASH}"
 EOF
-bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/started-kit-airgap.sh" "${AIRGAP_ENV}"
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/started-kit-airgap.sh" "${AIRGAP_ENV}"
+
+# Gitea runner scripts (dry-run)
+RUNNER_ENV="${TMP_DIR}/runner.env"
+cat <<EOF > "${RUNNER_ENV}"
+GITEA_INSTANCE_URL="http://gitea.local"
+RUNNER_TOKEN="token"
+DRY_RUN="true"
+EOF
+
+record_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/install-gitea-runner.sh"
+bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/install-gitea-runner.sh" "${RUNNER_ENV}"
+
+record_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/gitea-runner-service.sh"
+ENV_FILE="${RUNNER_ENV}" DRY_RUN=true bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/gitea-runner-service.sh" start
+
+record_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/install-gitea-runner-systemd.sh"
+DRY_RUN=true bash "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/install-gitea-runner-systemd.sh" "${RUNNER_ENV}"
+
+if [[ -n "${EVIDENCE_DIR:-}" ]]; then
+  mkdir -p "${EVIDENCE_DIR}"
+  printf '%s\n' "${EXECUTED_SCRIPTS[@]}" | sort -u > "${EVIDENCE_DIR}/mock-e2e-scripts.txt"
+  EVIDENCE_DIR="${EVIDENCE_DIR}" python3 - <<'PY' > "${EVIDENCE_DIR}/mock-e2e-hashes.json"
+import json
+import os
+
+paths = []
+with open(os.path.join(os.environ["EVIDENCE_DIR"], "mock-e2e-scripts.txt"), "r", encoding="utf-8") as fh:
+    paths = [line.strip() for line in fh if line.strip()]
+
+def sha256(path):
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+payload = {"scripts":[{"path": p, "sha256": sha256(p)} for p in paths if os.path.exists(p)]}
+print(json.dumps(payload, ensure_ascii=True, indent=2))
+PY
+fi
 
 echo "[mock-e2e] complete"
