@@ -1,0 +1,57 @@
+name: E2E Public Runner Validation
+
+on:
+  push:
+    branches: [ chore/scripts-testing, E2E ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Shellcheck scripts
+        run: |
+          set -euo pipefail
+          scripts=$(rg --files -g "*.sh" bash/GitDevSecDataAIOps scripts)
+          if [[ -n "${scripts}" ]]; then
+            bash -n ${scripts}
+            shellcheck ${scripts}
+          fi
+
+      - name: Python syntax check
+        run: |
+          set -euo pipefail
+          pyfiles=$(rg --files -g "*.py" bash/GitDevSecDataAIOps)
+          if [[ -n "${pyfiles}" ]]; then
+            python3 -m py_compile ${pyfiles}
+          fi
+
+      - name: Validate fine-tune dataset
+        run: |
+          set -euo pipefail
+          python3 bash/GitDevSecDataAIOps/tooling/fine-tune/ft_prepare.py \
+            datasets/atlantityqa_cognitive_suite_ft_v2.jsonl --validate-only
+          python3 bash/GitDevSecDataAIOps/tooling/fine-tune/ft_prepare.py \
+            datasets/atlantityqa_cognitive_suite_ft_v2.jsonl --split-by-sensitivity --out-dir /tmp/ft_outputs
+
+      - name: Model inventory (dry-run)
+        run: |
+          set -euo pipefail
+          python3 bash/GitDevSecDataAIOps/tooling/models/model_inventory.py \
+            --roots datasets \
+            --output /tmp/model-inventory.json \
+            --whitelist-output /tmp/model-whitelist.json \
+            --alerts-output /tmp/model-alerts.json \
+            --hash none \
+            --default-sensitivity INTERNAL \
+            --dry-run
