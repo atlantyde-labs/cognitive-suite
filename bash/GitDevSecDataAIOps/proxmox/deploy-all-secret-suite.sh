@@ -65,6 +65,7 @@ USER_MAP_VALIDATE_ENV=${USER_MAP_VALIDATE_ENV:-""}
 SECRETS_ENV=${SECRETS_ENV:-""}
 
 REPORT_ENTRIES=()
+REPORT_CONFIG_HASH=""
 
 require_file() {
   local path=$1
@@ -130,23 +131,41 @@ record_report() {
   REPORT_ENTRIES+=("${entry}")
 }
 
+compute_config_hash() {
+  if [[ -z "${CONFIG_PATH}" || ! -f "${CONFIG_PATH}" ]]; then
+    return
+  fi
+  if command -v sha256sum >/dev/null 2>&1; then
+    REPORT_CONFIG_HASH=$(sha256sum "${CONFIG_PATH}" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    REPORT_CONFIG_HASH=$(shasum -a 256 "${CONFIG_PATH}" | awk '{print $1}')
+  else
+    REPORT_CONFIG_HASH=""
+  fi
+}
+
 flush_report() {
   if [[ "${DRY_RUN_REPORT}" != "true" ]]; then
     return
   fi
+  compute_config_hash
   local lines
   lines=$(printf '%s\n' "${REPORT_ENTRIES[@]}")
   local report_dir
   report_dir=$(dirname "${DRY_RUN_REPORT_PATH}")
   mkdir -p "${report_dir}"
   local report
-  report=$(REPORT_LINES="${lines}" python3 - <<'PY'
+  report=$(REPORT_LINES="${lines}" REPORT_CONFIG_HASH="${REPORT_CONFIG_HASH}" python3 - <<'PY'
 import json
 import os
 
 raw = os.environ.get("REPORT_LINES", "")
+config_hash = os.environ.get("REPORT_CONFIG_HASH", "")
 lines = [l.strip() for l in raw.splitlines() if l.strip()]
-print(json.dumps({"entries":[json.loads(l) for l in lines]}, ensure_ascii=True, indent=2))
+payload = {"entries":[json.loads(l) for l in lines]}
+if config_hash:
+    payload["config_sha256"] = config_hash
+print(json.dumps(payload, ensure_ascii=True, indent=2))
 PY
   )
   echo "${report}" > "${DRY_RUN_REPORT_PATH}"
