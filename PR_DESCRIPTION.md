@@ -1,106 +1,46 @@
-# Mejorar análisis cognitivo y extracción de PDFs
+# Documentation Premium Overhaul: i18n Architecture & UI Polish
 
 ## 📋 Descripción
+Esta PR introduce una reestructuración completa de la arquitectura de documentación para soportar **internacionalización (i18n) nativa** y un rediseño visual "Premium" enfocado en la limpieza y la legibilidad técnica.
 
-Esta PR introduce mejoras significativas en el pipeline de análisis cognitivo y corrección de bugs en la ingesta de archivos PDFs.
+## 🔧 Cambios Estructurales Críticos
 
-## 🔧 Cambios Principales
+### 1. **Arquitectura i18n Sólida**
+- **Migración a `mkdocs-static-i18n`**: Se ha abandonado el sistema de navegación manual por un plugin especializado que gestiona contextos de idioma aislados.
+- **Estructura de Ficheros**: Migración de carpetas (`docs/en/file.md`) a sufijos (`docs/file.en.md`). Esto permite que el plugin enlace automáticamente las traducciones.
+- **Navegación Aislada**:
+    - **Español**: Menú exclusivo en español.
+    - **Inglés**: Menú exclusivo en inglés (sin sangrado de "Inicio").
+- **Selector de Idioma**: Selector nativo en el header (icono globo) totalmente funcional y contextual.
 
-### 1. **Fix: Normalización de extensiones en ingestor**
-- **Problema**: Los PDFs se guardaban como `.pdf`, no eran procesados por `analyze.py`
-- **Solución**: Cambiar extensión a `.txt` para procesamiento correcto
-- **Impacto**: Ahora PDFs y otros formatos se procesan correctamente
+### 2. **Rediseño Visual & UX**
+- **Limpieza de "Ruido"**:
+    - Ocultado los símbolos de párrafo (`¶`) en los encabezados.
+    - Ocultada la **barra lateral secundaria (Tabla de Contenidos)** para maximizar el espacio de lectura.
+- **Diagramas Mermaid Optimizados**:
+    - Layout Vertical (TD) para mejor flujo.
+    - **Tipografía Ultra-Legible**: Textos forzados a **20px Bold** via CSS.
+    - **Estética Limpia**: Eliminados los enlaces interactivos y subrayados que ensuciaban el diseño.
+- **Animaciones**: Implementada animación `fadeInUp` suave en la carga de contenidos.
 
-### 2. **Feat: Extracción mejorada de entidades legales**
-- Nueva función `extract_legal_entities()` que mapea etiquetas spaCy a referencias legales
-- Detecta palabras clave: 'ley', 'código', 'delito', 'sanción', 'artículo', etc.
-- **Resultado**: +1298 referencias legales detectadas en Código Penal
+### 3. **Correcciones Técnicas**
+- **Dependencias**: Añadido `mkdocs-static-i18n` al entorno virtual `.venv` y a `requirements.txt`.
+- **Linting CSS**: Corregido warning de `background-clip` para compatibilidad estándar.
 
-### 3. **Feat: Detección de flags de riesgo**
-- Identifica entidades con palabras de riesgo: 'riesgo', 'delito', 'crimen', 'peligro', 'pena'
-- **Resultado**: +230 flags de riesgo en documentos legales
+## 📊 Comparativa
 
-### 4. **Feat: Relevancia dinámica**
-- Antes: siempre 1.0
-- Ahora: basada en densidad de entidades + diversidad de tags
-- **Resultado**: Diferencia correcta entre relatos (0.55) y código penal (0.95)
+| Característica | Antes | Después (Esta PR) |
+|---|---|---|
+| **Navegación** | Mezcla de idiomas ("Inicio" en menú EN) | Contextos 100% aislados |
+| **Diagramas** | Texto pequeño, ilegible en móvil | **20px Bold**, Vertical, Alta claridad |
+| **Estética** | Enlaces azules, símbolos ¶ visibles | **Clean Design**, sin subrayados, sin ¶ |
+| **Arquitectura** | Manual, propensa a errores 404 | **Automática** via Plugin estándar |
 
-### 5. **Improvement: Interfaz de usuario mejorada**
-- Emojis y mensajes claros
-- Logging limpio (sin spam de transformers/huggingface)
-- Flag `--verbose` para debugging
-- Resumen final estructurado
+## 🚀 Validaciones
+- [x] `mkdocs serve` arranca sin errores ni warnings críticos.
+- [x] Navegación ES -> EN -> ES fluida y sin 404s.
+- [x] Mermaid legible en desktop y móvil.
+- [x] Animaciones fluidas.
 
-### 6. **Feat: Modelo spaCy en español**
-- Instalar `es_core_news_sm` para extracción de entidades
-- Mejora extracción de personas, organizaciones, ubicaciones en español
-
-## 📊 Testing Realizado
-
-### Documentos Probados
-- PDF 1.2MB: Código Penal (Ley Orgánica 10/1995)
-- TXT 44KB: Relatos eróticos
-
-### Resultados
-| Métrica | Relatos | Código Penal |
-|---------|---------|-------------|
-| Palabras | 7,746 | 115,997 |
-| Entidades | 349 | 3,494 |
-| Ref. Legales | 0 | 1,298 |
-| Flags Riesgo | 0 | 230 |
-| Relevancia | 0.55 | 0.95 |
-| Tags | 7 | 7 |
-
-## ⚠️ Limitaciones Conocidas (para futuras mejoras)
-
-1. **Clasificador de sentimientos**: XLM-Roberta base no está fine-tuned
-   - Marca NEGATIVE textos neutrales (ej: relatos eróticos)
-   - Posible mejora: usar modelo fine-tuned para español
-
-2. **Referencias legales**: Incluye algunos falsos positivos
-   - Palabras genéricas como 'Artículo', 'Persona' en contexto no-legal
-   - Posible mejora: filtrado más riguroso por contexto
-
-3. **Detección de riesgos**: Por palabras clave, no contextual
-   - 'Riesgo' en relato erótico ≠ 'riesgo' en derecho penal
-   - Posible mejora: análisis contextual
-
-4. **Detección de autores**: Captura flexible pero a veces inexacta
-   - Posible mejora: patrones más refinados
-
-## 🚀 Cómo Probar
-
-```bash
-# Inicializar estructura
-python cogctl.py init
-
-# Agregar archivos en data/input/
-# Ejemplo: cp archivo.pdf data/input/
-
-# Ingestar
-python cogctl.py ingest archivo.pdf
-
-# Analizar
-python cogctl.py analyze
-
-# Ver resultados
-cat outputs/insights/analysis.json | python -m json.tool
-```
-
-## 📝 Notas para Revisión
-
-- El código es modular y bien documentado
-- Todas las funciones tienen docstrings
-- Logging incluido para debugging
-- Compatible con Python 3.7+
-- Dependencias: spacy, transformers, fitz (PyMuPDF)
-
-## 📁 Archivos Modificados
-
-- `ingestor/ingest.py` - Normalizar extensión a .txt
-- `pipeline/analyze.py` - Mejorar análisis con entidades legales y relevancia dinámica
-- `cogctl.py` - Mejorar interfaz de usuario
-
----
-
-**Este es un MVP funcional. Validación del propietario recomendada para decisiones futuras.**
+## 📝 Notas para Reviewer (Jimmy)
+Recomiendo verificar especialmente la navegación cruzada entre idiomas. La estructura de archivos ha cambiado de carpetas anidadas a sufijos `.en.md` para cumplir con las mejores prácticas del plugin de i18n.
