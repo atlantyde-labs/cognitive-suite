@@ -28,6 +28,7 @@ root_dir=$(cd "${script_dir}/../.." && pwd)
 
 LOCAL_FIRST=${LOCAL_FIRST:-"true"}
 ALLOW_EXTERNAL=${ALLOW_EXTERNAL:-"false"}
+DRY_RUN=${DRY_RUN:-"false"}
 
 RUN_DEPLOY_GITEA=${RUN_DEPLOY_GITEA:-"false"}
 RUN_HARDEN=${RUN_HARDEN:-"false"}
@@ -112,10 +113,18 @@ run_script() {
   local script=$1
   local env_file=$2
   log "Running ${script}"
-  if [[ -n "${env_file}" ]]; then
-    "${script}" "${env_file}"
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    if [[ -n "${env_file}" ]]; then
+      env FORCE_DRY_RUN=true "${script}" "${env_file}"
+    else
+      env FORCE_DRY_RUN=true "${script}"
+    fi
   else
-    "${script}"
+    if [[ -n "${env_file}" ]]; then
+      "${script}" "${env_file}"
+    else
+      "${script}"
+    fi
   fi
 }
 

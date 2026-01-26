@@ -26,6 +26,10 @@ BACKUP_SUFFIX=${BACKUP_SUFFIX:-".bak"}
 RESTART_CMD=${RESTART_CMD:-""}
 DRY_RUN=${DRY_RUN:-"false"}
 
+if [[ "${FORCE_DRY_RUN:-false}" == "true" ]]; then
+  DRY_RUN="true"
+fi
+
 if [[ -z "${GITEA_APP_INI}" ]]; then
   echo "GITEA_APP_INI is required" >&2
   exit 1

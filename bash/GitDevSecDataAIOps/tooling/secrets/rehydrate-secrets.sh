@@ -22,6 +22,10 @@ SECRETS_FILE=${SECRETS_FILE:-""}
 SECRETS_VALUE_B64=${SECRETS_VALUE_B64:-"false"}
 DRY_RUN=${DRY_RUN:-"false"}
 
+if [[ "${FORCE_DRY_RUN:-false}" == "true" ]]; then
+  DRY_RUN="true"
+fi
+
 GITEA_URL=${GITEA_URL:-""}
 GITEA_TOKEN=${GITEA_TOKEN:-""}
 GITEA_SECRET_SET_CMD=${GITEA_SECRET_SET_CMD:-""}

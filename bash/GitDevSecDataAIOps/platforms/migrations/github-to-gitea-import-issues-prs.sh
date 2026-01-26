@@ -39,6 +39,10 @@ USER_MAP_FILE=${USER_MAP_FILE:-""}
 SET_CLOSED_STATE=${SET_CLOSED_STATE:-"false"}
 DRY_RUN=${DRY_RUN:-"false"}
 
+if [[ "${FORCE_DRY_RUN:-false}" == "true" ]]; then
+  DRY_RUN="true"
+fi
+
 if [[ -z "${GITEA_URL}" || -z "${GITEA_TOKEN}" ]]; then
   echo "GITEA_URL and GITEA_TOKEN are required" >&2
   exit 1

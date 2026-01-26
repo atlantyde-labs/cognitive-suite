@@ -27,6 +27,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Secret scanning (local, optional)
+        run: |
+          set -euo pipefail
+          if command -v gitleaks >/dev/null 2>&1; then
+            gitleaks detect --source . --no-banner --redact
+          else
+            echo "gitleaks not installed; skipping"
+          fi
+
+          if command -v detect-secrets >/dev/null 2>&1; then
+            detect-secrets scan > /tmp/detect-secrets.json || true
+            echo "detect-secrets output in /tmp/detect-secrets.json"
+          else
+            echo "detect-secrets not installed; skipping"
+          fi
+
       - name: Validate and prepare dataset
         env:
           DATASET: ${{ github.event.inputs.dataset_path }}

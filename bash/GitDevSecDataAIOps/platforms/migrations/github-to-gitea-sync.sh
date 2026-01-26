@@ -36,6 +36,10 @@ GITEA_PUSH_TOKEN=${GITEA_PUSH_TOKEN:-""}
 GITEA_REMOTE_TEMPLATE=${GITEA_REMOTE_TEMPLATE:-""}
 DRY_RUN=${DRY_RUN:-"false"}
 
+if [[ "${FORCE_DRY_RUN:-false}" == "true" ]]; then
+  DRY_RUN="true"
+fi
+
 if [[ -z "${GITHUB_TOKEN}" ]]; then
   echo "GITHUB_TOKEN is required" >&2
   exit 1

@@ -22,6 +22,11 @@ require_cmd pct
 require_cmd pveam
 require_cmd awk
 
+DRY_RUN=${DRY_RUN:-"false"}
+if [[ "${FORCE_DRY_RUN:-false}" == "true" ]]; then
+  DRY_RUN="true"
+fi
+
 PVE_STORAGE=${PVE_STORAGE:-"local-lvm"}
 PVE_TEMPLATE=${PVE_TEMPLATE:-"local:vztmpl/debian-12-standard_12.2-1_amd64.tar.zst"}
 PVE_BRIDGE=${PVE_BRIDGE:-"vmbr0"}
@@ -53,6 +58,11 @@ ensure_template() {
   template_file="${template_path#vztmpl/}"
 
   if ! pveam list "${storage}" | awk '{print $1}' | grep -q "${template_file}"; then
+    echo "Template ${template_file} not found in ${storage}"
+    if [[ "${DRY_RUN}" == "true" ]]; then
+      echo "[dry-run] would download template ${template_file} into ${storage}"
+      return
+    fi
     echo "Downloading template ${template_file} into ${storage}"
     pveam update
     pveam download "${storage}" "${template_file}"
@@ -94,11 +104,19 @@ create_container() {
     -unprivileged 1 \
     -nameserver "${PVE_DNS}" >/dev/null
 
-  pct start "${ctid}" >/dev/null
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    echo "[dry-run] would start container ${ctid}"
+  else
+    pct start "${ctid}" >/dev/null
+  fi
 }
 
 install_docker() {
   local ctid=$1
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    echo "[dry-run] would install docker in CT ${ctid}"
+    return
+  fi
   pct exec "${ctid}" -- bash -c "set -euo pipefail
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
@@ -111,6 +129,12 @@ configure_gitea() {
   local ctid=$1
   local root_url
   root_url=${GITEA_ROOT_URL:-"http://${GITEA_DOMAIN}:${GITEA_HTTP_PORT}/"}
+
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    echo "[dry-run] would configure Gitea in CT ${ctid}"
+    echo "[dry-run] root_url=${root_url}"
+    return
+  fi
 
   pct exec "${ctid}" -- bash -c "set -euo pipefail
     install -d /opt/gitea
@@ -164,6 +188,10 @@ SERVICE
     systemctl enable --now gitea-compose.service
   "
 }
+
+if [[ "${DRY_RUN}" == "true" ]]; then
+  echo "[dry-run] Dry run enabled. No changes will be applied."
+fi
 
 ensure_template
 create_container "${GITEA_CTID}" "${GITEA_HOSTNAME}" "${GITEA_MEMORY}" "${GITEA_CORES}" "${GITEA_DISK}" "${GITEA_IP}"
