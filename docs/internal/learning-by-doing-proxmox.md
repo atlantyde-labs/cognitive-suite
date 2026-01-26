@@ -59,6 +59,28 @@ Esto:
 - Ejecuta `bootstrap.sh` en **dry‑run** (no aplica cambios)
 - Lanza lint y validaciones locales
 
+## 3b) Variante air‑gap (sin pull remoto)
+
+Si no quieres acceso externo, copia el repo en un USB o ruta local y usa:
+
+```bash
+cat <<'ENV' > /tmp/started-kit-airgap.env
+SOURCE_DIR="/media/usb/cognitive-suite"
+DEST_DIR="$HOME/cognitive-suite"
+RUN_BOOTSTRAP="true"
+
+BOOTSTRAP_ENV="$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.env"
+BOOTSTRAP_PATH="$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/bootstrap.sh"
+
+SYNC_MODE="rsync"
+RSYNC_ARGS="-a --delete"
+ENV
+```
+
+```bash
+bash "$HOME/cognitive-suite/bash/GitDevSecDataAIOps/proxmox/started-kit-airgap.sh" /tmp/started-kit-airgap.env
+```
+
 ## 4) Ajustar el orquestador (API + SSH)
 
 En `deploy-all-secret-suite.env` (puedes usar placeholders locales):
