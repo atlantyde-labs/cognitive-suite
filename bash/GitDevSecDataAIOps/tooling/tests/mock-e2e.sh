@@ -199,6 +199,10 @@ export PATH="${MOCK_BIN}:${PATH}"
 
 echo "[mock-e2e] temp=${TMP_DIR}"
 
+if command -v git >/dev/null 2>&1 && [[ "$(id -u)" -eq 0 ]]; then
+  git config --global --add safe.directory "${ROOT_DIR}" >/dev/null 2>&1 || true
+fi
+
 EXECUTED_SCRIPTS=()
 
 record_script() {
