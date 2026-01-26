@@ -40,6 +40,7 @@ RUN_COMPLIANCE_LABELS=${RUN_COMPLIANCE_LABELS:-"false"}
 RUN_REPO_TYPE_LABELS=${RUN_REPO_TYPE_LABELS:-"false"}
 RUN_VALIDATE_SSO_MFA=${RUN_VALIDATE_SSO_MFA:-"false"}
 RUN_COMPLIANCE_REPORT=${RUN_COMPLIANCE_REPORT:-"false"}
+RUN_REBOOT_GUARD=${RUN_REBOOT_GUARD:-"false"}
 
 RUN_GITHUB_BOOTSTRAP=${RUN_GITHUB_BOOTSTRAP:-"false"}
 RUN_GITHUB_SYNC=${RUN_GITHUB_SYNC:-"false"}
@@ -59,6 +60,7 @@ COMPLIANCE_LABELS_ENV=${COMPLIANCE_LABELS_ENV:-""}
 REPO_TYPE_ENV=${REPO_TYPE_ENV:-""}
 SSO_MFA_ENV=${SSO_MFA_ENV:-""}
 COMPLIANCE_REPORT_ENV=${COMPLIANCE_REPORT_ENV:-""}
+REBOOT_GUARD_ENV=${REBOOT_GUARD_ENV:-""}
 
 GITHUB_ENV=${GITHUB_ENV:-""}
 GITHUB_IMPORT_ENV=${GITHUB_IMPORT_ENV:-""}
@@ -283,6 +285,12 @@ fi
 if [[ "${RUN_COMPLIANCE_REPORT}" == "true" ]]; then
   require_file "${COMPLIANCE_REPORT_ENV}"
   run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/compliance/eu-compliance-report.sh" "${COMPLIANCE_REPORT_ENV}" "compliance_report"
+fi
+
+# Reboot guard daemon
+if [[ "${RUN_REBOOT_GUARD}" == "true" ]]; then
+  require_file "${REBOOT_GUARD_ENV}"
+  run_script "${root_dir}/bash/GitDevSecDataAIOps/platforms/ops-systems/install-reboot-guard.sh" "${REBOOT_GUARD_ENV}" "reboot_guard"
 fi
 
 # GitHub migrations (external)
