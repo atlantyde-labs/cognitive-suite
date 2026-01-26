@@ -63,6 +63,7 @@ nav:
       - Métricas: portal/metrics.md
       - GitOps + Streamlit: portal/learning-gitops-streamlit.md
       - Labs de desafío de talento: portal/talent-challenge-labs.md
+      - "Lab 01: Inmersión profunda": portal/lab-01-deep-dive.md
       - Bootstrap de Streamlit: portal/bootstrap-streamlit.md
       - Contribuir: portal/contributing.md
   - Guías:
@@ -110,6 +111,7 @@ nav:
           - Metrics: en/portal/metrics.md
           - GitOps + Streamlit: en/portal/learning-gitops-streamlit.md
           - Talent Challenge Labs: en/portal/talent-challenge-labs.md
+          - "Lab 01: Deep Dive": en/portal/lab-01-deep-dive.md
           - Bootstrap Streamlit: en/portal/bootstrap-streamlit.md
           - Contributing: en/portal/contributing.md
       - Guides:
