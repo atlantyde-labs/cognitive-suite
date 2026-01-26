@@ -32,6 +32,10 @@ PULL_REQUEST_MODE=${PULL_REQUEST_MODE:-"issue"} # issue|pr
 IMPORT_LABELS=${IMPORT_LABELS:-"false"}
 IMPORT_ASSIGNEES=${IMPORT_ASSIGNEES:-"false"}
 IMPORT_MILESTONES=${IMPORT_MILESTONES:-"false"}
+CREATE_MISSING_LABELS=${CREATE_MISSING_LABELS:-"false"}
+CREATE_MISSING_MILESTONES=${CREATE_MISSING_MILESTONES:-"false"}
+USER_MAP=${USER_MAP:-""}
+USER_MAP_FILE=${USER_MAP_FILE:-""}
 SET_CLOSED_STATE=${SET_CLOSED_STATE:-"false"}
 DRY_RUN=${DRY_RUN:-"false"}
 
@@ -59,6 +63,35 @@ map_owner() {
   echo "${gh_owner}"
 }
 
+map_user() {
+  local gh_user=$1
+  if [[ -z "${gh_user}" ]]; then
+    echo ""
+    return
+  fi
+  if [[ -n "${USER_MAP}" ]]; then
+    local mapping
+    IFS=',' read -r -a mapping <<< "${USER_MAP}"
+    for pair in "${mapping[@]}"; do
+      local k=${pair%%=*}
+      local v=${pair#*=}
+      if [[ "${k}" == "${gh_user}" ]]; then
+        echo "${v}"
+        return
+      fi
+    done
+  fi
+  if [[ -n "${USER_MAP_FILE}" && -f "${USER_MAP_FILE}" ]]; then
+    local mapped
+    mapped=$(awk -F '=' -v k="${gh_user}" '$1 == k {print $2}' "${USER_MAP_FILE}")
+    if [[ -n "${mapped}" ]]; then
+      echo "${mapped}"
+      return
+    fi
+  fi
+  echo ""
+}
+
 api_get() {
   local path=$1
   curl -fsSL -H "Authorization: token ${GITEA_TOKEN}" "${GITEA_URL}/api/v1${path}"
@@ -84,16 +117,91 @@ api_patch() {
     -d "${payload}"
 }
 
+api_post_raw() {
+  local path=$1
+  local payload=$2
+  curl -sS -o /tmp/gitea-import.json -w '%{http_code}' \
+    -H "Authorization: token ${GITEA_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -X POST "${GITEA_URL}/api/v1${path}" \
+    -d "${payload}"
+}
+
 labels_map_for_repo() {
   local owner=$1
   local repo=$2
   api_get "/repos/${owner}/${repo}/labels" | jq -r '.[] | "\(.name)\t\(.id)"'
 }
 
+create_label() {
+  local owner=$1
+  local repo=$2
+  local name=$3
+  local color=$4
+
+  if [[ -z "${color}" ]]; then
+    color="ffffff"
+  fi
+
+  local payload
+  payload=$(jq -n --arg name "${name}" --arg color "${color}" '{name: $name, color: $color}')
+
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    echo "DRY_RUN: would create label ${owner}/${repo}:${name}"
+    echo ""
+    return 0
+  fi
+
+  local status
+  status=$(api_post_raw "/repos/${owner}/${repo}/labels" "${payload}")
+  if [[ "${status}" != "201" ]]; then
+    echo "Failed to create label ${owner}/${repo}:${name} (HTTP ${status})" >&2
+    cat /tmp/gitea-import.json >&2
+    echo ""
+    return 1
+  fi
+
+  jq -r '.id' /tmp/gitea-import.json
+}
+
 milestones_map_for_repo() {
   local owner=$1
   local repo=$2
   api_get "/repos/${owner}/${repo}/milestones" | jq -r '.[] | "\(.title)\t\(.id)"'
+}
+
+create_milestone() {
+  local owner=$1
+  local repo=$2
+  local title=$3
+  local description=$4
+  local due_on=$5
+  local state=$6
+
+  local payload
+  payload=$(jq -n \
+    --arg title "${title}" \
+    --arg description "${description}" \
+    --arg due_on "${due_on}" \
+    --arg state "${state}" \
+    '{title: $title} + ( $description | if length>0 then {description: $description} else {} end ) + ( $due_on | if length>0 then {due_on: $due_on} else {} end ) + ( $state | if length>0 then {state: $state} else {} end )')
+
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    echo "DRY_RUN: would create milestone ${owner}/${repo}:${title}"
+    echo ""
+    return 0
+  fi
+
+  local status
+  status=$(api_post_raw "/repos/${owner}/${repo}/milestones" "${payload}")
+  if [[ "${status}" != "201" ]]; then
+    echo "Failed to create milestone ${owner}/${repo}:${title} (HTTP ${status})" >&2
+    cat /tmp/gitea-import.json >&2
+    echo ""
+    return 1
+  fi
+
+  jq -r '.id' /tmp/gitea-import.json
 }
 
 resolve_label_ids() {
@@ -123,6 +231,26 @@ resolve_milestone_id() {
   local id
   id=$(awk -F '\t' -v n="${title}" '$1 == n {print $2}' "${map_file}")
   echo "${id}"
+}
+
+resolve_assignees() {
+  local raw=$1
+  local mapped=()
+  while IFS= read -r user; do
+    [[ -z "${user}" ]] && continue
+    local mapped_user
+    mapped_user=$(map_user "${user}")
+    if [[ -n "${mapped_user}" ]]; then
+      mapped+=("${mapped_user}")
+    fi
+  done <<< "${raw}"
+
+  if [[ "${#mapped[@]}" -eq 0 ]]; then
+    echo "[]"
+    return
+  fi
+
+  printf '%s\n' "${mapped[@]}" | awk 'NF' | sort -u | jq -R . | jq -cs .
 }
 
 format_issue_body() {
@@ -234,7 +362,7 @@ import_repo() {
 
   if [[ "${IMPORT_ISSUES}" == "true" && -f "${EXPORT_DIR}/${gh_owner}/${repo}/issues.jsonl" ]]; then
     while IFS= read -r line; do
-      local title body url author created_at state labels assignees milestone
+      local title body url author created_at state labels assignees milestone milestone_desc milestone_due milestone_state
       title=$(echo "${line}" | jq -r '.title')
       body=$(echo "${line}" | jq -r '.body // ""')
       url=$(echo "${line}" | jq -r '.html_url')
@@ -244,23 +372,50 @@ import_repo() {
       labels=$(echo "${line}" | jq -r '.labels[]?.name')
       assignees=$(echo "${line}" | jq -r '.assignees[]?.login')
       milestone=$(echo "${line}" | jq -r '.milestone.title // empty')
+      milestone_desc=$(echo "${line}" | jq -r '.milestone.description // empty')
+      milestone_due=$(echo "${line}" | jq -r '.milestone.due_on // empty')
+      milestone_state=$(echo "${line}" | jq -r '.milestone.state // empty')
 
       local body_out
       body_out=$(format_issue_body "${body}" "${url}" "${author}" "${created_at}")
 
       local label_ids_json="[]"
       if [[ "${IMPORT_LABELS}" == "true" ]]; then
+        if [[ "${CREATE_MISSING_LABELS}" == "true" ]]; then
+          while IFS= read -r label; do
+            [[ -z "${label}" ]] && continue
+            local existing
+            existing=$(awk -F '\t' -v n="${label}" '$1 == n {print $2}' "${labels_map_file}")
+            if [[ -z "${existing}" ]]; then
+              local color
+              color=$(echo "${line}" | jq -r --arg name "${label}" '.labels[]? | select(.name == $name) | .color' | head -n1)
+              local new_id
+              new_id=$(create_label "${target_owner}" "${repo}" "${label}" "${color}" || true)
+              if [[ -n "${new_id}" ]]; then
+                printf '%s\t%s\n' "${label}" "${new_id}" >> "${labels_map_file}"
+              fi
+            fi
+          done <<< "${labels}"
+        fi
         label_ids_json=$(resolve_label_ids "${labels}" "${labels_map_file}")
       fi
 
       local assignees_json="[]"
       if [[ "${IMPORT_ASSIGNEES}" == "true" ]]; then
-        assignees_json=$(printf '%s\n' "${assignees}" | awk 'NF' | jq -R . | jq -cs .)
+        assignees_json=$(resolve_assignees "${assignees}")
       fi
 
       local milestone_id="0"
       if [[ "${IMPORT_MILESTONES}" == "true" && -n "${milestone}" ]]; then
         milestone_id=$(resolve_milestone_id "${milestone}" "${milestones_map_file}")
+        if [[ -z "${milestone_id}" && "${CREATE_MISSING_MILESTONES}" == "true" ]]; then
+          local new_id
+          new_id=$(create_milestone "${target_owner}" "${repo}" "${milestone}" "${milestone_desc}" "${milestone_due}" "${milestone_state}" || true)
+          if [[ -n "${new_id}" ]]; then
+            printf '%s\t%s\n' "${milestone}" "${new_id}" >> "${milestones_map_file}"
+            milestone_id="${new_id}"
+          fi
+        fi
         milestone_id=${milestone_id:-0}
       fi
 
