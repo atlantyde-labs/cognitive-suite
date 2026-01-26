@@ -1,0 +1,37 @@
+name: Model Inventory (Local)
+
+on:
+  workflow_dispatch:
+    inputs:
+      roots:
+        description: "Comma-separated roots to scan"
+        required: true
+        default: "/var/lib/models,/opt/models,./models"
+      hash_mode:
+        description: "Hash mode"
+        type: choice
+        options: [none, sha256]
+        default: sha256
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: [self-hosted, local]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run model inventory
+        env:
+          ROOTS: ${{ github.event.inputs.roots }}
+          HASH_MODE: ${{ github.event.inputs.hash_mode }}
+        run: |
+          set -euo pipefail
+          OUT=outputs/model-inventory.json
+          python3 bash/GitDevSecDataAIOps/tooling/models/model_inventory.py \
+            --roots "${ROOTS}" \
+            --output "${OUT}" \
+            --hash "${HASH_MODE}" \
+            --default-sensitivity "INTERNAL"
+          echo "Inventory written to ${OUT} (local only)"
