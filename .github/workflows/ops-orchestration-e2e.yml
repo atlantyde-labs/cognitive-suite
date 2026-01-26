@@ -1,0 +1,115 @@
+name: Ops Orchestration E2E
+
+on:
+  push:
+    branches: [ E2E ]
+  pull_request:
+    branches: [ E2E ]
+  workflow_dispatch:
+    inputs:
+      area:
+        description: "Category to orchestrate"
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - sso
+          - platforms
+          - open-source-projects
+          - tooling
+          - libraries
+          - tech
+          - extension-code
+          - trends
+          - apps
+          - proxmox
+      dry_run:
+        description: "Only lint and list scripts"
+        type: boolean
+        required: false
+        default: true
+
+concurrency:
+  group: ops-orchestrate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  orchestrate:
+    runs-on: [self-hosted, local]
+    timeout-minutes: 90
+    env:
+      AREA: ${{ github.event.inputs.area || 'all' }}
+      DRY_RUN: ${{ (github.event_name == 'pull_request' && 'true') || github.event.inputs.dry_run || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve target scripts
+        id: discover
+        run: |
+          set -euo pipefail
+          BASE="bash/GitDevSecDataAIOps"
+          AREA="${AREA:-all}"
+
+          case "${AREA}" in
+            all)
+              patterns=(
+                sso platforms open-source-projects tooling libraries
+                tech extension-code trends apps proxmox
+              )
+              ;;
+            sso|platforms|open-source-projects|tooling|libraries|tech|extension-code|trends|apps|proxmox)
+              patterns=("${AREA}")
+              ;;
+            *)
+              echo "Unknown area: ${AREA}" >&2
+              exit 1
+              ;;
+          esac
+
+          files=()
+          for pat in "${patterns[@]}"; do
+            dir="${BASE}/${pat}"
+            if [[ -d "${dir}" ]]; then
+              while IFS= read -r -d '' file; do
+                files+=("${file}")
+              done < <(find "${dir}" -type f -name "*.sh" -print0)
+            fi
+          done
+
+          if [[ "${#files[@]}" -eq 0 ]]; then
+            echo "No scripts found for AREA=${AREA} under ${BASE}"
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          printf '%s\n' "${files[@]}" > /tmp/ops-scripts.txt
+          echo "found=true" >> "${GITHUB_OUTPUT}"
+          echo "count=${#files[@]}" >> "${GITHUB_OUTPUT}"
+
+      - name: Lint scripts
+        if: steps.discover.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          mapfile -t files < /tmp/ops-scripts.txt
+          bash -n "${files[@]}"
+          if command -v shellcheck >/dev/null 2>&1; then
+            shellcheck "${files[@]}"
+          else
+            echo "shellcheck not installed on runner"
+          fi
+
+      - name: Execute scripts
+        if: steps.discover.outputs.found == 'true' && env.DRY_RUN != 'true'
+        env:
+          OP_AREA: ${{ env.AREA }}
+        run: |
+          set -euo pipefail
+          mapfile -t files < /tmp/ops-scripts.txt
+          for file in "${files[@]}"; do
+            echo "Running ${file}"
+            bash "${file}"
+          done
