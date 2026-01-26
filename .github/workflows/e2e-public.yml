@@ -70,6 +70,12 @@ jobs:
             --default-sensitivity INTERNAL \
             --dry-run
 
+      - name: Mocked ops simulation (air-gap + Proxmox)
+        run: |
+          set -euo pipefail
+          mkdir -p outputs/ci-evidence
+          bash bash/GitDevSecDataAIOps/tooling/tests/mock-e2e.sh | tee outputs/ci-evidence/mock-e2e.log
+
       - name: Write evidence summary
         run: |
           set -euo pipefail
