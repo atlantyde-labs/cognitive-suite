@@ -18,19 +18,11 @@ if [[ -f "${ENV_FILE}" ]]; then
 fi
 
 RG_OVERRIDE_FILE=${RG_OVERRIDE_FILE:-"/run/reboot-guard/allow"}
-RG_OVERRIDE_TTL=${RG_OVERRIDE_TTL:-"30"}
 RG_AUDIT_LOG=${RG_AUDIT_LOG:-"/var/log/reboot-guard-audit.log"}
 DRY_RUN=${DRY_RUN:-"false"}
 if [[ "${FORCE_DRY_RUN:-false}" == "true" ]]; then
   DRY_RUN="true"
 fi
-
-if [[ -z "${RG_OVERRIDE_TTL}" || "${RG_OVERRIDE_TTL}" == "0" ]]; then
-  echo "RG_OVERRIDE_TTL must be > 0 to allow override." >&2
-  exit 1
-fi
-
-dir=$(dirname "${RG_OVERRIDE_FILE}")
 
 audit_log() {
   local action=$1
@@ -47,12 +39,16 @@ audit_log() {
 }
 
 if [[ "${DRY_RUN}" == "true" ]]; then
-  echo "[dry-run] would create ${RG_OVERRIDE_FILE} (TTL ${RG_OVERRIDE_TTL} minutes)"
-  audit_log "override-create"
+  echo "[dry-run] would remove ${RG_OVERRIDE_FILE}"
+  audit_log "override-close"
   exit 0
 fi
 
-install -d -m 0755 "${dir}"
-touch "${RG_OVERRIDE_FILE}"
-audit_log "override-create"
-echo "Override active for ${RG_OVERRIDE_TTL} minutes via ${RG_OVERRIDE_FILE}"
+if [[ -f "${RG_OVERRIDE_FILE}" ]]; then
+  rm -f "${RG_OVERRIDE_FILE}"
+  audit_log "override-close"
+  echo "Override closed: ${RG_OVERRIDE_FILE}"
+else
+  audit_log "override-close-missing"
+  echo "Override file not found: ${RG_OVERRIDE_FILE}"
+fi
