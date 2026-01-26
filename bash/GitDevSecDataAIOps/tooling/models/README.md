@@ -1,6 +1,6 @@
 # Model inventory (local-first)
 
-Detecta artefactos de fine-tune y mapas (vector indexes) y genera un inventario JSON con hashes.
+Detecta artefactos de fine-tune y mapas (vector indexes), genera inventario JSON y reporta violaciones.
 
 ## Config
 
@@ -14,7 +14,13 @@ cp bash/GitDevSecDataAIOps/tooling/models/model-inventory.env.example model-inve
 bash bash/GitDevSecDataAIOps/tooling/models/run-model-inventory.sh model-inventory.env
 ```
 
-## Salida
+## Resultado
 
 - `outputs/model-inventory.json`
-- Incluye `sensitivity=SECRET` por defecto para fine-tune y mapas.
+- `outputs/model-alerts.json` (violaciones + acciones)
+
+## Quarantine
+
+- `ALLOWED_SECRET_ROOTS`: rutas permitidas para artefactos SECRET.
+- `QUARANTINE_MODE=copy|move`: copia o mueve artefactos SECRET fuera de ruta permitida al `VAULT_DIR`.
+- `DRY_RUN=true`: no toca ficheros, solo reporta.
