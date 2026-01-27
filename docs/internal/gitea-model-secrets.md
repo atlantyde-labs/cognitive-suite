@@ -37,9 +37,12 @@ DRY_RUN=false bash bash/GitDevSecDataAIOps/tooling/secrets/gitea-model-repo-lock
 
 ## Onboarding contribuyentes (MFA + SSH)
 
-Usa el script de onboarding y luego exige 2FA en el primer login:
+Usa el wizard para generar CSV + etiquetas de comportamiento, luego aplica el script de onboarding y exige 2FA en el primer login:
 
 ```bash
+cp bash/GitDevSecDataAIOps/tooling/secrets/contributor-onboarding-wizard.env.example /tmp/onboard-wizard.env
+DRY_RUN=false bash bash/GitDevSecDataAIOps/tooling/secrets/contributor-onboarding-wizard.sh /tmp/onboard-wizard.env
+
 cp bash/GitDevSecDataAIOps/tooling/secrets/contributors.csv.example /tmp/contributors.csv
 cp bash/GitDevSecDataAIOps/tooling/secrets/gitea-onboard-contributors.env.example /tmp/onboard.env
 ```

@@ -406,6 +406,16 @@ GITEA_EVIDENCE_TOKEN="token"
 EOF
 run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/proxmox-local-secrets-wizard.sh" "${WIZARD_ENV}"
 
+# Contributor onboarding wizard (non-interactive, dry-run)
+ONBOARD_WIZ_ENV="${TMP_DIR}/onboard-wizard.env"
+cat <<EOF > "${ONBOARD_WIZ_ENV}"
+INTERACTIVE="false"
+DRY_RUN="true"
+OUTPUT_DIR="${TMP_DIR}/onboard-wizard"
+SEED_PLACEHOLDER="true"
+EOF
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/secrets/contributor-onboarding-wizard.sh" "${ONBOARD_WIZ_ENV}"
+
 # Gitea model repo lockdown (dry-run)
 LOCK_ENV="${TMP_DIR}/gitea-lock.env"
 cat <<EOF > "${LOCK_ENV}"
