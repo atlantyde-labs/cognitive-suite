@@ -1,37 +1,45 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONFIG_PATH="${1:-}"
-if [[ -n "${CONFIG_PATH}" ]]; then
-  if [[ ! -f "${CONFIG_PATH}" ]]; then
-    echo "Config not found: ${CONFIG_PATH}" >&2
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CS_ROOT="${SCRIPT_DIR}"
+while [[ ! -f "${CS_ROOT}/lib/cs-common.sh" ]]; do
+  if [[ "${CS_ROOT}" == "/" ]]; then
+    echo "cs-common.sh not found" >&2
     exit 1
   fi
-  # shellcheck disable=SC1090
-  source "${CONFIG_PATH}"
+  CS_ROOT=$(dirname "${CS_ROOT}")
+done
+# shellcheck disable=SC1090,SC1091
+source "${CS_ROOT}/lib/cs-common.sh"
+
+# shellcheck disable=SC2034
+CS_LOG_PREFIX="deploy-gitea-lxc"
+
+CONFIG_PATH="${1:-}"
+ENV_EXAMPLE="${CS_ROOT}/proxmox/deploy-gitea-lxc.env.example"
+if [[ -n "${CONFIG_PATH}" ]]; then
+  cs_load_env_chain "${CONFIG_PATH}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}"
 fi
 
-require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || {
-    echo "Missing required command: $1" >&2
-    exit 1
-  }
-}
-
-require_cmd pct
-require_cmd pveam
-require_cmd awk
+cs_require_cmd pct
+cs_require_cmd pveam
+cs_require_cmd awk
 
 DRY_RUN=${DRY_RUN:-"false"}
 if [[ "${FORCE_DRY_RUN:-false}" == "true" ]]; then
   DRY_RUN="true"
 fi
 
+cs_check_pve_version "${PVE_VERSION_STRICT:-false}"
+
 PVE_STORAGE=${PVE_STORAGE:-"local-lvm"}
 PVE_TEMPLATE=${PVE_TEMPLATE:-"local:vztmpl/debian-12-standard_12.2-1_amd64.tar.zst"}
 PVE_BRIDGE=${PVE_BRIDGE:-"vmbr0"}
 PVE_GATEWAY=${PVE_GATEWAY:-""}
 PVE_DNS=${PVE_DNS:-"1.1.1.1"}
+
+cs_warn_debian13_template "${PVE_TEMPLATE}"
 
 GITEA_CTID=${GITEA_CTID:-"9100"}
 GITEA_HOSTNAME=${GITEA_HOSTNAME:-"gitea"}

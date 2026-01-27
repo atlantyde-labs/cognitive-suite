@@ -1,19 +1,37 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CS_LIB_FALLBACK="/usr/local/lib/cognitive-suite/cs-common.sh"
+if [[ -f "${CS_LIB_FALLBACK}" ]]; then
+  # shellcheck disable=SC1090,SC1091
+  source "${CS_LIB_FALLBACK}"
+else
+  CS_ROOT="${SCRIPT_DIR}"
+  while [[ ! -f "${CS_ROOT}/lib/cs-common.sh" ]]; do
+    if [[ "${CS_ROOT}" == "/" ]]; then
+      echo "cs-common.sh not found" >&2
+      exit 1
+    fi
+    CS_ROOT=$(dirname "${CS_ROOT}")
+  done
+  # shellcheck disable=SC1090,SC1091
+  source "${CS_ROOT}/lib/cs-common.sh"
+fi
+
+# shellcheck disable=SC2034
+CS_LOG_PREFIX="gitea-runner-service"
+
 ACTION=${1:-start}
 ENV_FILE=${ENV_FILE:-"/etc/gitea-runner.env"}
+ENV_EXAMPLE="${SCRIPT_DIR}/gitea-runner.env.example"
 
 if [[ -f "${ENV_FILE}" ]]; then
-  # shellcheck disable=SC1090
-  source "${ENV_FILE}"
+  cs_load_env_file "${ENV_FILE}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}" || true
 fi
 
 require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || {
-    echo "Missing required command: $1" >&2
-    exit 1
-  }
+  cs_require_cmd "$1"
 }
 
 require_cmd docker
@@ -38,8 +56,7 @@ register_runner() {
     return
   fi
   if [[ -z "${GITEA_INSTANCE_URL}" || -z "${RUNNER_TOKEN}" ]]; then
-    echo "GITEA_INSTANCE_URL and RUNNER_TOKEN are required" >&2
-    exit 1
+    cs_die "GITEA_INSTANCE_URL and RUNNER_TOKEN are required"
   fi
 
   local register_cmd=(

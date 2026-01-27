@@ -1,21 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LOG_PREFIX="[reboot-guard]"
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CS_LIB_FALLBACK="/usr/local/lib/cognitive-suite/cs-common.sh"
+if [[ -f "${CS_LIB_FALLBACK}" ]]; then
+  # shellcheck disable=SC1090,SC1091
+  source "${CS_LIB_FALLBACK}"
+else
+  CS_ROOT="${SCRIPT_DIR}"
+  while [[ ! -f "${CS_ROOT}/lib/cs-common.sh" ]]; do
+    if [[ "${CS_ROOT}" == "/" ]]; then
+      echo "cs-common.sh not found" >&2
+      exit 1
+    fi
+    CS_ROOT=$(dirname "${CS_ROOT}")
+  done
+  # shellcheck disable=SC1090,SC1091
+  source "${CS_ROOT}/lib/cs-common.sh"
+fi
+
+# shellcheck disable=SC2034
+CS_LOG_PREFIX="reboot-guard"
 
 log() {
-  echo "${LOG_PREFIX} $*"
+  cs_log "$*"
 }
 
 fail() {
-  echo "${LOG_PREFIX} ERROR: $*" >&2
-  exit 1
+  cs_die "$*"
 }
 
 ENV_FILE=${ENV_FILE:-"/etc/reboot-guard.env"}
+ENV_EXAMPLE="${SCRIPT_DIR}/reboot-guard.env.example"
 if [[ -f "${ENV_FILE}" ]]; then
-  # shellcheck disable=SC1090
-  source "${ENV_FILE}"
+  cs_load_env_file "${ENV_FILE}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}" || true
 fi
 
 RG_WINDOW_START=${RG_WINDOW_START:-"02:00"}
@@ -32,7 +50,7 @@ RG_OVERRIDE_FILE=${RG_OVERRIDE_FILE:-"/run/reboot-guard/allow"}
 RG_OVERRIDE_TTL=${RG_OVERRIDE_TTL:-"0"}
 
 require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || fail "Missing required command: $1"
+  cs_require_cmd "$1"
 }
 
 require_cmd systemd-inhibit

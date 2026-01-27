@@ -1,24 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LOG_PREFIX="[gitea-onboard]"
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CS_ROOT="${SCRIPT_DIR}"
+while [[ ! -f "${CS_ROOT}/lib/cs-common.sh" ]]; do
+  if [[ "${CS_ROOT}" == "/" ]]; then
+    echo "cs-common.sh not found" >&2
+    exit 1
+  fi
+  CS_ROOT=$(dirname "${CS_ROOT}")
+done
+# shellcheck disable=SC1090,SC1091
+source "${CS_ROOT}/lib/cs-common.sh"
+
+# shellcheck disable=SC2034
+CS_LOG_PREFIX="gitea-onboard"
 
 log() {
-  echo "${LOG_PREFIX} $*"
+  cs_log "$*"
 }
 
 fail() {
-  echo "${LOG_PREFIX} ERROR: $*" >&2
-  exit 1
+  cs_die "$*"
 }
 
 CONFIG_PATH="${1:-}"
+ENV_EXAMPLE="${CS_ROOT}/tooling/secrets/gitea-onboard-contributors.env.example"
 if [[ -n "${CONFIG_PATH}" ]]; then
-  if [[ ! -f "${CONFIG_PATH}" ]]; then
-    fail "Config not found: ${CONFIG_PATH}"
-  fi
-  # shellcheck disable=SC1090
-  source "${CONFIG_PATH}"
+  cs_load_env_chain "${CONFIG_PATH}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}"
 fi
 
 GITEA_URL=${GITEA_URL:-""}
@@ -35,7 +44,7 @@ ADD_SSH_KEYS=${ADD_SSH_KEYS:-"true"}
 ADD_ORG_MEMBERSHIP=${ADD_ORG_MEMBERSHIP:-"true"}
 
 require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || fail "Missing required command: $1"
+  cs_require_cmd "$1"
 }
 
 require_cmd curl

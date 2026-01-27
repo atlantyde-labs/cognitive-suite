@@ -1,29 +1,40 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CS_ROOT="${script_dir}"
+while [[ ! -f "${CS_ROOT}/lib/cs-common.sh" ]]; do
+  if [[ "${CS_ROOT}" == "/" ]]; then
+    echo "cs-common.sh not found" >&2
+    exit 1
+  fi
+  CS_ROOT=$(dirname "${CS_ROOT}")
+done
+# shellcheck disable=SC1090,SC1091
+source "${CS_ROOT}/lib/cs-common.sh"
+
+# shellcheck disable=SC2034
+CS_LOG_PREFIX="secret-suite"
+
 CONFIG_PATH="${1:-}"
+ENV_EXAMPLE="${CS_ROOT}/proxmox/deploy-all-secret-suite.env.example"
 if [[ -z "${CONFIG_PATH}" ]]; then
-  echo "Usage: $0 /path/to/deploy-all-secret-suite.env" >&2
-  exit 1
+  cs_die "Usage: $0 /path/to/deploy-all-secret-suite.env"
 fi
 if [[ ! -f "${CONFIG_PATH}" ]]; then
-  echo "Config not found: ${CONFIG_PATH}" >&2
-  exit 1
+  cs_die "Config not found: ${CONFIG_PATH}"
 fi
 
-# shellcheck disable=SC1090
-source "${CONFIG_PATH}"
+cs_load_env_chain "${CONFIG_PATH}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}"
 
 log() {
-  echo "[secret-suite] $*"
+  cs_log "$*"
 }
 
 fail() {
-  echo "[secret-suite] ERROR: $*" >&2
-  exit 1
+  cs_die "$*"
 }
 
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 root_dir=$(cd "${script_dir}/../.." && pwd)
 
 LOCAL_FIRST=${LOCAL_FIRST:-"true"}
@@ -82,7 +93,8 @@ require_file() {
 get_env_value() {
   local env_file=$1
   local var=$2
-  bash -c "set -a; source \"${env_file}\"; eval \"echo \\\"\${${var}:-}\\\"\"" 2>/dev/null
+  local example_file=$3
+  cs_get_env_value "${env_file}" "${var}" "${example_file}" "${CS_STRICT_CONFIG:-false}"
 }
 
 is_private_host() {
@@ -227,17 +239,22 @@ run_script() {
 # Local-first URL checks for Gitea/SSO/MFA endpoints
 if [[ "${LOCAL_FIRST}" == "true" ]]; then
   if [[ -n "${COMPLIANCE_REPORT_ENV}" && -f "${COMPLIANCE_REPORT_ENV}" ]]; then
-    gitea_url=$(get_env_value "${COMPLIANCE_REPORT_ENV}" GITEA_URL)
-    sso_url=$(get_env_value "${COMPLIANCE_REPORT_ENV}" SSO_STATUS_ENDPOINT)
-    mfa_url=$(get_env_value "${COMPLIANCE_REPORT_ENV}" MFA_STATUS_ENDPOINT)
+    gitea_url=$(get_env_value "${COMPLIANCE_REPORT_ENV}" GITEA_URL \
+      "${CS_ROOT}/platforms/compliance/eu-compliance-report.env.example")
+    sso_url=$(get_env_value "${COMPLIANCE_REPORT_ENV}" SSO_STATUS_ENDPOINT \
+      "${CS_ROOT}/platforms/compliance/eu-compliance-report.env.example")
+    mfa_url=$(get_env_value "${COMPLIANCE_REPORT_ENV}" MFA_STATUS_ENDPOINT \
+      "${CS_ROOT}/platforms/compliance/eu-compliance-report.env.example")
     check_local_url "GITEA_URL" "${gitea_url}"
     check_local_url "SSO_STATUS_ENDPOINT" "${sso_url}"
     check_local_url "MFA_STATUS_ENDPOINT" "${mfa_url}"
   fi
 
   if [[ -n "${SSO_MFA_ENV}" && -f "${SSO_MFA_ENV}" ]]; then
-    sso_url=$(get_env_value "${SSO_MFA_ENV}" SSO_STATUS_ENDPOINT)
-    mfa_url=$(get_env_value "${SSO_MFA_ENV}" MFA_STATUS_ENDPOINT)
+    sso_url=$(get_env_value "${SSO_MFA_ENV}" SSO_STATUS_ENDPOINT \
+      "${CS_ROOT}/platforms/compliance/sso-mfa-status.env.example")
+    mfa_url=$(get_env_value "${SSO_MFA_ENV}" MFA_STATUS_ENDPOINT \
+      "${CS_ROOT}/platforms/compliance/sso-mfa-status.env.example")
     check_local_url "SSO_STATUS_ENDPOINT" "${sso_url}"
     check_local_url "MFA_STATUS_ENDPOINT" "${mfa_url}"
   fi

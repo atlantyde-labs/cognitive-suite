@@ -2,27 +2,35 @@
 set -euo pipefail
 umask 077
 
-LOG_PREFIX="[bootstrap]"
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CS_ROOT="${SCRIPT_DIR}"
+while [[ ! -f "${CS_ROOT}/lib/cs-common.sh" ]]; do
+  if [[ "${CS_ROOT}" == "/" ]]; then
+    echo "cs-common.sh not found" >&2
+    exit 1
+  fi
+  CS_ROOT=$(dirname "${CS_ROOT}")
+done
+# shellcheck disable=SC1090,SC1091
+source "${CS_ROOT}/lib/cs-common.sh"
+
+# shellcheck disable=SC2034
+CS_LOG_PREFIX="bootstrap"
 
 log() {
-  echo "${LOG_PREFIX} $*"
+  cs_log "$*"
 }
 
 fail() {
-  echo "${LOG_PREFIX} ERROR: $*" >&2
-  exit 1
+  cs_die "$*"
 }
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT_DIR=$(cd "${SCRIPT_DIR}/../.." && pwd)
 
 CONFIG_PATH="${1:-}"
+ENV_EXAMPLE="${CS_ROOT}/proxmox/bootstrap.env.example"
 if [[ -n "${CONFIG_PATH}" ]]; then
-  if [[ ! -f "${CONFIG_PATH}" ]]; then
-    fail "Config not found: ${CONFIG_PATH}"
-  fi
-  # shellcheck disable=SC1090
-  source "${CONFIG_PATH}"
+  cs_load_env_chain "${CONFIG_PATH}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}"
 fi
 
 REPO_DIR=${REPO_DIR:-"${ROOT_DIR}"}
@@ -35,11 +43,7 @@ ALLOW_EXTERNAL_CONFIRM=${ALLOW_EXTERNAL_CONFIRM:-""}
 APPLY=${APPLY:-"false"}
 CONFIRM_APPLY=${CONFIRM_APPLY:-""}
 
-require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || fail "Missing required command: $1"
-}
-
-require_cmd bash
+cs_require_cmd bash
 
 copy_example() {
   local target=$1
@@ -76,13 +80,16 @@ ensure_env_file() {
 get_env_value() {
   local env_file=$1
   local var=$2
-  bash -c "set -a; source \"${env_file}\"; eval \"echo \\\"\${${var}:-}\\\"\"" 2>/dev/null
+  local example_file=$3
+  cs_get_env_value "${env_file}" "${var}" "${example_file}" "${CS_STRICT_CONFIG:-false}"
 }
 
 ensure_env_file "${SUITE_ENV}"
 
-local_first=$(get_env_value "${SUITE_ENV}" LOCAL_FIRST)
-allow_external=$(get_env_value "${SUITE_ENV}" ALLOW_EXTERNAL)
+local_first=$(get_env_value "${SUITE_ENV}" LOCAL_FIRST \
+  "${CS_ROOT}/proxmox/deploy-all-secret-suite.env.example")
+allow_external=$(get_env_value "${SUITE_ENV}" ALLOW_EXTERNAL \
+  "${CS_ROOT}/proxmox/deploy-all-secret-suite.env.example")
 if [[ "${local_first}" == "true" && "${allow_external}" == "true" ]]; then
   if [[ "${ALLOW_EXTERNAL_CONFIRM}" != "YES" ]]; then
     fail "ALLOW_EXTERNAL=true while LOCAL_FIRST=true. Set ALLOW_EXTERNAL_CONFIRM=YES if intentional."
@@ -106,7 +113,8 @@ env_keys=(
 )
 
 for key in "${env_keys[@]}"; do
-  path=$(get_env_value "${SUITE_ENV}" "${key}")
+  path=$(get_env_value "${SUITE_ENV}" "${key}" \
+    "${CS_ROOT}/proxmox/deploy-all-secret-suite.env.example")
   if [[ -n "${path}" ]]; then
     ensure_env_file "${REPO_DIR}/${path}"
   fi
@@ -119,7 +127,8 @@ if [[ "${CHECK_PLACEHOLDERS}" == "true" ]]; then
     missing+=("${SUITE_ENV}")
   fi
   for key in "${env_keys[@]}"; do
-    path=$(get_env_value "${SUITE_ENV}" "${key}")
+    path=$(get_env_value "${SUITE_ENV}" "${key}" \
+      "${CS_ROOT}/proxmox/deploy-all-secret-suite.env.example")
     if [[ -n "${path}" && -f "${REPO_DIR}/${path}" ]]; then
       if grep -Eq "${placeholder_regex}" "${REPO_DIR}/${path}"; then
         missing+=("${REPO_DIR}/${path}")

@@ -1,20 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CS_LIB_FALLBACK="/usr/local/lib/cognitive-suite/cs-common.sh"
+if [[ -f "${CS_LIB_FALLBACK}" ]]; then
+  # shellcheck disable=SC1090,SC1091
+  source "${CS_LIB_FALLBACK}"
+else
+  CS_ROOT="${SCRIPT_DIR}"
+  while [[ ! -f "${CS_ROOT}/lib/cs-common.sh" ]]; do
+    if [[ "${CS_ROOT}" == "/" ]]; then
+      echo "cs-common.sh not found" >&2
+      exit 1
+    fi
+    CS_ROOT=$(dirname "${CS_ROOT}")
+  done
+  # shellcheck disable=SC1090,SC1091
+  source "${CS_ROOT}/lib/cs-common.sh"
+fi
+
+# shellcheck disable=SC2034
+CS_LOG_PREFIX="reboot-guard-allow"
+
 CONFIG_PATH="${1:-}"
+ENV_EXAMPLE="${SCRIPT_DIR}/reboot-guard.env.example"
 if [[ -n "${CONFIG_PATH}" ]]; then
-  if [[ ! -f "${CONFIG_PATH}" ]]; then
-    echo "Config not found: ${CONFIG_PATH}" >&2
-    exit 1
-  fi
-  # shellcheck disable=SC1090
-  source "${CONFIG_PATH}"
+  cs_load_env_chain "${CONFIG_PATH}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}"
 fi
 
 ENV_FILE=${ENV_FILE:-"/etc/reboot-guard.env"}
 if [[ -f "${ENV_FILE}" ]]; then
-  # shellcheck disable=SC1090
-  source "${ENV_FILE}"
+  cs_load_env_file "${ENV_FILE}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}" || true
 fi
 
 RG_OVERRIDE_FILE=${RG_OVERRIDE_FILE:-"/run/reboot-guard/allow"}
@@ -26,8 +42,7 @@ if [[ "${FORCE_DRY_RUN:-false}" == "true" ]]; then
 fi
 
 if [[ -z "${RG_OVERRIDE_TTL}" || "${RG_OVERRIDE_TTL}" == "0" ]]; then
-  echo "RG_OVERRIDE_TTL must be > 0 to allow override." >&2
-  exit 1
+  cs_die "RG_OVERRIDE_TTL must be > 0 to allow override."
 fi
 
 dir=$(dirname "${RG_OVERRIDE_FILE}")

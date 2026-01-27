@@ -1,21 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONFIG_PATH="${1:-}"
-if [[ -n "${CONFIG_PATH}" ]]; then
-  if [[ ! -f "${CONFIG_PATH}" ]]; then
-    echo "Config not found: ${CONFIG_PATH}" >&2
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CS_ROOT="${SCRIPT_DIR}"
+while [[ ! -f "${CS_ROOT}/lib/cs-common.sh" ]]; do
+  if [[ "${CS_ROOT}" == "/" ]]; then
+    echo "cs-common.sh not found" >&2
     exit 1
   fi
-  # shellcheck disable=SC1090
-  source "${CONFIG_PATH}"
+  CS_ROOT=$(dirname "${CS_ROOT}")
+done
+# shellcheck disable=SC1090,SC1091
+source "${CS_ROOT}/lib/cs-common.sh"
+
+# shellcheck disable=SC2034
+CS_LOG_PREFIX="rehydrate-secrets"
+
+CONFIG_PATH="${1:-}"
+ENV_EXAMPLE="${CS_ROOT}/tooling/secrets/rehydrate.env.example"
+if [[ -n "${CONFIG_PATH}" ]]; then
+  cs_load_env_chain "${CONFIG_PATH}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}"
 fi
 
 require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || {
-    echo "Missing required command: $1" >&2
-    exit 1
-  }
+  cs_require_cmd "$1"
 }
 
 SECRETS_FILE=${SECRETS_FILE:-""}
@@ -31,12 +39,10 @@ GITEA_TOKEN=${GITEA_TOKEN:-""}
 GITEA_SECRET_SET_CMD=${GITEA_SECRET_SET_CMD:-""}
 
 if [[ -z "${SECRETS_FILE}" ]]; then
-  echo "SECRETS_FILE is required" >&2
-  exit 1
+  cs_die "SECRETS_FILE is required"
 fi
 if [[ ! -f "${SECRETS_FILE}" ]]; then
-  echo "Secrets file not found: ${SECRETS_FILE}" >&2
-  exit 1
+  cs_die "Secrets file not found: ${SECRETS_FILE}"
 fi
 
 maybe_decode() {
@@ -55,7 +61,7 @@ set_gitea_secret_default() {
   local value=$4
 
   if [[ -z "${GITEA_URL}" || -z "${GITEA_TOKEN}" ]]; then
-    echo "Gitea URL/token missing for ${owner}/${repo}:${name}" >&2
+    cs_warn "Gitea URL/token missing for ${owner}/${repo}:${name}"
     return 1
   fi
 
