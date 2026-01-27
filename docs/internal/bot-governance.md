@@ -52,3 +52,9 @@ Secrets/vars requeridos para Gitea:
 ## Nota ética
 Los bots **no sustituyen** a revisores humanos.  
 Para merges regulados, exige **2 humanos reales** y usa bots como soporte.
+
+## Wizard interactivo
+Script: `bash/GitDevSecDataAIOps/tooling/bots/bot-setup-wizard.sh`
+
+- Genera `.env` locales con placeholders.
+- No escribe tokens reales.

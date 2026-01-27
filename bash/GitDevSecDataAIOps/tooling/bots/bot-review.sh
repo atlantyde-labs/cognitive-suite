@@ -27,6 +27,7 @@ PLATFORM=${PLATFORM:-"github"} # github|gitea
 BOT_NAME=${BOT_NAME:-"ops-bot"}
 BOT_ACTION=${BOT_ACTION:-"comment"} # comment|approve
 DRY_RUN=${DRY_RUN:-"true"}
+INTERACTIVE=${INTERACTIVE:-"false"}
 
 ALLOW_BOT_APPROVE=${ALLOW_BOT_APPROVE:-"NO"}
 HITL_APPROVE=${HITL_APPROVE:-""}
@@ -57,6 +58,26 @@ require_cmd() {
 require_cmd curl
 require_cmd jq
 require_cmd date
+
+if [[ "${INTERACTIVE}" == "true" ]]; then
+  if [[ ! -t 0 ]]; then
+    cs_die "INTERACTIVE=true requires a TTY"
+  fi
+  cs_ui_header "Bot Review"
+  PLATFORM=$(cs_ui_prompt "Platform (github|gitea)" "${PLATFORM}")
+  BOT_NAME=$(cs_ui_prompt "Bot name" "${BOT_NAME}")
+  BOT_ACTION=$(cs_ui_prompt "Bot action (comment|approve)" "${BOT_ACTION}")
+  DRY_RUN=$(cs_ui_prompt "DRY_RUN (true|false)" "${DRY_RUN}")
+  if [[ "${PLATFORM}" == "github" ]]; then
+    REPO_SLUG=$(cs_ui_prompt "GitHub repo (owner/repo)" "${REPO_SLUG:-owner/repo}")
+    PR_NUMBER=$(cs_ui_prompt "PR number" "${PR_NUMBER:-}")
+  else
+    GITEA_URL=$(cs_ui_prompt "Gitea URL" "${GITEA_URL:-}")
+    REPO_OWNER=$(cs_ui_prompt "Repo owner" "${REPO_OWNER:-}")
+    REPO_NAME=$(cs_ui_prompt "Repo name" "${REPO_NAME:-}")
+    PR_INDEX=$(cs_ui_prompt "PR index" "${PR_INDEX:-}")
+  fi
+fi
 
 timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 

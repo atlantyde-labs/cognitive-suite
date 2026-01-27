@@ -27,6 +27,7 @@ DRY_RUN=${DRY_RUN:-"true"}
 EVIDENCE_SOURCE_DIR=${EVIDENCE_SOURCE_DIR:-""}
 EVIDENCE_SUBDIR=${EVIDENCE_SUBDIR:-""}
 EVIDENCE_COMMIT_MESSAGE=${EVIDENCE_COMMIT_MESSAGE:-"chore(evidence): publish bot evidence"}
+INTERACTIVE=${INTERACTIVE:-"false"}
 
 GITEA_URL=${GITEA_URL:-""}
 GITEA_EVIDENCE_REPO=${GITEA_EVIDENCE_REPO:-"founders/evidence"} # placeholder
@@ -40,6 +41,19 @@ require_cmd() {
 require_cmd git
 require_cmd rsync
 require_cmd date
+
+if [[ "${INTERACTIVE}" == "true" ]]; then
+  if [[ ! -t 0 ]]; then
+    cs_die "INTERACTIVE=true requires a TTY"
+  fi
+  cs_ui_header "Bot Evidence Publisher"
+  DRY_RUN=$(cs_ui_prompt "DRY_RUN (true|false)" "${DRY_RUN}")
+  EVIDENCE_SOURCE_DIR=$(cs_ui_prompt "Evidence source dir" "${EVIDENCE_SOURCE_DIR:-outputs/ci-evidence}")
+  GITEA_URL=$(cs_ui_prompt "Gitea URL" "${GITEA_URL:-}")
+  GITEA_EVIDENCE_REPO=$(cs_ui_prompt "Evidence repo (owner/repo)" "${GITEA_EVIDENCE_REPO}")
+  GITEA_EVIDENCE_USER=$(cs_ui_prompt "Evidence user" "${GITEA_EVIDENCE_USER}")
+  cs_ui_note "Set GITEA_EVIDENCE_TOKEN via env or .env file before running in non-dry-run."
+fi
 
 if [[ -z "${EVIDENCE_SOURCE_DIR}" || ! -d "${EVIDENCE_SOURCE_DIR}" ]]; then
   cs_die "EVIDENCE_SOURCE_DIR not found"

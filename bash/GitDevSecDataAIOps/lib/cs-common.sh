@@ -207,3 +207,97 @@ cs_warn_debian13_template() {
     cs_warn "Debian 13 containers may fail; prefer Debian 12 templates."
   fi
 }
+
+cs_color_enabled() {
+  local mode="${CS_COLOR:-auto}"
+  if [[ "${mode}" == "never" || -n "${NO_COLOR:-}" ]]; then
+    return 1
+  fi
+  if [[ "${mode}" == "always" ]]; then
+    return 0
+  fi
+  [[ -t 1 ]]
+}
+
+cs_color() {
+  local code="$1"
+  if cs_color_enabled; then
+    printf '\033[%sm' "${code}"
+  fi
+}
+
+cs_ui_reset() {
+  cs_color "0"
+}
+
+cs_ui_header() {
+  local title="$1"
+  local line="=================================================="
+  cs_color "1;36"
+  printf '%s\n' "${line}"
+  printf '%s\n' "${title}"
+  printf '%s\n' "${line}"
+  cs_ui_reset
+}
+
+cs_ui_step() {
+  local msg="$1"
+  cs_color "1;34"
+  printf '>> %s\n' "${msg}"
+  cs_ui_reset
+}
+
+cs_ui_note() {
+  local msg="$1"
+  cs_color "0;33"
+  printf '!! %s\n' "${msg}"
+  cs_ui_reset
+}
+
+cs_ui_ok() {
+  local msg="$1"
+  cs_color "0;32"
+  printf 'OK %s\n' "${msg}"
+  cs_ui_reset
+}
+
+cs_ui_prompt() {
+  local label="$1"
+  local default="$2"
+  local value=""
+  if [[ -n "${default}" ]]; then
+    cs_color "1;37"
+    printf '%s [%s]: ' "${label}" "${default}"
+    cs_ui_reset
+  else
+    cs_color "1;37"
+    printf '%s: ' "${label}"
+    cs_ui_reset
+  fi
+  read -r value
+  if [[ -z "${value}" ]]; then
+    value="${default}"
+  fi
+  printf '%s' "${value}"
+}
+
+cs_ui_confirm() {
+  local label="$1"
+  local default="${2:-N}"
+  local prompt="y/N"
+  if [[ "${default}" == "Y" ]]; then
+    prompt="Y/n"
+  fi
+  cs_color "1;37"
+  printf '%s [%s]: ' "${label}" "${prompt}"
+  cs_ui_reset
+  local value=""
+  read -r value
+  if [[ -z "${value}" ]]; then
+    value="${default}"
+  fi
+  case "${value}" in
+    y|Y|yes|YES) return 0 ;;
+    *) return 1 ;;
+  esac
+}
