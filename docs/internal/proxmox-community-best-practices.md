@@ -19,6 +19,19 @@ Esta suite adopta practicas seguras y compatibles con las recomendaciones de com
 - **Logging estructurado** con prefijos consistentes (`CS_LOG_PREFIX`) para trazabilidad.
 - **Dry-run** como primer paso antes de aplicar en produccion.
 
+## Telemetria, bloqueo y mirror local
+
+- **Opt-out de diagnosticos**: community-scripts usa `/usr/local/community-scripts/diagnostics` con `DIAGNOSTICS=yes|no`. En entornos regulados recomendamos forzar `no`.
+- **Bloqueo de telemetria**: si la politica exige cero egress, bloquea `api.community-scripts.org` (hosts o firewall).
+- **Mirror local**: evita `curl | bash` directo; clona el repo en local y revisa hashes antes de ejecutar.
+
+Script recomendado (por defecto en dry-run):
+
+```bash
+bash bash/GitDevSecDataAIOps/proxmox/community-scripts-hardening.sh \
+  bash/GitDevSecDataAIOps/proxmox/community-scripts-hardening.env.example
+```
+
 ## Notas de seguridad
 
 - El parser seguro evita inyecciones por configuraciones maliciosas.

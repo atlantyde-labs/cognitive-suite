@@ -13,6 +13,9 @@ done
 # shellcheck disable=SC1090,SC1091
 source "${CS_ROOT}/lib/cs-common.sh"
 
+# shellcheck disable=SC2034
+CS_LOG_STDERR=true
+
 CONFIG_PATH="${1:-}"
 shift || true
 

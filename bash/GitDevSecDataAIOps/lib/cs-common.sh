@@ -2,6 +2,10 @@
 
 cs_log() {
   local prefix="${CS_LOG_PREFIX:-cs}"
+  if [[ "${CS_LOG_STDERR:-false}" == "true" ]]; then
+    printf '%s [%s] %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${prefix}" "$*" >&2
+    return 0
+  fi
   printf '%s [%s] %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${prefix}" "$*"
 }
 

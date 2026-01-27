@@ -64,16 +64,20 @@ if [[ -n "${PASSWORD_OUTPUT}" ]]; then
 fi
 
 generate_password() {
-  if command -v openssl >/dev/null 2>&1; then
-    openssl rand -base64 24
-    return
-  fi
-  python3 - <<'PY'
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - <<'PY'
 import secrets
 import string
 alphabet = string.ascii_letters + string.digits + "!@#%^*-_"
 print("".join(secrets.choice(alphabet) for _ in range(24)))
 PY
+    return
+  fi
+  if command -v openssl >/dev/null 2>&1; then
+    openssl rand -base64 24
+    return
+  fi
+  fail "No password generator available (python3 or openssl required)"
 }
 
 api_post_json() {

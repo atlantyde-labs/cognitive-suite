@@ -51,6 +51,13 @@ require_cmd() {
   cs_require_cmd "$1"
 }
 
+abs_path() {
+  local path="$1"
+  local dir
+  dir=$(cd "$(dirname "${path}")" && pwd)
+  printf '%s/%s' "${dir}" "$(basename "${path}")"
+}
+
 if [[ -z "${SOURCE_DIR}" || -z "${OUTPUT_DIR}" ]]; then
   fail "SOURCE_DIR and OUTPUT_DIR are required"
 fi
@@ -79,7 +86,11 @@ fi
 log "Generating manifest ${MANIFEST_NAME}"
 (
   cd "${SOURCE_DIR}"
-  find . -type f -not -path './.git/*' -print0 | sort -z | xargs -0 sha256sum > "${OUTPUT_DIR}/${MANIFEST_NAME}"
+  find . -type f \
+    -not -path './.git/*' \
+    -not -name "${MANIFEST_NAME}" \
+    -not -name "${SIGNATURE_NAME}" \
+    -print0 | sort -z | xargs -0 sha256sum > "${OUTPUT_DIR}/${MANIFEST_NAME}"
 )
 
 case "${SIGNATURE_TOOL}" in
@@ -97,7 +108,11 @@ case "${SIGNATURE_TOOL}" in
     fi
     log "Signing manifest with cosign"
     cosign sign-blob --key "${COSIGN_KEY}" --output-signature "${OUTPUT_DIR}/${SIGNATURE_NAME}" "${OUTPUT_DIR}/${MANIFEST_NAME}"
-    cp "${COSIGN_PUB}" "${OUTPUT_DIR}/cosign.pub"
+    src_pub=$(abs_path "${COSIGN_PUB}")
+    dest_pub=$(abs_path "${OUTPUT_DIR}/cosign.pub")
+    if [[ "${src_pub}" != "${dest_pub}" ]]; then
+      cp "${COSIGN_PUB}" "${OUTPUT_DIR}/cosign.pub"
+    fi
     if command -v sha256sum >/dev/null 2>&1; then
       sha256sum "${OUTPUT_DIR}/cosign.pub" | awk '{print $1}' > "${OUTPUT_DIR}/cosign.pub.sha256"
     elif command -v shasum >/dev/null 2>&1; then
