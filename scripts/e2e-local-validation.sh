@@ -43,12 +43,6 @@ error() {
   echo "[$timestamp] [E2E LOCAL:ERROR] $*" >&2
 }
 
-verbose_log() {
-  if [[ "$VERBOSE" == "true" ]]; then
-    log "DEBUG: $*"
-  fi
-}
-
 elapsed_time() {
   local end_time
   end_time=$(date +%s)
