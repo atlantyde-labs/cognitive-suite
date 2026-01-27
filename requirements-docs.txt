@@ -99,3 +99,4 @@ urllib3==2.6.3
     # via requests
 watchdog==6.0.0
     # via mkdocs
+mkdocs-static-i18n
