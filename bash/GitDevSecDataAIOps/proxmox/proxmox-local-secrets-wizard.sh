@@ -106,6 +106,77 @@ escape_value() {
   printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
 
+prompt_value() {
+  local label=$1
+  local default=$2
+  local help=$3
+  local secret=${4:-"false"}
+  local allow_empty=${5:-"true"}
+  local kind=${6:-""}
+  local value=""
+  while true; do
+    if [[ -n "${default}" ]]; then
+      cs_color "1;37"
+      printf '%s [%s]: ' "${label}" "${default}"
+      cs_ui_reset
+    else
+      cs_color "1;37"
+      printf '%s: ' "${label}"
+      cs_ui_reset
+    fi
+    if [[ "${secret}" == "true" ]]; then
+      read -r -s value
+      printf '\n'
+    else
+      read -r value
+    fi
+    if [[ -z "${value}" ]]; then
+      value="${default}"
+    fi
+    if [[ "${value}" == "?" ]]; then
+      cs_ui_note "${help}"
+      continue
+    fi
+    if [[ "${value}" == "skip" ]]; then
+      printf '__SKIP__'
+      return 0
+    fi
+    if [[ "${kind}" == "url" && ( "${value}" == "y" || "${value}" == "Y" || "${value}" == "n" || "${value}" == "N" ) ]]; then
+      cs_ui_note "Parece un yes/no. Usa Enter para el default o escribe la URL completa."
+      continue
+    fi
+    if [[ "${allow_empty}" != "true" && -z "${value}" ]]; then
+      cs_ui_note "Este campo es obligatorio."
+      continue
+    fi
+    printf '%s' "${value}"
+    return 0
+  done
+}
+
+prompt_bool() {
+  local label=$1
+  local default=$2
+  local help=$3
+  local value=""
+  while true; do
+    value=$(prompt_value "${label}" "${default}" "${help}" "false" "true")
+    if [[ "${value}" == "__SKIP__" ]]; then
+      printf '__SKIP__'
+      return 0
+    fi
+    case "${value}" in
+      true|false)
+        printf '%s' "${value}"
+        return 0
+        ;;
+      *)
+        cs_ui_note "Valor invalido. Usa true o false."
+        ;;
+    esac
+  done
+}
+
 write_kv() {
   local file=$1
   local key=$2
@@ -186,6 +257,7 @@ run_contributor_wizard() {
 
 if [[ "${INTERACTIVE}" == "true" ]]; then
   cs_ui_header "Proxmox Local Secrets Wizard"
+  cs_ui_note "Tip: Enter = default, ? = ayuda, skip = omitir seccion"
   cs_ui_note "DRY_RUN=${DRY_RUN}"
   cs_ui_note "OUTPUT_DIR=${OUTPUT_DIR}"
 fi
@@ -219,10 +291,15 @@ ensure_output_dir
 if [[ "${WRITE_PVE_API_ENV}" == "true" ]]; then
   cs_ui_step "PVE API env"
   if [[ "${INTERACTIVE}" == "true" ]]; then
-    PVE_API_URL=$(cs_ui_prompt "PVE API URL" "${PVE_API_URL}")
-    PVE_API_TOKEN=$(prompt_secret "PVE API TOKEN" "${PVE_API_TOKEN}")
-    PVE_INSECURE=$(cs_ui_prompt "PVE INSECURE (true/false)" "${PVE_INSECURE}")
-    PVE_DRY_RUN=$(cs_ui_prompt "DRY_RUN" "${PVE_DRY_RUN}")
+    cs_ui_note "Configura acceso a Proxmox API (token + URL)."
+    PVE_API_URL=$(prompt_value "PVE API URL" "${PVE_API_URL}" "Ej: https://127.0.0.1:8006/api2/json" "false" "true" "url")
+    if [[ "${PVE_API_URL}" == "__SKIP__" ]]; then
+      WRITE_PVE_API_ENV="false"
+    else
+      PVE_API_TOKEN=$(prompt_value "PVE API TOKEN" "${PVE_API_TOKEN}" "Token: user@pve!tokenid=..." "true" "true")
+      PVE_INSECURE=$(prompt_bool "PVE INSECURE (true/false)" "${PVE_INSECURE}" "true = aceptar TLS autosignado")
+      PVE_DRY_RUN=$(prompt_bool "DRY_RUN" "${PVE_DRY_RUN}" "true = no ejecuta cambios")
+    fi
   fi
   PVE_ENV_PATH="${OUTPUT_DIR}/pve-api.env"
   if [[ "${DRY_RUN}" == "true" ]]; then
@@ -241,22 +318,27 @@ fi
 if [[ "${WRITE_GITEA_ONBOARD_ENV}" == "true" ]]; then
   cs_ui_step "Gitea onboard env"
   if [[ "${INTERACTIVE}" == "true" ]]; then
-    GITEA_URL=$(cs_ui_prompt "Gitea URL" "${GITEA_URL}")
-    GITEA_TOKEN=$(prompt_secret "Gitea token" "${GITEA_TOKEN}")
-    ORG=$(cs_ui_prompt "Org" "${ORG}")
-    USERS_CSV=$(cs_ui_prompt "Contributors CSV path" "${USERS_CSV}")
-    if cs_ui_confirm "Generate passwords per user?" "Y"; then
+    cs_ui_note "Configura onboarding de usuarios (CSV + org + token admin)."
+    GITEA_URL=$(prompt_value "Gitea URL" "${GITEA_URL}" "Ej: https://gitea.example.com" "false" "true" "url")
+    if [[ "${GITEA_URL}" == "__SKIP__" ]]; then
+      WRITE_GITEA_ONBOARD_ENV="false"
+    else
+      GITEA_TOKEN=$(prompt_value "Gitea token" "${GITEA_TOKEN}" "Token admin con permisos para crear usuarios" "true" "true")
+      ORG=$(prompt_value "Org" "${ORG}" "Organizacion destino" "false" "true")
+      USERS_CSV=$(prompt_value "Contributors CSV path" "${USERS_CSV}" "Ruta al CSV de usuarios" "false" "true")
+      if cs_ui_confirm "Generate passwords per user?" "Y"; then
       GENERATE_PASSWORDS="true"
       DEFAULT_PASSWORD=""
-      PASSWORD_OUTPUT=$(cs_ui_prompt "Password output CSV" "${PASSWORD_OUTPUT}")
-    else
-      GENERATE_PASSWORDS="false"
-      DEFAULT_PASSWORD=$(prompt_secret "Default password" "${DEFAULT_PASSWORD}")
+      PASSWORD_OUTPUT=$(prompt_value "Password output CSV" "${PASSWORD_OUTPUT}" "CSV con passwords generadas" "false" "true")
+      else
+        GENERATE_PASSWORDS="false"
+        DEFAULT_PASSWORD=$(prompt_value "Default password" "${DEFAULT_PASSWORD}" "Password por defecto (temporal)" "true" "true")
+      fi
+      GITEA_DRY_RUN=$(prompt_bool "DRY_RUN" "${GITEA_DRY_RUN}" "true = no ejecuta cambios")
+      ENFORCE_MUST_CHANGE_PASSWORD=$(prompt_bool "Must change password" "${ENFORCE_MUST_CHANGE_PASSWORD}" "true = forzar cambio en primer login")
+      ADD_SSH_KEYS=$(prompt_bool "Add SSH keys" "${ADD_SSH_KEYS}" "true = añade SSH keys desde CSV")
+      ADD_ORG_MEMBERSHIP=$(prompt_bool "Add org membership" "${ADD_ORG_MEMBERSHIP}" "true = añade a la org")
     fi
-    GITEA_DRY_RUN=$(cs_ui_prompt "DRY_RUN" "${GITEA_DRY_RUN}")
-    ENFORCE_MUST_CHANGE_PASSWORD=$(cs_ui_prompt "Must change password" "${ENFORCE_MUST_CHANGE_PASSWORD}")
-    ADD_SSH_KEYS=$(cs_ui_prompt "Add SSH keys" "${ADD_SSH_KEYS}")
-    ADD_ORG_MEMBERSHIP=$(cs_ui_prompt "Add org membership" "${ADD_ORG_MEMBERSHIP}")
   fi
   ONBOARD_ENV_PATH="${OUTPUT_DIR}/gitea-onboard.env"
   if [[ "${DRY_RUN}" == "true" ]]; then
@@ -302,16 +384,21 @@ fi
 if [[ "${WRITE_BOT_EVIDENCE_ENV}" == "true" ]]; then
   cs_ui_step "Bot evidence env"
   if [[ "${INTERACTIVE}" == "true" ]]; then
-    EVIDENCE_SOURCE_DIR=$(cs_ui_prompt "Evidence source dir" "${EVIDENCE_SOURCE_DIR}")
-    EVIDENCE_SUBDIR=$(cs_ui_prompt "Evidence subdir (optional)" "${EVIDENCE_SUBDIR}")
-    EVIDENCE_COMMIT_MESSAGE=$(cs_ui_prompt "Evidence commit message" "${EVIDENCE_COMMIT_MESSAGE}")
-    GITEA_URL=$(cs_ui_prompt "Gitea URL" "${GITEA_URL}")
-    GITEA_EVIDENCE_REPO=$(cs_ui_prompt "Evidence repo" "${GITEA_EVIDENCE_REPO}")
-    GITEA_EVIDENCE_USER=$(cs_ui_prompt "Evidence user" "${GITEA_EVIDENCE_USER}")
-    GITEA_EVIDENCE_TOKEN=$(prompt_secret "Evidence token" "${GITEA_EVIDENCE_TOKEN}")
-    BOT_NAME=$(cs_ui_prompt "Bot name" "${BOT_NAME}")
-    BOT_EMAIL=$(cs_ui_prompt "Bot email" "${BOT_EMAIL}")
-    BOT_DRY_RUN=$(cs_ui_prompt "DRY_RUN" "${BOT_DRY_RUN}")
+    cs_ui_note "Configura el bot que publica evidencias en Gitea."
+    EVIDENCE_SOURCE_DIR=$(prompt_value "Evidence source dir" "${EVIDENCE_SOURCE_DIR}" "Carpeta con evidencias" "false" "true")
+    EVIDENCE_SUBDIR=$(prompt_value "Evidence subdir (optional)" "${EVIDENCE_SUBDIR}" "Subdirectorio opcional" "false" "true")
+    EVIDENCE_COMMIT_MESSAGE=$(prompt_value "Evidence commit message" "${EVIDENCE_COMMIT_MESSAGE}" "Mensaje del commit" "false" "true")
+    GITEA_URL=$(prompt_value "Gitea URL" "${GITEA_URL}" "URL base de Gitea" "false" "true" "url")
+    if [[ "${GITEA_URL}" == "__SKIP__" ]]; then
+      WRITE_BOT_EVIDENCE_ENV="false"
+    else
+      GITEA_EVIDENCE_REPO=$(prompt_value "Evidence repo" "${GITEA_EVIDENCE_REPO}" "owner/repo" "false" "true")
+      GITEA_EVIDENCE_USER=$(prompt_value "Evidence user" "${GITEA_EVIDENCE_USER}" "Usuario bot" "false" "true")
+      GITEA_EVIDENCE_TOKEN=$(prompt_value "Evidence token" "${GITEA_EVIDENCE_TOKEN}" "Token bot (oculto)" "true" "true")
+      BOT_NAME=$(prompt_value "Bot name" "${BOT_NAME}" "Nombre bot" "false" "true")
+      BOT_EMAIL=$(prompt_value "Bot email" "${BOT_EMAIL}" "Email bot" "false" "true")
+      BOT_DRY_RUN=$(prompt_bool "DRY_RUN" "${BOT_DRY_RUN}" "true = no ejecuta cambios")
+    fi
   fi
   EVIDENCE_ENV_PATH="${OUTPUT_DIR}/bot-evidence.env"
   if [[ "${DRY_RUN}" == "true" ]]; then
