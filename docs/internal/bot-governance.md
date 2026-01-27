@@ -32,6 +32,23 @@ Los scripts usan placeholders:
 - `BOT_NAME="ops-bot"`
 - Tokens solo en `.env` locales
 
+## Workflow (GitHub Actions + self-hosted)
+Archivo: `.github/workflows/bot-review.yml`
+
+Labels opcionales:
+- `ops/bot-approve` -> permite approval si HITL tambien esta en YES
+- `ops/bot-approve-github` -> permite approval en GitHub (ademas del anterior)
+- `ops/hitl-approve` -> confirma HITL para bots
+
+Secrets/vars requeridos para Gitea:
+- `GITEA_URL`
+- `GITEA_TOKEN`
+- `GITEA_EVIDENCE_TOKEN`
+- `GITEA_EVIDENCE_REPO` (placeholder por defecto)
+- `GITEA_EVIDENCE_USER`
+- `GITEA_REPO_OWNER` (var)
+- `GITEA_REPO_NAME` (var)
+
 ## Nota ética
 Los bots **no sustituyen** a revisores humanos.  
 Para merges regulados, exige **2 humanos reales** y usa bots como soporte.

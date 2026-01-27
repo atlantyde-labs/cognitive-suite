@@ -1,0 +1,186 @@
+name: bot-review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      allow_bot_approve:
+        description: "Allow bot approval (ops gate)"
+        type: boolean
+        default: false
+      allow_github_bot_approve:
+        description: "Allow bot approval on GitHub (requires allow_bot_approve)"
+        type: boolean
+        default: false
+      hitl_approve:
+        description: "HITL approval flag"
+        type: boolean
+        default: false
+      gitea_pr_index:
+        description: "Override Gitea PR index"
+        type: string
+        required: false
+      pr_number:
+        description: "Override GitHub PR number"
+        type: string
+        required: false
+      dry_run:
+        description: "Dry-run"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  bot-review-github:
+    runs-on: ubuntu-latest
+    outputs:
+      allow_bot_approve: ${{ steps.flags.outputs.allow_bot_approve }}
+      allow_github_bot_approve: ${{ steps.flags.outputs.allow_github_bot_approve }}
+      hitl_approve: ${{ steps.flags.outputs.hitl_approve }}
+      pr_number: ${{ steps.pr.outputs.pr_number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve flags
+        id: flags
+        run: |
+          set -euo pipefail
+          allow_bot_approve="NO"
+          allow_github_bot_approve="NO"
+          hitl="NO"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ inputs.allow_bot_approve }}" == "true" ]]; then
+              allow_bot_approve="YES"
+            fi
+            if [[ "${{ inputs.allow_github_bot_approve }}" == "true" ]]; then
+              allow_github_bot_approve="YES"
+            fi
+            if [[ "${{ inputs.hitl_approve }}" == "true" ]]; then
+              hitl="YES"
+            fi
+          else
+            labels=$(jq -r '.pull_request.labels[].name' "${GITHUB_EVENT_PATH}" || true)
+            if echo "${labels}" | grep -qx "ops/bot-approve"; then
+              allow_bot_approve="YES"
+            fi
+            if echo "${labels}" | grep -qx "ops/bot-approve-github"; then
+              allow_github_bot_approve="YES"
+            fi
+            if echo "${labels}" | grep -qx "ops/hitl-approve"; then
+              hitl="YES"
+            fi
+          fi
+          echo "allow_bot_approve=${allow_bot_approve}" >> "$GITHUB_OUTPUT"
+          echo "allow_github_bot_approve=${allow_github_bot_approve}" >> "$GITHUB_OUTPUT"
+          echo "hitl_approve=${hitl}" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve PR number
+        id: pr
+        run: |
+          set -euo pipefail
+          pr_number="${{ github.event.pull_request.number }}"
+          if [[ "${{ inputs.pr_number }}" != "" ]]; then
+            pr_number="${{ inputs.pr_number }}"
+          fi
+          if [[ -z "${pr_number}" ]]; then
+            echo "PR number is required" >&2
+            exit 1
+          fi
+          echo "pr_number=${pr_number}" >> "$GITHUB_OUTPUT"
+
+      - name: Bot review (GitHub)
+        env:
+          PLATFORM: github
+          BOT_NAME: ops-bot
+          BOT_ACTION: comment
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          ALLOW_BOT_APPROVE: ${{ steps.flags.outputs.allow_bot_approve }}
+          HITL_APPROVE: ${{ steps.flags.outputs.hitl_approve }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_SLUG: ${{ github.repository }}
+          PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+          EVIDENCE_DIR: outputs/bot-evidence/github
+          REVIEW_BODY: "Automated advisory review. Evidence stored in Gitea (private)."
+        run: |
+          set -euo pipefail
+          if [[ "${ALLOW_BOT_APPROVE}" == "YES" && "${{ steps.flags.outputs.allow_github_bot_approve }}" == "YES" && "${HITL_APPROVE}" == "YES" ]]; then
+            BOT_ACTION="approve"
+          fi
+          export BOT_ACTION
+          bash bash/GitDevSecDataAIOps/tooling/bots/bot-review.sh
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-evidence
+          path: outputs/bot-evidence
+
+  bot-review-gitea:
+    runs-on: [self-hosted, linux]
+    needs: bot-review-github
+    if: ${{ secrets.GITEA_URL != '' && secrets.GITEA_TOKEN != '' && secrets.GITEA_EVIDENCE_TOKEN != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: bot-evidence
+          path: outputs/bot-evidence
+
+      - name: Resolve Gitea PR index
+        id: gitea
+        run: |
+          set -euo pipefail
+          pr_index="${{ github.event.pull_request.number }}"
+          if [[ "${{ inputs.gitea_pr_index }}" != "" ]]; then
+            pr_index="${{ inputs.gitea_pr_index }}"
+          fi
+          if [[ -z "${pr_index}" ]]; then
+            echo "Gitea PR index is required" >&2
+            exit 1
+          fi
+          echo "pr_index=${pr_index}" >> "$GITHUB_OUTPUT"
+
+      - name: Bot review (Gitea)
+        env:
+          PLATFORM: gitea
+          BOT_NAME: ops-bot
+          BOT_ACTION: comment
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          ALLOW_BOT_APPROVE: ${{ needs.bot-review-github.outputs.allow_bot_approve }}
+          HITL_APPROVE: ${{ needs.bot-review-github.outputs.hitl_approve }}
+          GITEA_URL: ${{ secrets.GITEA_URL }}
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+          REPO_OWNER: ${{ vars.GITEA_REPO_OWNER || 'founders' }}
+          REPO_NAME: ${{ vars.GITEA_REPO_NAME || 'repo' }}
+          PR_INDEX: ${{ steps.gitea.outputs.pr_index }}
+          EVIDENCE_DIR: outputs/bot-evidence/gitea
+          REVIEW_BODY: "Ops review. Evidence recorded."
+        run: |
+          set -euo pipefail
+          if [[ "${ALLOW_BOT_APPROVE}" == "YES" && "${HITL_APPROVE}" == "YES" ]]; then
+            BOT_ACTION="approve"
+          fi
+          export BOT_ACTION
+          bash bash/GitDevSecDataAIOps/tooling/bots/bot-review.sh
+
+      - name: Publish evidence to Gitea (private)
+        env:
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          EVIDENCE_SOURCE_DIR: outputs/bot-evidence
+          GITEA_URL: ${{ secrets.GITEA_URL }}
+          GITEA_EVIDENCE_REPO: ${{ secrets.GITEA_EVIDENCE_REPO || 'founders/evidence' }}
+          GITEA_EVIDENCE_USER: ${{ secrets.GITEA_EVIDENCE_USER || 'bot' }}
+          GITEA_EVIDENCE_TOKEN: ${{ secrets.GITEA_EVIDENCE_TOKEN }}
+          BOT_NAME: ops-bot
+          BOT_EMAIL: ops-bot@example.local
+        run: |
+          set -euo pipefail
+          bash bash/GitDevSecDataAIOps/tooling/bots/bot-evidence-publish.sh
