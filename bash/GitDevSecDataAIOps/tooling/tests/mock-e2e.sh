@@ -390,6 +390,18 @@ HITL_REQUIRED="false"
 EOF
 run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/airgap-safe-ops.sh" "${AIRGAP_SAFE_ENV}"
 
+# Gitea model repo lockdown (dry-run)
+LOCK_ENV="${TMP_DIR}/gitea-lock.env"
+cat <<EOF > "${LOCK_ENV}"
+GITEA_URL="http://gitea.local"
+GITEA_TOKEN="token"
+OWNER="founders"
+REPOS="models-private"
+FOUNDERS="founder1,founder2,founder3"
+DRY_RUN="true"
+EOF
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/secrets/gitea-model-repo-lockdown.sh" "${LOCK_ENV}"
+
 if [[ -n "${EVIDENCE_DIR:-}" ]]; then
   mkdir -p "${EVIDENCE_DIR}"
   printf '%s\n' "${EXECUTED_SCRIPTS[@]}" | sort -u > "${EVIDENCE_DIR}/mock-e2e-scripts.txt"

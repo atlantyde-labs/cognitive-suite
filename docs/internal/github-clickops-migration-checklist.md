@@ -32,3 +32,9 @@ Ejemplo JSONL:
 - `datasets/github-migration-clickops.example.jsonl`
 
 Cada linea representa una evidencia de ClickOps con status y checks.
+
+## Politica de secretos de modelos (Gitea)
+
+- Repos privados de modelos en Gitea con acceso maximo a 3 Founders.
+- Enforce via script: `bash/GitDevSecDataAIOps/tooling/secrets/gitea-model-repo-lockdown.sh`.
+- Ejemplo env: `bash/GitDevSecDataAIOps/tooling/secrets/gitea-model-repo-lockdown.env.example`.

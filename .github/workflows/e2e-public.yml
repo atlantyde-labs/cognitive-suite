@@ -27,7 +27,12 @@ jobs:
       - name: Install tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck ripgrep jq
+          sudo apt-get install -y shellcheck ripgrep jq python3-pip
+
+      - name: Install jsonschema
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install jsonschema
 
       - name: Shellcheck scripts
         run: |
@@ -86,6 +91,14 @@ jobs:
           OUTPUT_DIR=outputs/ci-evidence/actions-forensics \
             REPO="${GITHUB_REPOSITORY}" \
             bash bash/GitDevSecDataAIOps/tooling/forensics/gh-actions-forensics.sh
+
+      - name: Validate ClickOps JSONL schema
+        run: |
+          set -euo pipefail
+          python3 bash/GitDevSecDataAIOps/tooling/forensics/validate-jsonl.py \
+            --schema schemas/github-migration-clickops.schema.json \
+            --input datasets/github-migration-clickops.example.jsonl \
+            | tee outputs/ci-evidence/clickops-validate.log
 
       - name: Ops state machine (mocked)
         run: |
