@@ -100,6 +100,14 @@ jobs:
             --input datasets/github-migration-clickops.example.jsonl \
             | tee outputs/ci-evidence/clickops-validate.log
 
+      - name: Validate Bot ClickOps JSONL schema
+        run: |
+          set -euo pipefail
+          python3 bash/GitDevSecDataAIOps/tooling/forensics/validate-jsonl.py \
+            --schema schemas/bot-clickops.schema.json \
+            --input datasets/bot-clickops.example.jsonl \
+            | tee outputs/ci-evidence/bot-clickops-validate.log
+
       - name: Ops state machine (mocked)
         run: |
           set -euo pipefail

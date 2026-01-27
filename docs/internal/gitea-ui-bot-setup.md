@@ -11,7 +11,7 @@ Ejecuta:
 bash bash/GitDevSecDataAIOps/tooling/bots/gitea-ui-wizard.sh
 ```
 
-El wizard genera un checklist `.md` con:
+El wizard genera un checklist `.md` y un JSONL semantico con:
 - Creacion de machine user
 - Token del bot
 - Team/permiso minimo

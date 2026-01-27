@@ -97,6 +97,7 @@ nav:
       - Buenas practicas Proxmox: internal/proxmox-community-best-practices.md
       - Bot Governance: internal/bot-governance.md
       - Gitea UI Bot Setup: internal/gitea-ui-bot-setup.md
+      - GitHub Apps Bot Setup: internal/github-apps-bot-setup.md
       - ClickOps Migration Checklist: internal/github-clickops-migration-checklist.md
       - Gitea Runners CLI: internal/gitea-runners-cli.md
       - Gitea Model Secrets: internal/gitea-model-secrets.md
