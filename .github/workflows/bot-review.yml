@@ -46,6 +46,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install jsonschema
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install jsonschema
+
+      - name: Validate JSONL (auto schema)
+        run: |
+          set -euo pipefail
+          mkdir -p outputs/ci-evidence
+          INPUT_PATH="." \
+          AUTO_SCHEMA=true \
+          INTERACTIVE=false \
+          OUTPUT_FILE=outputs/ci-evidence/jsonl-validate-summary.json \
+          bash bash/GitDevSecDataAIOps/tooling/bots/jsonl-validate-wizard.sh
+
       - name: Resolve flags
         id: flags
         run: |
