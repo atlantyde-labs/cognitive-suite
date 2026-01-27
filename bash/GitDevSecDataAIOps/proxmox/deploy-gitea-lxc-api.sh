@@ -102,16 +102,19 @@ api_call() {
   local path=$2
   shift 2 || true
   if [[ -n "${CONFIG_PATH}" ]]; then
-    bash "${API_CLIENT}" "${CONFIG_PATH}" "${method}" "${path}" "$@"
+    env DRY_RUN="${DRY_RUN}" bash "${API_CLIENT}" "${CONFIG_PATH}" "${method}" "${path}" "$@"
   else
-    bash "${API_CLIENT}" "" "${method}" "${path}" "$@"
+    env DRY_RUN="${DRY_RUN}" bash "${API_CLIENT}" "" "${method}" "${path}" "$@"
   fi
 }
 
 api_get() {
   local path=$1
   shift || true
-  DRY_RUN="false" api_call GET "${path}" "$@"
+  local prev="${DRY_RUN}"
+  DRY_RUN="false"
+  api_call GET "${path}" "$@"
+  DRY_RUN="${prev}"
 }
 
 api_post() {
