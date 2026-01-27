@@ -75,6 +75,14 @@ BOT_NAME=${BOT_NAME:-"ops-bot"}
 BOT_EMAIL=${BOT_EMAIL:-"ops-bot@example.local"}
 BOT_DRY_RUN=${BOT_DRY_RUN:-"true"}
 
+RUN_CONTRIBUTOR_WIZARD=${RUN_CONTRIBUTOR_WIZARD:-"false"}
+CONTRIBUTOR_WIZARD_INTERACTIVE=${CONTRIBUTOR_WIZARD_INTERACTIVE:-"${INTERACTIVE}"}
+CONTRIBUTOR_WIZARD_DRY_RUN=${CONTRIBUTOR_WIZARD_DRY_RUN:-"${DRY_RUN}"}
+CONTRIBUTOR_TAGS_JSONL=${CONTRIBUTOR_TAGS_JSONL:-"${OUTPUT_DIR}/contributors-tags.jsonl"}
+CONTRIBUTOR_TAGS_CSV=${CONTRIBUTOR_TAGS_CSV:-"${OUTPUT_DIR}/contributors-tags.csv"}
+CONTRIBUTOR_SEED_PLACEHOLDER=${CONTRIBUTOR_SEED_PLACEHOLDER:-"true"}
+CONTRIBUTOR_EVIDENCE_DIR=${CONTRIBUTOR_EVIDENCE_DIR:-"${EVIDENCE_DIR}"}
+
 require_root_if_apply() {
   if [[ "${DRY_RUN}" == "true" ]]; then
     return 0
@@ -157,6 +165,25 @@ write_evidence() {
   printf '%s\n' "${record}" >> "${EVIDENCE_DIR}/proxmox-local-secrets-wizard.jsonl"
 }
 
+run_contributor_wizard() {
+  local wizard="${CS_ROOT}/tooling/secrets/contributor-onboarding-wizard.sh"
+  if [[ ! -x "${wizard}" ]]; then
+    fail "Contributor onboarding wizard not found: ${wizard}"
+  fi
+  cs_ui_step "Contributor onboarding wizard"
+  env \
+    INTERACTIVE="${CONTRIBUTOR_WIZARD_INTERACTIVE}" \
+    DRY_RUN="${CONTRIBUTOR_WIZARD_DRY_RUN}" \
+    OUTPUT_DIR="${OUTPUT_DIR}" \
+    CSV_PATH="${USERS_CSV}" \
+    TAGS_JSONL_PATH="${CONTRIBUTOR_TAGS_JSONL}" \
+    TAGS_CSV_PATH="${CONTRIBUTOR_TAGS_CSV}" \
+    SEED_PLACEHOLDER="${CONTRIBUTOR_SEED_PLACEHOLDER}" \
+    EVIDENCE_DIR="${CONTRIBUTOR_EVIDENCE_DIR}" \
+    bash "${wizard}"
+  cs_ui_ok "Contributor wizard completed"
+}
+
 if [[ "${INTERACTIVE}" == "true" ]]; then
   cs_ui_header "Proxmox Local Secrets Wizard"
   cs_ui_note "DRY_RUN=${DRY_RUN}"
@@ -178,6 +205,11 @@ if [[ "${INTERACTIVE}" == "true" ]]; then
     WRITE_BOT_EVIDENCE_ENV="true"
   else
     WRITE_BOT_EVIDENCE_ENV="false"
+  fi
+  if cs_ui_confirm "Run contributor onboarding wizard?" "Y"; then
+    RUN_CONTRIBUTOR_WIZARD="true"
+  else
+    RUN_CONTRIBUTOR_WIZARD="false"
   fi
 fi
 
@@ -261,6 +293,10 @@ if [[ "${WRITE_GITEA_ONBOARD_ENV}" == "true" ]]; then
       fi
     fi
   fi
+fi
+
+if [[ "${RUN_CONTRIBUTOR_WIZARD}" == "true" ]]; then
+  run_contributor_wizard
 fi
 
 if [[ "${WRITE_BOT_EVIDENCE_ENV}" == "true" ]]; then
