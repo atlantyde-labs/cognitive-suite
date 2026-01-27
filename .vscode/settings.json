@@ -1,0 +1,81 @@
+{
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.formatting.provider": "black",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": true,
+      "source.organizeImports.ruff": true
+    }
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "shellformat.shell-format",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true
+    }
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true
+  },
+  "[makefile]": {
+    "editor.insertSpaces": false
+  },
+  "shellformat.path": "/usr/bin/shfmt",
+  "shellformat.showError": true,
+  "shellformat.executablePath": "shfmt",
+  "shellformat.effectOnSave": "format",
+  "shellcheck.enable": true,
+  "shellcheck.run": "onSave",
+  "shellcheck.executablePath": "shellcheck",
+  "shellcheck.severity": "warning",
+  "shellcheck.exclude": [
+    "SC1091",
+    "SC2086"
+  ],
+  "redhat.telemetry.enabled": false,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.*": true,
+    "**/.git": true
+  },
+  "search.exclude": {
+    "**/__pycache__": true,
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/.venv": true
+  },
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "/bin/bash",
+      "args": []
+    }
+  },
+  "files.watcherExclude": {
+    "**/__pycache__": true,
+    "**/.git": true
+  },
+  "editor.wordWrap": "on",
+  "editor.rulers": [80, 120],
+  "editor.trimAutoWhitespace": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "todo-tree.general.enableFileNameNumbering": true,
+  "todo-tree.general.enableDragAndDrop": true,
+  "remote.containers.defaultExtensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "timonwong.shellcheck",
+    "shellformat.shell-format",
+    "eamodio.gitlens"
+  ]
+}
