@@ -390,6 +390,22 @@ HITL_REQUIRED="false"
 EOF
 run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/airgap-safe-ops.sh" "${AIRGAP_SAFE_ENV}"
 
+# Proxmox secrets wizard (non-interactive, dry-run)
+WIZARD_ENV="${TMP_DIR}/wizard.env"
+cat <<EOF > "${WIZARD_ENV}"
+INTERACTIVE="false"
+DRY_RUN="true"
+OUTPUT_DIR="${TMP_DIR}/wizard-secrets"
+WRITE_PVE_API_ENV="true"
+WRITE_GITEA_ONBOARD_ENV="true"
+WRITE_BOT_EVIDENCE_ENV="true"
+COPY_CONTRIBUTORS_EXAMPLE="true"
+PVE_API_TOKEN="token"
+GITEA_TOKEN="token"
+GITEA_EVIDENCE_TOKEN="token"
+EOF
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/proxmox/proxmox-local-secrets-wizard.sh" "${WIZARD_ENV}"
+
 # Gitea model repo lockdown (dry-run)
 LOCK_ENV="${TMP_DIR}/gitea-lock.env"
 cat <<EOF > "${LOCK_ENV}"
