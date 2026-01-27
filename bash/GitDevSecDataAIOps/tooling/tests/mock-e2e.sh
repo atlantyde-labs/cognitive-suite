@@ -402,6 +402,26 @@ DRY_RUN="true"
 EOF
 run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/secrets/gitea-model-repo-lockdown.sh" "${LOCK_ENV}"
 
+# Gitea contributor onboarding (dry-run)
+CONTRIB_CSV="${TMP_DIR}/contributors.csv"
+cat <<EOF > "${CONTRIB_CSV}"
+username,email,full_name,ssh_key
+contrib1,contrib1@example.com,Contributor One,ssh-ed25519 AAAAC3NzExampleKey1
+contrib2,contrib2@example.com,Contributor Two,ssh-ed25519 AAAAC3NzExampleKey2
+EOF
+
+ONBOARD_ENV="${TMP_DIR}/onboard.env"
+cat <<EOF > "${ONBOARD_ENV}"
+GITEA_URL="http://gitea.local"
+GITEA_TOKEN="token"
+ORG="founders"
+USERS_CSV="${CONTRIB_CSV}"
+GENERATE_PASSWORDS="true"
+PASSWORD_OUTPUT="${TMP_DIR}/passwords.csv"
+DRY_RUN="true"
+EOF
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/secrets/gitea-onboard-contributors.sh" "${ONBOARD_ENV}"
+
 if [[ -n "${EVIDENCE_DIR:-}" ]]; then
   mkdir -p "${EVIDENCE_DIR}"
   printf '%s\n' "${EXECUTED_SCRIPTS[@]}" | sort -u > "${EVIDENCE_DIR}/mock-e2e-scripts.txt"

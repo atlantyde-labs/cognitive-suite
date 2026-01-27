@@ -34,3 +34,18 @@ DRY_RUN=false bash bash/GitDevSecDataAIOps/tooling/secrets/gitea-model-repo-lock
 ## Evidencia
 
 - Guarda logs de ejecucion y confirma en UI que solo los 3 Founders tienen acceso.
+
+## Onboarding contribuyentes (MFA + SSH)
+
+Usa el script de onboarding y luego exige 2FA en el primer login:
+
+```bash
+cp bash/GitDevSecDataAIOps/tooling/secrets/contributors.csv.example /tmp/contributors.csv
+cp bash/GitDevSecDataAIOps/tooling/secrets/gitea-onboard-contributors.env.example /tmp/onboard.env
+```
+
+```bash
+DRY_RUN=true bash bash/GitDevSecDataAIOps/tooling/secrets/gitea-onboard-contributors.sh /tmp/onboard.env
+```
+
+Los usuarios deben activar MFA con apps como Aegis/FreeOTP (sin Google/AWS/MS).
