@@ -1,0 +1,56 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/venv/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true
+    },
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "[shellscript]": {
+      "editor.defaultFormatter": "shellformat.shell-format"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "charliermarsh.ruff",
+      "timonwong.shellcheck",
+      "shellformat.shell-format",
+      "redhat.vscode-yaml",
+      "eamodio.gitlens",
+      "github.vscode-github-actions",
+      "ms-vscode.makefile-tools"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: Current File",
+        "type": "python",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
+        "justMyCode": true
+      },
+      {
+        "name": "Python: Pipeline Analysis",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/pipeline/analyze.py",
+        "console": "integratedTerminal",
+        "justMyCode": true
+      }
+    ]
+  }
+}

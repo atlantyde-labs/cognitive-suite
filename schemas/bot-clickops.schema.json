@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/bot-clickops.schema.json",
+  "title": "Bot ClickOps Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id",
+    "platform",
+    "category",
+    "title",
+    "status",
+    "checks",
+    "steps",
+    "created_at"
+  ],
+  "properties": {
+    "record_id": { "type": "string" },
+    "platform": { "type": "string", "enum": ["github", "gitea", "generic"] },
+    "category": {
+      "type": "string",
+      "enum": ["github-apps", "gitea-ui", "bot-setup", "evidence", "governance"]
+    },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "repo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "name"],
+      "properties": {
+        "owner": { "type": "string" },
+        "name": { "type": "string" },
+        "url": { "type": "string" }
+      }
+    },
+    "actors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step_id", "title", "ui_path", "required"],
+        "properties": {
+          "step_id": { "type": "string" },
+          "title": { "type": "string" },
+          "ui_path": { "type": "string" },
+          "required": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "expected": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check_id", "status"],
+        "properties": {
+          "check_id": { "type": "string" },
+          "status": { "type": "string", "enum": ["pass", "fail", "partial", "skipped", "info"] },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "ref"],
+        "properties": {
+          "type": { "type": "string", "enum": ["ui", "artifact", "log", "url", "note"] },
+          "ref": { "type": "string" },
+          "url": { "type": "string" },
+          "hash": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "fail", "partial", "skipped", "info"]
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "notes": { "type": "string" },
+    "placeholders": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

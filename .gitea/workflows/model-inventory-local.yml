@@ -1,0 +1,81 @@
+name: Model Inventory (Local)
+
+on:
+  workflow_dispatch:
+    inputs:
+      roots:
+        description: "Comma-separated roots to scan"
+        required: true
+        default: "/var/lib/models,/opt/models,./models"
+      allowed_secret_roots:
+        description: "Allowed roots for SECRET artifacts"
+        required: false
+        default: "/var/lib/secret-models,/opt/secret-models"
+      quarantine_mode:
+        description: "Quarantine mode"
+        type: choice
+        options: [none, copy, move]
+        default: none
+      vault_dir:
+        description: "Quarantine target directory"
+        required: false
+        default: "/var/lib/secret-models/quarantine"
+      preserve_paths:
+        description: "Preserve folder structure in quarantine"
+        type: boolean
+        required: false
+        default: true
+      fail_on_violation:
+        description: "Fail workflow if violations detected"
+        type: boolean
+        required: false
+        default: true
+      hash_mode:
+        description: "Hash mode"
+        type: choice
+        options: [none, sha256]
+        default: sha256
+
+jobs:
+  inventory:
+    runs-on: [local]
+    steps:
+      - uses: https://github.com/actions/checkout@v4
+
+      - name: Run model inventory
+        env:
+          ROOTS: ${{ github.event.inputs.roots }}
+          ALLOWED_SECRET_ROOTS: ${{ github.event.inputs.allowed_secret_roots }}
+          QUARANTINE_MODE: ${{ github.event.inputs.quarantine_mode }}
+          VAULT_DIR: ${{ github.event.inputs.vault_dir }}
+          FAIL_ON_VIOLATION: ${{ github.event.inputs.fail_on_violation }}
+          PRESERVE_PATHS: ${{ github.event.inputs.preserve_paths }}
+          HASH_MODE: ${{ github.event.inputs.hash_mode }}
+        run: |
+          set -euo pipefail
+          OUT=outputs/model-inventory.json
+          args=(
+            --roots "${ROOTS}"
+            --output "${OUT}"
+            --whitelist-output outputs/model-whitelist.json
+            --hash "${HASH_MODE}"
+            --default-sensitivity "INTERNAL"
+            --alerts-output outputs/model-alerts.json
+          )
+          if [[ -n "${ALLOWED_SECRET_ROOTS}" ]]; then
+            args+=(--allowed-secret-roots "${ALLOWED_SECRET_ROOTS}")
+          fi
+          if [[ -n "${VAULT_DIR}" ]]; then
+            args+=(--vault-dir "${VAULT_DIR}")
+          fi
+          if [[ "${QUARANTINE_MODE}" != "none" ]]; then
+            args+=(--quarantine-mode "${QUARANTINE_MODE}")
+          fi
+          if [[ "${FAIL_ON_VIOLATION}" == "true" ]]; then
+            args+=(--fail-on-violation)
+          fi
+          if [[ "${PRESERVE_PATHS}" == "true" ]]; then
+            args+=(--preserve-paths)
+          fi
+          python3 bash/GitDevSecDataAIOps/tooling/models/model_inventory.py "${args[@]}"
+          echo "Inventory written to ${OUT} (local only)"
