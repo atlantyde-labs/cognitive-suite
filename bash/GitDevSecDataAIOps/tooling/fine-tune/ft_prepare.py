@@ -80,28 +80,29 @@ def main() -> int:
 
     outputs = {}
     total = 0
-    for idx, obj in iter_jsonl(args.input):
-        validate_obj(idx, obj)
-        total += 1
-        if args.validate_only:
-            continue
+    try:
+        for idx, obj in iter_jsonl(args.input):
+            validate_obj(idx, obj)
+            total += 1
+            if args.validate_only:
+                continue
 
-        out_obj = obj
-        if args.to_prompt:
-            out_obj = to_prompt_completion(obj)
+            out_obj = obj
+            if args.to_prompt:
+                out_obj = to_prompt_completion(obj)
 
-        if args.split_by_sensitivity:
-            key = split_sensitivity(obj)
-            out_path = os.path.join(args.out_dir, f"{os.path.basename(args.input)}.{key}.jsonl")
-        else:
-            out_path = os.path.join(args.out_dir, os.path.basename(args.input))
+            if args.split_by_sensitivity:
+                key = split_sensitivity(obj)
+                out_path = os.path.join(args.out_dir, f"{os.path.basename(args.input)}.{key}.jsonl")
+            else:
+                out_path = os.path.join(args.out_dir, os.path.basename(args.input))
 
-        if out_path not in outputs:
-            outputs[out_path] = open(out_path, "w", encoding="utf-8")
-        outputs[out_path].write(json.dumps(out_obj, ensure_ascii=True) + "\n")
-
-    for fh in outputs.values():
-        fh.close()
+            if out_path not in outputs:
+                outputs[out_path] = open(out_path, "w", encoding="utf-8")
+            outputs[out_path].write(json.dumps(out_obj, ensure_ascii=True) + "\n")
+    finally:
+        for fh in outputs.values():
+            fh.close()
 
     print(f"Validated {total} records")
     return 0
