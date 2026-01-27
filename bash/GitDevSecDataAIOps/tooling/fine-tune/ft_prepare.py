@@ -78,31 +78,32 @@ def main() -> int:
 
     os.makedirs(args.out_dir, exist_ok=True)
 
-    outputs = {}
+    outputs = set()
     total = 0
-    try:
-        for idx, obj in iter_jsonl(args.input):
-            validate_obj(idx, obj)
-            total += 1
-            if args.validate_only:
-                continue
+    for idx, obj in iter_jsonl(args.input):
+        validate_obj(idx, obj)
+        total += 1
+        if args.validate_only:
+            continue
 
-            out_obj = obj
-            if args.to_prompt:
-                out_obj = to_prompt_completion(obj)
+        out_obj = obj
+        if args.to_prompt:
+            out_obj = to_prompt_completion(obj)
 
-            if args.split_by_sensitivity:
-                key = split_sensitivity(obj)
-                out_path = os.path.join(args.out_dir, f"{os.path.basename(args.input)}.{key}.jsonl")
-            else:
-                out_path = os.path.join(args.out_dir, os.path.basename(args.input))
+        if args.split_by_sensitivity:
+            key = split_sensitivity(obj)
+            out_path = os.path.join(args.out_dir, f"{os.path.basename(args.input)}.{key}.jsonl")
+        else:
+            out_path = os.path.join(args.out_dir, os.path.basename(args.input))
 
-            if out_path not in outputs:
-                outputs[out_path] = open(out_path, "w", encoding="utf-8")
-            outputs[out_path].write(json.dumps(out_obj, ensure_ascii=True) + "\n")
-    finally:
-        for fh in outputs.values():
-            fh.close()
+        line = json.dumps(out_obj, ensure_ascii=True) + "\n"
+        if out_path not in outputs:
+            outputs.add(out_path)
+            mode = "w"
+        else:
+            mode = "a"
+        with open(out_path, mode, encoding="utf-8") as fh:
+            fh.write(line)
 
     print(f"Validated {total} records")
     return 0
