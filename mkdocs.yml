@@ -95,6 +95,7 @@ nav:
       - Registro de evidencias: internal/control-evidence-log.md
       - Learning by Doing (Proxmox): internal/learning-by-doing-proxmox.md
       - Buenas practicas Proxmox: internal/proxmox-community-best-practices.md
+      - Bot Governance: internal/bot-governance.md
       - ClickOps Migration Checklist: internal/github-clickops-migration-checklist.md
       - Gitea Runners CLI: internal/gitea-runners-cli.md
       - Gitea Model Secrets: internal/gitea-model-secrets.md

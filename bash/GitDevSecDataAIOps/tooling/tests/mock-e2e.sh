@@ -422,6 +422,36 @@ DRY_RUN="true"
 EOF
 run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/secrets/gitea-onboard-contributors.sh" "${ONBOARD_ENV}"
 
+# Bot review (dry-run)
+BOT_REVIEW_ENV="${TMP_DIR}/bot-review.env"
+cat <<EOF > "${BOT_REVIEW_ENV}"
+PLATFORM="gitea"
+BOT_NAME="ops-bot"
+BOT_ACTION="comment"
+DRY_RUN="true"
+GITEA_URL="http://gitea.local"
+GITEA_TOKEN="token"
+REPO_OWNER="founders"
+REPO_NAME="repo"
+PR_INDEX="1"
+EVIDENCE_DIR="${TMP_DIR}/bot-evidence"
+EOF
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/bots/bot-review.sh" "${BOT_REVIEW_ENV}"
+
+# Bot evidence publish (dry-run)
+BOT_EVIDENCE_ENV="${TMP_DIR}/bot-evidence.env"
+cat <<EOF > "${BOT_EVIDENCE_ENV}"
+DRY_RUN="true"
+EVIDENCE_SOURCE_DIR="${TMP_DIR}/bot-evidence"
+GITEA_URL="http://gitea.local"
+GITEA_EVIDENCE_REPO="founders/evidence"
+GITEA_EVIDENCE_USER="bot"
+GITEA_EVIDENCE_TOKEN="token"
+BOT_NAME="ops-bot"
+BOT_EMAIL="ops-bot@example.local"
+EOF
+run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/bots/bot-evidence-publish.sh" "${BOT_EVIDENCE_ENV}"
+
 if [[ -n "${EVIDENCE_DIR:-}" ]]; then
   mkdir -p "${EVIDENCE_DIR}"
   printf '%s\n' "${EXECUTED_SCRIPTS[@]}" | sort -u > "${EVIDENCE_DIR}/mock-e2e-scripts.txt"
