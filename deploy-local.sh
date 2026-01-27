@@ -11,6 +11,14 @@ GIT_REPO_URL="https://github.com/atlantyde-labs/cognitive-suite.git"
 PROJECT_DIR="cognitive-suite"
 # ---------------------
 
+# --- Verificación de Seguridad ---
+# No ejecutar este script desde un directorio con el mismo nombre que el proyecto.
+if [[ "$(basename "$(pwd)")" == "$PROJECT_DIR" ]]; then
+    echo "ERROR: Este script no debe ejecutarse desde un directorio llamado '$PROJECT_DIR'." >&2
+    echo "Por favor, ejecútalo desde tu directorio home (~/ o /root) o un nivel superior." >&2
+    exit 1
+fi
+
 echo "### Paso 1: Actualizando el sistema e instalando dependencias... ###"
 sudo apt-get update
 sudo apt-get install -y docker.io docker-compose git
@@ -24,23 +32,31 @@ echo "   AVISO: Debes cerrar sesión y volver a iniciarla para usar 'docker' sin
 echo "   Para este script, usaremos 'sudo' por seguridad."
 echo
 
-echo "### Paso 3: Clonando el repositorio del proyecto... ###"
+echo "### Paso 3: Clonando o actualizando el repositorio del proyecto... ###"
 if [ -d "$PROJECT_DIR" ]; then
-    echo "-> El directorio '$PROJECT_DIR' ya existe. Omitiendo clonación."
+    echo "-> El directorio '$PROJECT_DIR' ya existe. Actualizando con 'git pull'..."
+    cd "$PROJECT_DIR"
+    git pull
 else
     echo "-> Clonando el repositorio desde $GIT_REPO_URL..."
     git clone "$GIT_REPO_URL" "$PROJECT_DIR"
+    cd "$PROJECT_DIR"
 fi
-cd "$PROJECT_DIR"
 echo "-> Directorio de trabajo: $(pwd)"
 echo
 
 echo "### Paso 4: Preparando el archivo de configuración de entorno... ###"
 if [ -f ".env.local" ]; then
-    echo "-> El archivo '.env.local' ya existe. No se realizarán cambios."
+    echo "-> '.env.local' ya existe. No se realizarán cambios."
 else
-    echo "-> Creando '.env.local' a partir del archivo de ejemplo."
-    cp .env.local.example .env.local
+    if [ -f ".env.local.example" ]; then
+        echo "-> Creando '.env.local' a partir del archivo de ejemplo."
+        cp .env.local.example .env.local
+    else
+        echo "-> ATENCIÓN: No se encontró '.env.local.example'. Se creará un archivo '.env.local' vacío."
+        echo "-> Deberás configurarlo manualmente."
+        touch .env.local
+    fi
 fi
 echo
 
