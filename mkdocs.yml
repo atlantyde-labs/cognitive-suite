@@ -74,8 +74,8 @@ extra:
 copyright: |
   <span class="atlantyqa-copyright-wrapper">
     &copy; 2026 Atlantyqa Labs.  | 
-    <a href="#" style="color: rgba(255,255,255,0.5);">Política de Privacidad</a> · 
-    <a href="#" style="color: rgba(255,255,255,0.5);">Términos de Servicio</a>
+    <a href="#">Política de Privacidad</a> · 
+    <a href="#">Términos de Servicio</a>
   </span>
 
 plugins:
