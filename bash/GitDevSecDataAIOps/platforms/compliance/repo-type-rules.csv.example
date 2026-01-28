@@ -1,0 +1,11 @@
+# type,regex,labels,milestones
+# labels are separated by ';' and can include optional color with '|'
+# milestones are separated by ';' and can include optional fields title|description|due_on|state
+legal,^(legal-|compliance-|law-).*,type:legal|b60205;scope:legal,Legal Baseline;Legal Review
+business,^(biz-|sales-|commercial-).*,type:business|1d76db;scope:business,Business KPIs;Quarterly Review
+personal,^(personal-|me-|private-).*,type:personal|5319e7;scope:personal,Personal Roadmap
+learning,^(learn-|course-|lab-).*,type:learning|0e8a16;scope:learning,Learning Path
+knowledge,^(knowledge-|kb-|notes-).*,type:knowledge|0052cc;scope:knowledge,Knowledge Curation
+ops,^(ops-|infra-|platform-).*,type:ops|fbca04;scope:ops,Operations
+patterns,^(pattern-|design-).*,type:patterns|d4c5f9;scope:patterns,Pattern Library
+decisions,^(adr-|decision-).*,type:decisions|5319e7;scope:decisions,Decision Log

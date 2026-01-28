@@ -1,0 +1,11 @@
+[Unit]
+Description=Local SSO/MFA status API
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/sso-mfa-status.env
+ExecStart=/usr/bin/env python3 /opt/sso-mfa-status/sso-mfa-status-server.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

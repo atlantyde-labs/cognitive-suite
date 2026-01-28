@@ -1,0 +1,14 @@
+[Unit]
+Description=Gitea Actions Runner (Docker)
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/gitea-runner.env
+ExecStart=/usr/local/bin/gitea-runner-service.sh start
+ExecStop=/usr/local/bin/gitea-runner-service.sh stop
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

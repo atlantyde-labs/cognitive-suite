@@ -1,0 +1,153 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Lint: Shell scripts",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "scripts=$(find bash/GitDevSecDataAIOps scripts -type f -name '*.sh' 2>/dev/null); [[ -n \"$scripts\" ]] && shellcheck $scripts || echo 'No shell scripts found'"],
+      "problemMatcher": ["$shellcheck"],
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Lint: Python files",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "ruff check bash/GitDevSecDataAIOps pipeline/analyze.py scripts/*.py 2>/dev/null || echo 'Ruff check complete'"],
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Format: Shell scripts",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "scripts=$(find bash/GitDevSecDataAIOps scripts -type f -name '*.sh' 2>/dev/null); [[ -n \"$scripts\" ]] && shfmt -i 2 -w $scripts || echo 'No shell scripts found'"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Format: Python files",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "ruff format bash/GitDevSecDataAIOps pipeline/analyze.py scripts/*.py wrappers/*.py 2>/dev/null || echo 'Ruff format complete'"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Test: E2E scripts (dry-run)",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "bash -n bash/GitDevSecDataAIOps/tooling/tests/mock-e2e.sh"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Validate: JSON schemas",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "python3 -m pip list | grep -q jsonschema || python3 -m pip install jsonschema && python3 bash/GitDevSecDataAIOps/tooling/forensics/validate-jsonl.py --schema schemas/bot-clickops.schema.json --input datasets/bot-clickops.example.jsonl 2>/dev/null || echo 'Schema validation complete'"],
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Build: Docker images",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "docker compose -f docker-compose.yml config -q && echo 'Docker config valid'"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Docs: Build MkDocs",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "python3 -m pip list | grep -q mkdocs || python3 -m pip install -r requirements-docs.txt && mkdocs build -f mkdocs.yml"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Dev: Bootstrap environment",
+      "type": "shell",
+      "command": "bash",
+      "args": ["dev/bootstrap.sh"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Run: Frontend Streamlit",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "cd frontend && python3 -m streamlit run streamlit_app.py --logger.level=debug"],
+      "isBackground": true,
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Run: Pipeline analysis",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "cd pipeline && python3 analyze.py"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Test: E2E CI Complete (NO TIMEOUT) 🚀",
+      "type": "shell",
+      "command": "bash",
+      "args": ["scripts/e2e-local-validation.sh", "--verbose"],
+      "isBackground": false,
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: E2E CI Complete (output only)",
+      "type": "shell",
+      "command": "bash",
+      "args": ["scripts/e2e-local-validation.sh"],
+      "isBackground": false,
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}

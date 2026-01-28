@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Shell Script Linting",
+    "key": "ctrl+shift+l",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Lint: Shell scripts"
+  },
+  {
+    "name": "Python Linting",
+    "key": "ctrl+shift+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Lint: Python files"
+  },
+  {
+    "name": "Format Shell Scripts",
+    "key": "ctrl+shift+f",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Format: Shell scripts"
+  },
+  {
+    "name": "Format Python Files",
+    "key": "alt+shift+f",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Format: Python files"
+  },
+  {
+    "name": "Run E2E Tests",
+    "key": "ctrl+shift+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Test: E2E scripts (dry-run)"
+  }
+]

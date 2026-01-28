@@ -1,0 +1,151 @@
+name: Ops Orchestration E2E
+
+on:
+  # Ajusta aqui los disparadores si cambias la rama o quieres otros eventos.
+  push:
+    branches: [ E2E ]
+  pull_request:
+    branches: [ E2E ]
+  workflow_dispatch:
+    inputs:
+      area:
+        description: "Category to orchestrate (directory under bash/GitDevSecDataAIOps) or 'all'"
+        type: string
+        required: true
+        default: all
+      dry_run:
+        description: "Only lint and list scripts"
+        type: boolean
+        required: false
+        default: true
+      promote_on_dry_run:
+        description: "If true, push HEAD to promote_branch when dry run gates pass"
+        type: boolean
+        required: false
+        default: false
+      promote_branch:
+        description: "Target branch to update when promote_on_dry_run is true"
+        type: string
+        required: false
+        default: E2E-gated
+
+concurrency:
+  group: ops-orchestrate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  BASE_DIR: "bash/GitDevSecDataAIOps"
+
+jobs:
+  orchestrate:
+    runs-on: [self-hosted, local]
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    env:
+      AREA: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.area || 'all' }}
+      DRY_RUN: ${{ github.event_name == 'pull_request' && 'true' || github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'true' }}
+      PROMOTE_ON_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.promote_on_dry_run || 'false' }}
+      PROMOTE_BRANCH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.promote_branch || 'E2E-gated' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve target scripts
+        id: discover
+        run: |
+          set -euo pipefail
+          BASE="${BASE_DIR:-bash/GitDevSecDataAIOps}"
+          AREA="${AREA:-all}"
+
+          if [[ ! -d "${BASE}" ]]; then
+            echo "Base directory not found: ${BASE}" >&2
+            exit 1
+          fi
+
+          mapfile -t categories < <(find "${BASE}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+          if [[ "${#categories[@]}" -eq 0 ]]; then
+            echo "No categories found under ${BASE}"
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if [[ "${AREA}" == "all" ]]; then
+            patterns=("${categories[@]}")
+          else
+            if ! printf '%s\n' "${categories[@]}" | grep -qx "${AREA}"; then
+              echo "Unknown area: ${AREA}" >&2
+              echo "Available categories: ${categories[*]}" >&2
+              exit 1
+            fi
+            patterns=("${AREA}")
+          fi
+
+          files=()
+          for pat in "${patterns[@]}"; do
+            dir="${BASE}/${pat}"
+            if [[ -d "${dir}" ]]; then
+              while IFS= read -r -d '' file; do
+                files+=("${file}")
+              done < <(find "${dir}" -type f -name "*.sh" -print0)
+            fi
+          done
+
+          if [[ "${#files[@]}" -eq 0 ]]; then
+            echo "No scripts found for AREA=${AREA} under ${BASE}"
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          printf '%s\n' "${files[@]}" > /tmp/ops-scripts.txt
+          echo "found=true" >> "${GITHUB_OUTPUT}"
+          echo "count=${#files[@]}" >> "${GITHUB_OUTPUT}"
+
+      - name: Dry run summary
+        if: steps.discover.outputs.found == 'true' && env.DRY_RUN == 'true'
+        run: |
+          set -euo pipefail
+          echo "Dry run enabled. Scripts selected:"
+          cat /tmp/ops-scripts.txt
+
+      - name: Lint scripts
+        if: steps.discover.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          mapfile -t files < /tmp/ops-scripts.txt
+          bash -n "${files[@]}"
+          if command -v shellcheck >/dev/null 2>&1; then
+            shellcheck "${files[@]}"
+          else
+            echo "shellcheck not installed on runner"
+          fi
+
+      - name: Promote dry run to branch
+        if: steps.discover.outputs.found == 'true' && env.DRY_RUN == 'true' && env.PROMOTE_ON_DRY_RUN == 'true' && github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          if [[ -z "${PROMOTE_BRANCH}" ]]; then
+            echo "PROMOTE_BRANCH is empty; skipping." >&2
+            exit 1
+          fi
+          if [[ "${PROMOTE_BRANCH}" == "${GITHUB_REF_NAME}" ]]; then
+            echo "PROMOTE_BRANCH equals current branch; skipping."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git push origin "HEAD:refs/heads/${PROMOTE_BRANCH}"
+
+      - name: Execute scripts
+        if: steps.discover.outputs.found == 'true' && env.DRY_RUN != 'true'
+        env:
+          OP_AREA: ${{ env.AREA }}
+        run: |
+          set -euo pipefail
+          mapfile -t files < /tmp/ops-scripts.txt
+          for file in "${files[@]}"; do
+            echo "Running ${file}"
+            bash "${file}"
+          done
