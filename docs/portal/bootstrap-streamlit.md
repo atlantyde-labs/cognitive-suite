@@ -85,6 +85,10 @@ Ahora refresca el navegador (F5). Deberías ver gráficos y tablas.
 
 Explora cómo asegurar este flujo con **GitOps**.
 
+### 🔭 Misiones Relacionadas
+*   [🟢 Lab 01: Inmersión Profunda](../lab-01-deep-dive/)
+*   [🔵 Lab 02: GitOps Steward](../learning-gitops-streamlit/)
+
 <div class="hero-cta" style="justify-content: start;">
   <a href="../learning-gitops-streamlit/" class="btn-primary">Ir al Lab de GitOps →</a>
 </div>
