@@ -58,6 +58,26 @@ markdown_extensions:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/atlantyde-labs/cognitive-suite
+      name: Atlantyqa on GitHub
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/company/atlantyqa
+      name: Atlantyqa on LinkedIn
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/atlantyqa
+      name: Atlantyqa on Twitter
+  
+copyright: |
+  <span class="atlantyqa-copyright-wrapper">
+    &copy; 2026 Atlantyqa Labs.  | 
+    <a href="#">Política de Privacidad</a> · 
+    <a href="#">Términos de Servicio</a>
+  </span>
+
 plugins:
   - search
   - i18n:
@@ -117,50 +137,50 @@ plugins:
         - locale: en
           name: English
           nav:
-            - Home: index.md
+            - Home: index.en.md
             - Start Here:
-                - Quickstart: portal/quickstart.md
-                - Learning Path: portal/learning-path.md
-                - Identity and Ecosystem: portal/identity-ecosystem.md
-                - Metrics: portal/metrics.md
-                - GitOps + Streamlit: portal/learning-gitops-streamlit.md
-                - Talent Challenge Labs: portal/talent-challenge-labs.md
-                - "Lab 01: Deep Dive": portal/lab-01-deep-dive.md
-                - Bootstrap Streamlit: portal/bootstrap-streamlit.md
-                - Contributing: portal/contributing.md
+                - Quickstart: portal/quickstart.en.md
+                - Learning Path: portal/learning-path.en.md
+                - Identity and Ecosystem: portal/identity-ecosystem.en.md
+                - Metrics: portal/metrics.en.md
+                - GitOps + Streamlit: portal/learning-gitops-streamlit.en.md
+                - Talent Challenge Labs: portal/talent-challenge-labs.en.md
+                - "Lab 01: Deep Dive": portal/lab-01-deep-dive.en.md
+                - Bootstrap Streamlit: portal/bootstrap-streamlit.en.md
+                - Contributing: portal/contributing.en.md
             - Guides:
-                - Installation: installation.md
-                - Adoption Plan: adoption-plan.md
-                - Execution Plan: execution-plan.md
-                - Execution Plan (Early Adopters): execution-plan-early-adopters.md
-                - Compute Strategy: compute-strategy.md
-                - User Vision: user-vision.md
-                - Open Notebook: open_notebook_integration.md
+                - Installation: installation.en.md
+                - Adoption Plan: adoption-plan.en.md
+                - Execution Plan: execution-plan.en.md
+                - Execution Plan (Early Adopters): execution-plan-early-adopters.en.md
+                - Compute Strategy: compute-strategy.en.md
+                - User Vision: user-vision.en.md
+                - Open Notebook: open_notebook_integration.en.md
             - User Interface:
-                - Overview: user-interface/overview.md
-                - Operations Dashboard: user-interface/dashboard.md
-                - Ingestion Flows: user-interface/flows.md
-                - GitOps Panel: user-interface/gitops.md
-                - CLI Terminal: user-interface/cli.md
-                - Local UI View: user-view/local-ui.md
+                - Overview: user-interface/overview.en.md
+                - Operations Dashboard: user-interface/dashboard.en.md
+                - Ingestion Flows: user-interface/flows.en.md
+                - GitOps Panel: user-interface/gitops.en.md
+                - CLI Terminal: user-interface/cli.en.md
+                - Local UI View: user-view/local-ui.en.md
             - Internal (Ops):
-                - Compute Strategy: internal/compute-strategy.md
-                - Execution Plan: internal/execution-plan.md
-                - Compliance Controls: internal/compliance-controls.md
-                - Compliance Roadmap: internal/compliance-roadmap.md
-                - Policies: internal/policies.md
-                - DPIA: internal/dpia.md
-                - RoPA: internal/ropa.md
-                - BCP-DR: internal/bcp-dr.md
-                - Incident Response: internal/incident-response-playbook.md
-                - Access Review: internal/access-review.md
-                - Evidence Log: internal/control-evidence-log.md
+                - Compute Strategy: internal/compute-strategy.en.md
+                - Execution Plan: internal/execution-plan.en.md
+                - Compliance Controls: internal/compliance-controls.en.md
+                - Compliance Roadmap: internal/compliance-roadmap.en.md
+                - Policies: internal/policies.en.md
+                - DPIA: internal/dpia.en.md
+                - RoPA: internal/ropa.en.md
+                - BCP-DR: internal/bcp-dr.en.md
+                - Incident Response: internal/incident-response-playbook.en.md
+                - Access Review: internal/access-review.en.md
+                - Evidence Log: internal/control-evidence-log.en.md
                 - Examples:
-                    - DPIA Example: internal/examples/dpia-example.md
-                    - RoPA Example: internal/examples/ropa-example.md
-                    - BCP-DR Example: internal/examples/bcp-dr-example.md
-                    - Incident Response Example: internal/examples/incident-response-example.md
-                    - Access Review Example: internal/examples/access-review-example.md
-                    - Evidence Log Example: internal/examples/control-evidence-log-example.md
-                    - Restore Test Example: internal/examples/restore-test-report.md
-                    - Hardening Note: internal/examples/hardening-note.md
+                    - DPIA Example: internal/examples/dpia-example.en.md
+                    - RoPA Example: internal/examples/ropa-example.en.md
+                    - BCP-DR Example: internal/examples/bcp-dr-example.en.md
+                    - Incident Response Example: internal/examples/incident-response-example.en.md
+                    - Access Review Example: internal/examples/access-review-example.en.md
+                    - Evidence Log Example: internal/examples/control-evidence-log-example.en.md
+                    - Restore Test Example: internal/examples/restore-test-report.en.md
+                    - Hardening Note: internal/examples/hardening-note.en.md
