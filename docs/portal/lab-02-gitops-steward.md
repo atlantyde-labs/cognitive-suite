@@ -65,17 +65,17 @@ Sigue los pasos con precisión quirúrgica.
     *   ✅ Números de cuenta → `[REDACTED_ACCOUNT]`
 
 === "Paso 4: Sincronización GitOps"
-    Ahora sí, sincroniza SOLO los datos seguros.
+    Ahora sí, sincroniza SOLO los datos seguros. El comando `-f` (force) es necesario porque la carpeta `outputs/` está protegida por defecto en `.gitignore`.
 
     ```bash
-    # Añade solo la carpeta de insights (datos redactados)
-    git add outputs/insights/
+    # Añadimos forzosamente el resultado seguro
+    git add -f outputs/insights/analysis.json
 
     # Commit con mensaje descriptivo
-    git commit -m "feat(data): add redacted analysis for contract_ejemplo"
+    git commit -m "feat(data): entrega Lab 02 - análisis redactado y seguro"
 
-    # Push al remoto
-    git push origin main
+    # Push a tu rama actual (para simular el sync)
+    git push origin fix/i18n-footer-mobile
     ```
 
     > **⚠️ NUNCA hagas:** `git add outputs/raw/` - ¡Contiene datos sin redactar!
@@ -109,23 +109,19 @@ Evidencia adjunta en /evidence folder.
 ---
 
 ## 4. 🛡️ Validación de Seguridad
+Antes de hacer push, ejecuta esta validación automática para asegurar la soberanía de los datos:
 
-Antes de hacer push, ejecuta esta validación automática:
+=== "Multiplataforma (Recomendado)"
+    ```bash
+    # Ejecuta el validador cognitivo
+    python scripts/validate_gitops.py
+    ```
 
-```bash
-# Script de validación (crea este archivo: scripts/validate_gitops.sh)
-#!/bin/bash
+=== "🔎 ¿Qué hace este script?"
+    Analiza los archivos preparados (`git add`) y busca patrones sensibles (DNI, CIF, nombres reales). Si detecta algo que la redacción se ha saltado, bloqueará el proceso por seguridad.
 
-echo "🔍 Validando datos antes de GitOps sync..."
-
-# Buscar patrones sensibles en archivos staged
-if git diff --cached | grep -iE "(email|password|token|secret)"; then
-    echo "❌ ALERTA: Datos sensibles detectados en staged files!"
-    exit 1
-fi
-
-echo "✅ Validación pasada. Seguro para push."
-```
+??? example "Código del Validador"
+    Este script está en `scripts/validate_gitops.py` y es compatible con Windows y Linux.
 
 ### 🆘 Problemas Comunes
 

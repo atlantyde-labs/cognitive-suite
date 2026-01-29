@@ -31,7 +31,7 @@ Follow the steps with surgical precision.
     First, generate local data (you should have this from Lab 01).
 
     ```bash
-    python cogctl.py ingest data/input/sample_contract.pdf
+    python cogctl.py ingest contrato.pdf
     python cogctl.py analyze
     ```
 
@@ -65,17 +65,17 @@ Follow the steps with surgical precision.
     *   ✅ Account numbers → `[REDACTED_ACCOUNT]`
 
 === "Step 4: GitOps Synchronization"
-    Now yes, sync ONLY the secure data.
+    Now yes, sync ONLY the secure data. The `-f` (force) flag is necessary because the `outputs/` folder is protected by default in `.gitignore`.
 
     ```bash
-    # Add only the insights folder (redacted data)
-    git add outputs/insights/
+    # Force add the secure result
+    git add -f outputs/insights/analysis.json
 
     # Commit with descriptive message
-    git commit -m "feat(data): add redacted analysis for sample_contract"
+    git commit -m "feat(data): Lab 02 submission - redacted and secure analysis"
 
-    # Push to remote
-    git push origin main
+    # Push to your current branch (to simulate sync)
+    git push origin fix/i18n-footer-mobile
     ```
 
     > **⚠️ NEVER do:** `git add outputs/raw/` - Contains unredacted data!
@@ -109,23 +109,19 @@ Evidence attached in /evidence folder.
 ---
 
 ## 4. 🛡️ Security Validation
+Before pushing, run this automated validation to ensure data sovereignty:
 
-Before pushing, run this automated validation:
+=== "Cross-platform (Recommended)"
+    ```bash
+    # Run the cognitive validator
+    python scripts/validate_gitops.py
+    ```
 
-```bash
-# Validation script (create this file: scripts/validate_gitops.sh)
-#!/bin/bash
+=== "🔎 What does this script do?"
+    It analyzes the files you've prepared (`git add`) and looks for sensitive patterns (ID, CIF, real names). If it detects something the redaction missed, it will block the process for security.
 
-echo "🔍 Validating data before GitOps sync..."
-
-# Search for sensitive patterns in staged files
-if git diff --cached | grep -iE "(email|password|token|secret)"; then
-    echo "❌ ALERT: Sensitive data detected in staged files!"
-    exit 1
-fi
-
-echo "✅ Validation passed. Safe to push."
-```
+??? example "Validator Code"
+    This script is located at `scripts/validate_gitops.py` and is compatible with Windows and Linux.
 
 ### 🆘 Common Problems
 
