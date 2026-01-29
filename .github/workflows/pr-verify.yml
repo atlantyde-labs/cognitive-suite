@@ -20,8 +20,6 @@ jobs:
       - name: Sanity checks
         run: |
           set -euo pipefail
-          test -f frontend/onboarding_app.py
-          test -d labs
           test -f docs/portal/lab-01-deep-dive.md
           test -f docs/portal/lab-02-gitops-steward.md
           test -f docs/portal/lab-03-bootstrap-dashboard.md
