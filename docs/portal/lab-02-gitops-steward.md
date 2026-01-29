@@ -31,7 +31,7 @@ Sigue los pasos con precisión quirúrgica.
     Primero, genera datos locales (deberías tener esto del Lab 01).
 
     ```bash
-    python cogctl.py ingest data/input/contrato_ejemplo.pdf
+    python cogctl.py ingest contrato.pdf
     python cogctl.py analyze
     ```
 

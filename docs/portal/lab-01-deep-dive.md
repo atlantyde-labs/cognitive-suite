@@ -27,25 +27,25 @@ Sigue los pasos con precisión quirúrgica.
 
 === "Paso 1: Ingesta"
     Crea un archivo `confidencial.txt` en `data/input/` con datos falsos (pero realistas) y ejecútalo.
-    
+
     ```bash
-    python cogctl.py ingest data/input/confidencial.txt
+    python cogctl.py ingest confidencial.txt
     ```
 
 === "Paso 2: Análisis Blindado"
     Activa el escudo de privacidad. La variable `COGNITIVE_REDACT` es tu mejor amiga.
-    
+
     ```bash
     # En PowerShell
     $env:COGNITIVE_REDACT="1"; python cogctl.py analyze
-    
+
     # En Bash
     COGNITIVE_REDACT=1 python cogctl.py analyze
     ```
 
 === "Paso 3: Verificación"
     Comprueba que el sistema funcionó. Abre el JSON resultante.
-    
+
     *   **Esperado:** `"PERSON": "[REDACTED]"`
     *   **Fallido:** `"PERSON": "Juan Pérez"`
 
@@ -78,7 +78,7 @@ Adjunto evidencia en /evidence folder.
 ### 🆘 ¿Problemas Comunes?
 
 ??? question "Mi documento no se procesa"
-    *   ¿Está en `data/input`? 
+    *   ¿Está en `data/input`?
     *   ¿Tiene extensión `.txt` o `.pdf`?
     *   ¿Tienes permisos de escritura en `outputs/`?
 
