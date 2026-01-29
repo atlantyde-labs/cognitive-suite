@@ -32,7 +32,7 @@ Sigue los pasos para levantar tu dashboard.
 
     ```bash
     # Ingesta demo
-    python cogctl.py ingest data/demo/sample_report.pdf
+    python cogctl.py ingest sample_report.pdf
 
     # Análisis
     python cogctl.py analyze
@@ -46,11 +46,11 @@ Sigue los pasos para levantar tu dashboard.
     ```bash
     # En PowerShell
     $env:COGNITIVE_ENV="prod"
-    $env:STREAMLIT_AUTH_TOKEN="mi_token_secreto"
+    $env:COGNITIVE_UI_TOKEN_ADMIN="mi_token_secreto_123"
 
     # En Bash
     export COGNITIVE_ENV=prod
-    export STREAMLIT_AUTH_TOKEN=mi_token_secreto
+    export COGNITIVE_UI_TOKEN_ADMIN=mi_token_secreto_123
     ```
 
 === "Paso 3: Lanzar Dashboard"
