@@ -34,15 +34,15 @@ Choose your difficulty level. Each completed mission forges your reputation in t
     </div>
     <div class="feature-card" style="border-top: 5px solid #37a880;">
         <h3>🔵 Lab 02: GitOps Steward</h3>
-        <p><strong>Objective:</strong> Sync results to the cloud without leaking a single sensitive byte.</p>
+        <p><strong>Objective:</strong> Sync results to the cloud without leaking a single sensitive byte. Master the secure GitOps flow.</p>
         <p><strong>Reward:</strong> <code>100 XP</code> + Badge ☁️</p>
-        <span style="display:block; text-align:center; margin-top:1rem; opacity:0.6;">(Coming Soon)</span>
+        <a href="../lab-02-gitops-steward/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Start Mission</a>
     </div>
     <div class="feature-card" style="border-top: 5px solid #182232;">
-        <h3>🔴 Lab 03: Runtime Guardian</h3>
-        <p><strong>Objective:</strong> Harden Docker containers and block attack vectors.</p>
-        <p><strong>Reward:</strong> <code>200 XP</code> + Badge 💂</p>
-        <span style="display:block; text-align:center; margin-top:1rem; opacity:0.6;">(Experts Only)</span>
+        <h3>🟣 Lab 03: Bootstrap Dashboard</h3>
+        <p><strong>Objective:</strong> Create a visual command center with Streamlit. Visualize insights without touching code.</p>
+        <p><strong>Reward:</strong> <code>75 XP</code> + Badge 📊</p>
+        <a href="../lab-03-bootstrap-dashboard/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Start Mission</a>
     </div>
 </div>
 
