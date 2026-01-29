@@ -2,20 +2,20 @@
 
 !!! tip "Misión de Hoy"
     **Tiempo estimado:** 5 mins | **Requisito:** Python 3.10+
-    
+
     Bienvenido al puente de mando. Transformarás datos brutos en inteligencia estructurada.
 
 ---
 
 <div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
   <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Flujo de Activación</h3>
-  
+
 ```mermaid
 graph LR
       A[🏗️ Inicializar] --> B[📥 Ingestar]
       B --> C[🧠 Analizar]
       C --> D[💎 Insights]
-      
+
       %% Styling with high contrast text
       style A fill:#e7ae4c,stroke:#333,stroke-width:2px,color:#fff
       style B fill:#37a880,stroke:#333,stroke-width:2px,color:#fff
@@ -53,7 +53,7 @@ Alimenta al sistema. Mueve un archivo (PDF o TXT) a `data/input`.
 
 === "Paso 2: Ingestar"
     ```bash
-    python cogctl.py ingest data/input/mi_documento.pdf
+    python cogctl.py ingest mi_documento.pdf
     ```
 
 !!! success "Soberanía Garantizada"
@@ -97,10 +97,10 @@ El archivo `analysis.json` es el "cerebro" extraído de tu documento. Aquí te e
           { "ref": "GDPR Art. 28", "description": "Encargado del tratamiento" }
         ],
         "risk_flags": [ // (4)
-          { 
-            "level": "HIGH", 
-            "category": "Compliance", 
-            "text": "Penalización por retraso del 5% diario" 
+          {
+            "level": "HIGH",
+            "category": "Compliance",
+            "text": "Penalización por retraso del 5% diario"
           }
         ]
       }

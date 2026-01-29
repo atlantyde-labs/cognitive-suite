@@ -53,7 +53,7 @@ Feed the system. Move a file (PDF or TXT) to `data/input`.
 
 === "Step 2: Ingest"
     ```bash
-    python cogctl.py ingest data/input/my_document.pdf
+    python cogctl.py ingest my_document.pdf
     ```
 
 !!! success "Guaranteed Sovereignty"

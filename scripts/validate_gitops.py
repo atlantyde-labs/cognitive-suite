@@ -33,10 +33,14 @@ def main():
 
     diff_text = result.stdout
 
+    # Filtrar solo las líneas añadidas (que empiezan con '+') para no validar lo que se borra
+    added_lines = "\n".join([line[1:] for line in diff_text.splitlines() if line.startswith("+") and not line.startswith("+++")])
+
     # Patrones prohibidos (sensibles) que no deberían estar en el diff
     # Buscamos patrones que indiquen datos no redactados
     forbidden_patterns = [
-        (r'("PERSON"|PER):\s*"[^\[]', "Nombres reales detectados (sin redactar)"),
+        (r'("PERSON"|PER):\s*"[^\[]', "Nombres reales detectados en campos PER/PERSON"),
+        (r'(Nombre y apellidos|Trabajador|Persona):\s*(?!\[REDACTED)[^",\n]+', "Nombres reales detectados en el texto (sin redactar)"),
         (r'("EMAIL"|EMAIL):\s*"[^\[]', "Emails detectados (sin redactar)"),
         (r'\b[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-JA-J]\b', "CIF detectado"),
         (r'\b[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]\b', "DNI detectado"),
@@ -46,7 +50,7 @@ def main():
     found_issues = []
 
     for pattern, description in forbidden_patterns:
-        if re.search(pattern, diff_text, re.IGNORECASE):
+        if re.search(pattern, added_lines, re.IGNORECASE):
             found_issues.append(description)
 
     if found_issues:

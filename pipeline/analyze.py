@@ -78,6 +78,17 @@ IPV4_RE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
 SSN_RE = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 CARD_RE = re.compile(r"\b(?:\d[ -]*?){13,19}\b")
 CURRENCY_RE = re.compile(r"\b\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\s?(?:€|\$|USD|EUR)")
+CIF_RE = re.compile(r"\b[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-JA-J]\b", re.IGNORECASE)
+DNI_RE = re.compile(r"\b[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]\b", re.IGNORECASE)
+
+# Patrones para redacción contextual (Basado en etiquetas)
+CONTEXTUAL_PATTERNS = [
+    (re.compile(r"(Razón social|Empresa|Sociedad):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_ORG]"),
+    (re.compile(r"(Nombre y apellidos|Trabajador|Persona):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_PER]"),
+    (re.compile(r"(DNI|NIF|NIE):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_ID]"),
+    (re.compile(r"(CIF):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_CIF]"),
+    (re.compile(r"(Calle|Avenida|C/|Plaza):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_LOC]"),
+]
 
 
 def should_skip_models() -> bool:
@@ -143,9 +154,18 @@ def redact_regex(text: str) -> str:
     text = EMAIL_RE.sub("[REDACTED_EMAIL]", text)
     text = IPV4_RE.sub("[REDACTED_IP]", text)
     text = SSN_RE.sub("[REDACTED_SSN]", text)
+    text = CIF_RE.sub("[REDACTED_CIF]", text)
+    text = DNI_RE.sub("[REDACTED_DNI]", text)
     text = redact_credit_cards(text)
     text = PHONE_RE.sub("[REDACTED_PHONE]", text)
     text = CURRENCY_RE.sub("[REDACTED_MONEY]", text)
+
+    # Aplicar redacción contextual
+    for pattern, replacement in CONTEXTUAL_PATTERNS:
+        def replace_match(m):
+            return f"{m.group(1)}: {replacement}"
+        text = pattern.sub(replace_match, text)
+
     return text
 
 
@@ -282,7 +302,7 @@ def load_spacy_model() -> Optional[Any]:
     if spacy is None:
         logger.warning("spaCy no está instalado. La extracción de entidades estará deshabilitada.")
         return None
-    
+
     for model_name in ["es_core_news_md", "es_core_news_sm", "en_core_web_sm"]:
         try:
             logger.debug(f"Intenta cargar: {model_name}")
@@ -292,7 +312,7 @@ def load_spacy_model() -> Optional[Any]:
         except OSError:
             logger.debug(f"Modelo no disponible: {model_name}")
             continue
-    
+
     logger.warning("No se pudo cargar ningún modelo spaCy.")
     return None
 
@@ -303,7 +323,7 @@ def load_sentiment_classifier() -> Optional[Any]:
     Intenta cargar un modelo multilingüe que funciona bien con textos en español:
     - `xlm-roberta-base` con fine-tuning para sentimientos (multilingüe, robusto)
     - Si falla, recurre a la heurística que busca palabras clave en español
-    
+
     NOTA: `distilbert-base-uncased-finetuned-sst-2-english` está limitado a inglés.
     Usamos un modelo multilingüe para mejor precisión en textos españoles.
     """
@@ -352,15 +372,15 @@ def heuristic_sentiment(text: str) -> Tuple[str, float]:
         "sanción", "castigo", "ilegal", "prohibido", "violación"
     }
     lower = text.lower()
-    
+
     # Contar palabras completas (no subcadenas) para mayor precisión
     pos_count = sum(1 for word in positive_words if f" {word} " in f" {lower} " or f" {word}." in f" {lower} ")
     neg_count = sum(1 for word in negative_words if f" {word} " in f" {lower} " or f" {word}." in f" {lower} ")
-    
+
     total = pos_count + neg_count
     if total == 0:
         return ("NEUTRAL", 0.5)
-    
+
     score = pos_count / total
     label = "POSITIVE" if score >= 0.5 else "NEGATIVE"
     return (label, round(score, 4))
@@ -368,7 +388,7 @@ def heuristic_sentiment(text: str) -> Tuple[str, float]:
 
 def classify_sentiment(text: str, classifier: Optional[Any]) -> Tuple[str, float]:
     """Determina el sentimiento usando el clasificador de transformers o heurístico.
-    
+
     Si se proporciona un clasificador, lo intenta primero. Si falla o no está disponible,
     recurre a la heurística que busca palabras clave en el texto completo.
     """
@@ -380,7 +400,7 @@ def classify_sentiment(text: str, classifier: Optional[Any]) -> Tuple[str, float
                 r = result[0]
                 label = r.get("label", "NEUTRAL")
                 score = float(r.get("score", 0.5))
-                
+
                 # Normalizar etiquetas del modelo multilingüe (pueden ser LABEL_0, LABEL_1, etc.)
                 if label in {"LABEL_0", "NEGATIVE"}:
                     label = "NEGATIVE"
@@ -388,33 +408,33 @@ def classify_sentiment(text: str, classifier: Optional[Any]) -> Tuple[str, float
                     label = "POSITIVE"
                 else:
                     label = "NEUTRAL"
-                
+
                 return (label, score)
         except Exception as e:
             logger.debug(f"Error al clasificar sentimiento con transformers: {e}")
-    
+
     # Fallback a heurística que analiza el texto completo
     return heuristic_sentiment(text)
 
 
 def extract_legal_entities(doc: Optional[Any], text: str) -> List[Tuple[str, str]]:
     """Extrae entidades que son referencias legales basándose en etiquetas y palabras clave.
-    
+
     spaCy en español no tiene etiqueta LAW, así que buscamos MISC/ORG que contengan
     palabras clave legales: "ley", "código", "artículo", "decreto", etc.
     """
     legal_entities: List[Tuple[str, str]] = []
-    
+
     if doc is None:
         return legal_entities
-    
+
     legal_keywords = {
         "ley", "código", "artículo", "decreto", "reglamento", "normativa",
         "regulación", "estatuto", "ordenanza", "resolución", "sentencia",
         "juzgado", "tribunal", "fiscal", "abogado", "delito", "crimen",
         "sanción", "pena", "castigo", "ilegal", "infracción"
     }
-    
+
     try:
         for ent in doc.ents:
             # Si es MISC u ORG, verificar si contiene palabras legales
@@ -424,38 +444,38 @@ def extract_legal_entities(doc: Optional[Any], text: str) -> List[Tuple[str, str
                     legal_entities.append(("LEGAL", ent.text))
     except Exception as e:
         logger.debug(f"Error al extraer entidades legales: {e}")
-    
+
     return legal_entities
 
 
 def extract_entities(doc: Optional[Any]) -> List[Tuple[str, str]]:
     """Extrae entidades nombradas de un doc de spaCy como tuplas (tipo, texto).
-    
+
     Si doc es None, devuelve una lista vacía. Las entidades se devuelven como
     pares (etiqueta, texto).
     """
     entities: List[Tuple[str, str]] = []
     if doc is None:
         return entities
-    
+
     try:
         for ent in doc.ents:
             entities.append((ent.label_, ent.text))
     except Exception as e:
         logger.debug(f"Error al extraer entidades: {e}")
-    
+
     return entities
 
 
 def generate_cognitive_tags(text: str, doc: Optional[Any]) -> List[str]:
     """Genera etiquetas cognitivas combinando reglas heurísticas y entidades.
-    
+
     Analiza el texto en busca de palabras clave relacionadas con conceptos
     cognitivos: idea, riesgo, legalidad, proyecto, viabilidad, emociones, etc.
     """
     tags: List[str] = []
     lower = text.lower()
-    
+
     # Palabras clave expandidas
     idea_keywords = {"idea", "innovación", "concepto", "teoría", "hipótesis", "propuesta", "pensamiento"}
     risk_keywords = {"riesgo", "amenaza", "peligro", "problema", "delito", "crimen", "ilegalidad", "sanción"}
@@ -465,7 +485,7 @@ def generate_cognitive_tags(text: str, doc: Optional[Any]) -> List[str]:
     emotion_keywords = {"feliz", "triste", "emocionado", "enojado", "satisfecho", "preocupado", "esperanzado"}
     intuition_keywords = {"intuición", "presentimiento", "corazonada", "instinto", "sensación"}
     action_keywords = {"pendiente", "por hacer", "tarea", "accionar", "deber", "debe", "necesario"}
-    
+
     # Verificar palabras clave (búsqueda aproximada para mayor cobertura)
     if any(word in lower for word in idea_keywords):
         tags.append("idea")
@@ -483,7 +503,7 @@ def generate_cognitive_tags(text: str, doc: Optional[Any]) -> List[str]:
         tags.append("intuición")
     if any(word in lower for word in action_keywords):
         tags.append("acción pendiente")
-    
+
     # Analizar entidades si disponible
     if doc is not None:
         try:
@@ -496,11 +516,11 @@ def generate_cognitive_tags(text: str, doc: Optional[Any]) -> List[str]:
                     tags.append("proyecto")
         except Exception as e:
             logger.debug(f"Error al procesar entidades para tags: {e}")
-    
+
     # Si no hay etiquetas, asignar "otros"
     if not tags:
         tags.append("otros")
-    
+
     return tags
 
 
@@ -520,7 +540,7 @@ def generate_record(
     trace_context: Dict[str, str]
 ) -> Dict[str, Any]:
     """Procesa un archivo y devuelve un registro semántico conforme al esquema.
-    
+
     Lee el archivo, aplica análisis de NLP, extrae entidades, clasifica sentimiento
     y genera etiquetas cognitivas.
     """
@@ -529,7 +549,7 @@ def generate_record(
     except Exception as e:
         logger.error(f"Error al leer {file_path}: {e}")
         raise
-    
+
     # Procesar con spaCy si está disponible
     doc = None
     if nlp_model is not None:
@@ -538,27 +558,27 @@ def generate_record(
         except Exception as e:
             logger.warning(f"Error al procesar con spaCy para {file_path}: {e}")
             doc = None
-    
+
     # Contar palabras y caracteres
     word_count = len(re.findall(r"\w+", text))
     char_count = len(text)
-    
+
     # Etiquetas cognitivas
     tags = generate_cognitive_tags(text, doc)
-    
+
     # Sentimiento
     sentiment_label, sentiment_score = classify_sentiment(text, sentiment_classifier)
-    
+
     # Entidades
     entities = extract_entities(doc)
-    
+
     # Entidades legales
     legal_entities = extract_legal_entities(doc, text)
-    
+
     # Extraer flags de riesgo (palabras clave de riesgo en el texto)
     risk_keywords = {"riesgo", "delito", "crimen", "peligro", "amenaza", "sanción", "pena", "castigo", "ilegal"}
     risk_flags = [ent for ent in legal_entities if any(kw in ent[1].lower() for kw in risk_keywords)]
-    
+
     # Rellenar campos del esquema semántico
     record: Dict[str, Any] = {
         "uuid": str(uuid.uuid4()),
@@ -574,12 +594,12 @@ def generate_record(
     }
     record["redacted"] = False
     record["redaction"] = {"enabled": False, "env": env}
-    
+
     # Campos adicionales basados en heurísticas
     record["idea_summary"] = record["summary"] if "idea" in tags else ""
     record["risk_flags"] = risk_flags if "riesgo" in tags else []
     record["legal_reference"] = legal_entities if "legal" in tags else []
-    
+
     # Firma de autor: buscar líneas que contengan "autor", "firma", "por", "escrito"
     author = None
     author_patterns = ["autor:", "firma:", "por:", "escrito por", "signed by"]
@@ -594,20 +614,20 @@ def generate_record(
                         break
             if author:
                 break
-    
+
     record["author_signature"] = author or ""
-    
+
     # Relevancia mejorada: basada en densidad de entidades + variedad de tags + sentimiento
     entity_density = len(legal_entities) / max(word_count / 1000, 1)  # entidades por 1000 palabras
     tag_diversity = len(set(tags)) / 8  # máximo 8 tags diferentes
-    
+
     # Normalizar: dar más peso a entidades y tags que al tamaño
     relevance = (
         min(0.4, entity_density / 10) +  # Densidad de entidades (0-0.4)
         (tag_diversity * 0.4) +            # Diversidad de tags (0-0.4)
         (0.2 if len(tags) >= 4 else 0.1)  # Bonus por múltiples tags (0-0.2)
     )
-    
+
     record["relevance_score"] = round(min(1.0, relevance), 3)
 
     hash_source = redact_text(text, doc)
@@ -696,7 +716,7 @@ def main() -> None:
         },
         audit_path
     )
-    
+
     # Procesar archivos de texto
     print(f"📂 Procesando archivos en {input_dir}...")
     for p in input_dir.rglob('*'):
@@ -725,7 +745,7 @@ def main() -> None:
                     error_files.append(p.name)
                 print(f"  ✗ {p.name} (error)")
                 continue
-    
+
     # Guardar resultados
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with output_file.open('w', encoding='utf-8') as f:
@@ -749,7 +769,7 @@ def main() -> None:
         },
         audit_path
     )
-    
+
     # Resumen final
     print("\n" + "="*60)
     print(f"✅ Análisis completado")

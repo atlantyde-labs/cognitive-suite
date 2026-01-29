@@ -29,7 +29,7 @@ Follow the steps with surgical precision.
     Create a `confidential.txt` file in `data/input/` with fake (but realistic) data and execute it.
 
     ```bash
-    python cogctl.py ingest data/input/confidential.txt
+    python cogctl.py ingest confidential.txt
     ```
 
 === "Step 2: Armored Analysis"
