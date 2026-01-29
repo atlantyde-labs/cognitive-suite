@@ -57,7 +57,7 @@ Sigue los pasos para levantar tu dashboard.
     Ejecuta Streamlit y abre el navegador.
 
     ```bash
-    streamlit run frontend/dashboard_app.py --server.port 8501
+    streamlit run frontend/streamlit_app.py --server.port 8501
     ```
 
     **Acceso:** Abre tu navegador en `http://localhost:8501`
@@ -69,7 +69,7 @@ Sigue los pasos para levantar tu dashboard.
     *   📄 Resumen ejecutivo
 
 === "Paso 4: Personalizar Dashboard"
-    Edita `frontend/dashboard_app.py` para añadir tu propio widget.
+    Edita `frontend/streamlit_app.py` para añadir tu propio widget.
 
     ```python
     import streamlit as st
