@@ -80,14 +80,17 @@ CARD_RE = re.compile(r"\b(?:\d[ -]*?){13,19}\b")
 CURRENCY_RE = re.compile(r"\b\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\s?(?:€|\$|USD|EUR)")
 CIF_RE = re.compile(r"\b[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-JA-J]\b", re.IGNORECASE)
 DNI_RE = re.compile(r"\b[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]\b", re.IGNORECASE)
+ZIP_RE = re.compile(r"\b(0[1-9]|[1-4][0-9]|5[0-2])[0-9]{3}\b")
+DATE_RE = re.compile(r"\b\d{1,2}\s+de\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b(?:\s+de\s+\d{4})?", re.IGNORECASE)
 
 # Patrones para redacción contextual (Basado en etiquetas)
 CONTEXTUAL_PATTERNS = [
     (re.compile(r"(Razón social|Empresa|Sociedad):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_ORG]"),
-    (re.compile(r"(Nombre y apellidos|Trabajador|Persona):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_PER]"),
+    (re.compile(r"(Nombre y apellidos|Trabajador|Persona|Representad[oa] por):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_PER]"),
+    (re.compile(r"(en calidad de|cargo|puesto):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_POS]"),
     (re.compile(r"(DNI|NIF|NIE):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_ID]"),
     (re.compile(r"(CIF):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_CIF]"),
-    (re.compile(r"(Calle|Avenida|C/|Plaza):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_LOC]"),
+    (re.compile(r"(Calle|Avenida|C/|Plaza|Dirección|Domicilio|Madrid|Barcelona|Valencia):\s*([^\n,.]+)", re.IGNORECASE), "[REDACTED_LOC]"),
 ]
 
 
@@ -159,6 +162,8 @@ def redact_regex(text: str) -> str:
     text = redact_credit_cards(text)
     text = PHONE_RE.sub("[REDACTED_PHONE]", text)
     text = CURRENCY_RE.sub("[REDACTED_MONEY]", text)
+    text = ZIP_RE.sub("[REDACTED_ZIP]", text)
+    text = DATE_RE.sub("[REDACTED_DATE]", text)
 
     # Aplicar redacción contextual
     for pattern, replacement in CONTEXTUAL_PATTERNS:

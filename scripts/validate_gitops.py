@@ -39,11 +39,15 @@ def main():
     # Patrones prohibidos (sensibles) que no deberían estar en el diff
     # Buscamos patrones que indiquen datos no redactados
     forbidden_patterns = [
-        (r'("PERSON"|PER):\s*"[^\[]', "Nombres reales detectados en campos PER/PERSON"),
-        (r'(Nombre y apellidos|Trabajador|Persona):\s*(?!\[REDACTED)[^",\n]+', "Nombres reales detectados en el texto (sin redactar)"),
-        (r'("EMAIL"|EMAIL):\s*"[^\[]', "Emails detectados (sin redactar)"),
-        (r'\b[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-JA-J]\b', "CIF detectado"),
-        (r'\b[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]\b', "DNI detectado"),
+        (r'("PERSON"|PER):\s*(?!\s*\[REDACTED)[^",\n]+', "Nombres reales detectados en campos PER/PERSON"),
+        (r'\b(Nombre y apellidos|Trabajador|Persona|Representad[oa] por|en calidad de|cargo|puesto|Razón social|Empresa|Sociedad)\b\s*:\s*(?!\s*\[REDACTED)[^",\n]+', "Datos sensibles detectados en el texto (sin redactar)"),
+        (r'\b(Persona Trabajadora)\b\s*:\s*(?!\s*.*Nombre y apellidos\s*:\s*\[REDACTED)', "Contexto de persona trabajadora no redactado correctamente"),
+        (r'\b(Fecha)\b\s*:\s*(?!\s*\[REDACTED)[^",\n]+', "Fechas detectadas (sin redactar)"),
+        (r'(?<!\[REDACTED_)\b\d{1,2}\s+de\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b', "Fecha sin redactar detectada"),
+        (r'("EMAIL"|EMAIL):\s*(?!\s*\[REDACTED)[^",\n]+', "Emails detectados (sin redactar)"),
+        (r'\b(?<!\[REDACTED_CIF\])[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-JA-J]\b', "CIF detectado"),
+        (r'\b(?<!\[REDACTED_DNI\])[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]\b', "DNI detectado"),
+        (r'\b(?<!\[REDACTED_ZIP\])(0[1-9]|[1-4][0-9]|5[0-2])[0-9]{3}\b', "Código Postal detectado"),
         (r'("password"|"secret"|"token"):\s*"[^"]+"', "Posible secreto o token detectado")
     ]
 
