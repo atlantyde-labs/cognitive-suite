@@ -56,8 +56,11 @@ def extract_pdf_text(file_path: Path) -> str:
                 content.append(text)
         if content:
             return '\n'.join(content)
-    except Exception:
-        pass
+    except ImportError:
+        pass  # Fallback a PyPDF2
+    except Exception as e:
+        print(f"⚠️ Error extrayendo con PyMuPDF: {e}")
+
     # Fallback a PyPDF2
     try:
         from PyPDF2 import PdfReader  # type: ignore
@@ -66,9 +69,14 @@ def extract_pdf_text(file_path: Path) -> str:
         for page in reader.pages:
             text = page.extract_text() or ''
             content.append(text)
-        return '\n'.join(content)
-    except Exception:
-        return ''
+        if any(content):
+            return '\n'.join(content)
+    except ImportError:
+        print("❌ Error: No se encontró PyMuPDF ni PyPDF2. Instala las dependencias con 'pip install -r requirements.txt'")
+    except Exception as e:
+        print(f"⚠️ Error extrayendo con PyPDF2: {e}")
+
+    return ''
 
 
 def extract_audio_text(file_path: Path) -> str:
