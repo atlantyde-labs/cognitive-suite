@@ -1,16 +1,18 @@
 site_name: Atlantyqa Cognitive Suite
 site_description: Digital Sovereignty · Cognitive Governance · Local-First AI
+site_url: https://atlantyde-labs.github.io/cognitive-suite/
 # repo_url: https://github.com/atlantyde-labs/cognitive-suite
 # repo_name: atlantyde-labs/cognitive-suite
 
 theme:
   name: material
+  custom_dir: overrides
   palette:
     scheme: light
     primary: custom
     accent: custom
   language: es
-  
+
   features:
     - navigation.sections
     - navigation.expand
@@ -21,16 +23,17 @@ theme:
     - search.highlight
     - content.code.copy
     - content.code.annotate
-  
+
   font:
     text: Inter
     code: Roboto Mono
-  
+
   icon:
     repo: fontawesome/brands/github
 
 extra_css:
   - stylesheets/custom.css
+  - stylesheets/mobile.css
 
 extra_javascript:
   - javascripts/custom.js
@@ -70,13 +73,6 @@ extra:
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/atlantyqa
       name: Atlantyqa on Twitter
-  
-copyright: |
-  <span class="atlantyqa-copyright-wrapper">
-    &copy; 2026 Atlantyqa Labs.  | 
-    <a href="#">Política de Privacidad</a> · 
-    <a href="#">Términos de Servicio</a>
-  </span>
 
 plugins:
   - search
