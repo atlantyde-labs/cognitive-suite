@@ -1,114 +1,78 @@
-# Desafio de deteccion de talento (Labs + agentes IA)
+# 🏆 Labs de Desafío de Talento
 
-Esta guia define un desafio estructurado para que los adoptantes tempranos revelen senales de talento mediante Labs, sistemas de recompensas y agentes de IA personales que acompanan la experiencia del usuario.
+!!! abstract "Campo de Entrenamiento"
+    Demuestra tu valía en escenarios reales. Estos Labs no son simulaciones teóricas; son **misiones operativas** donde tu desempeño se mide con evidencia criptográfica.
 
-## Objetivos
-- Detectar talento tecnico usando Labs practicos.
-- Proveer un agente de IA personal para guia y retroalimentacion.
-- Otorgar recompensas transparentes y auditables basadas en evidencia.
-- Mantener privacidad, cumplimiento y restricciones soberanas.
+---
 
-## Concepto base
-- Los Labs son misiones cortas y practicas que reflejan flujos reales.
-- Cada Lab genera evidencia via GitOps (PRs, logs, artefactos).
-- Las recompensas se otorgan por evidencia, no por opiniones.
-- El agente personal es un acompanante: guia, revisor y guardia de seguridad.
+<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
+  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">El Ecosistema de Evaluación</h3>
+  
+```mermaid
+graph TD
+    User[👤 Talento] -->|Ejecuta Lab| Agent[🤖 Agente IA]
+    Agent -->|Valida Evidencia| Score[💯 Puntuación]
+    Score -->|Desbloquea| Badge[🏅 Insignia Verificada]
 
-## Recorrido del usuario
-1) Incorporacion
-   - Selecciona una ruta (Data, DevSecOps, ML, Product, Frontend, Docs).
-   - Crea un perfil con consentimiento explicito para puntuacion.
+    style User fill:#e7ae4c,stroke:#333,stroke-width:2px,color:#fff
+    style Agent fill:#e0e7ff,stroke:#333,stroke-width:2px,color:#182232
+    style Score fill:#37a880,stroke:#333,stroke-width:2px,color:#fff
+    style Badge fill:#f1f5f9,stroke:#182232,stroke-width:2px,color:#182232
+```
+</div>
 
-2) Seleccion de Lab
-   - Elige un Lab de una escalera de dificultad.
-   - El agente explica objetivos, riesgos y reglas de recompensa.
+## 1. 📂 Misiones Disponibles
 
-3) Ejecucion
-   - El usuario completa tareas en un fork o rama sandbox.
-   - El agente ayuda con pistas, controles y validaciones.
+Elige tu nivel de dificultad. Cada misión completada forja tu reputación en la comunidad.
 
-4) Envio de evidencia
-   - Envios via PR o sync GitOps.
-   - CI registra evidencia: SBOM, SCA, tests, logs de auditoria.
+<div class="features-grid">
+    <div class="feature-card" style="border-top: 5px solid #e7ae4c;">
+        <h3>🟢 Lab 01: Inmersión Profunda</h3>
+        <p><strong>Objetivo:</strong> Configurar el <em>Pipeline Seguro</em>. Establecer una línea base y ejecutar el análisis local con redacción activa.</p>
+        <p><strong>Recompensa:</strong> <code>50 XP</code> + Insignia 🛡️</p>
+        <a href="../lab-01-deep-dive/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Iniciar Misión</a>
+    </div>
+    <div class="feature-card" style="border-top: 5px solid #37a880;">
+        <h3>🔵 Lab 02: GitOps Steward</h3>
+        <p><strong>Objetivo:</strong> Sincronizar resultados a la nube sin filtrar ni un solo byte sensible.</p>
+        <p><strong>Recompensa:</strong> <code>100 XP</code> + Insignia ☁️</p>
+        <span style="display:block; text-align:center; margin-top:1rem; opacity:0.6;">(Próximamente)</span>
+    </div>
+    <div class="feature-card" style="border-top: 5px solid #182232;">
+        <h3>🔴 Lab 03: Runtime Guardian</h3>
+        <p><strong>Objetivo:</strong> Endurecer contenedores Docker y bloquear vectores de ataque.</p>
+        <p><strong>Recompensa:</strong> <code>200 XP</code> + Insignia 💂</p>
+        <span style="display:block; text-align:center; margin-top:1rem; opacity:0.6;">(Solo Expertos)</span>
+    </div>
+</div>
 
-5) Puntuacion y recompensas
-   - Puntuacion automatica basada en evidencias.
-   - Revision manual solo en casos limite.
+---
 
-6) Crecimiento
-   - El siguiente Lab se ajusta segun fortalezas y brechas observadas.
+## 2. 🤖 Tu Copiloto IA
 
-## Estructura del Lab (plantilla)
-- Titulo:
-- Dificultad: L1 / L2 / L3 / L4
-- Objetivo:
-- Salidas requeridas:
-- Fuentes de evidencia:
-- Controles de riesgo y cumplimiento:
-- Recompensa:
+No estás solo. Un agente personal te acompañará durante el desafío.
 
-## Ejemplos de Labs
+=== "🧭 Guía"
+    Te explicará el contexto de la misión y te dará pistas si te atascas, sin resolver el problema por ti.
 
-### Lab 01 - Linea base de pipeline seguro
-- Dificultad: L1
-- Objetivo: ejecutar pipeline con redaccion y logs de auditoria.
-- **Guía Detallada**: [lab-01-deep-dive.md](lab-01-deep-dive.md)
-- Salidas requeridas: analysis.json, entradas de log de auditoria.
-- Evidencia: `outputs/audit/analysis.jsonl` + PR GitOps.
-- Recompensa: 50 puntos + insignia `secure-runner`.
+=== "🛡️ Guardián"
+    Si intentas hacer un `git push` de datos confidenciales, el agente bloqueará la acción y te explicará el riesgo.
 
-### Lab 02 - Sync GitOps con outputs redactados
-- Dificultad: L2
-- Objetivo: sincronizar outputs redactados a un repo remoto.
-- Salidas requeridas: PR con solo outputs redactados.
-- Evidencia: logs de CI, evidencia de `gitops/sync.sh`.
-- Recompensa: 100 puntos + insignia `gitops-steward`.
+=== "⚖️ Juez"
+    Analizará tus logs de auditoría y la calidad de tus `commit messages` para calcular tu puntuación final.
 
-### Lab 03 - Guia de endurecimiento
-- Dificultad: L3
-- Objetivo: aplicar endurecimiento de contenedores y documentar riesgos.
-- Salidas requeridas: compose actualizado y nota corta de riesgo.
-- Evidencia: diff de `docker-compose.prod.yml` + notas de revision.
-- Recompensa: 200 puntos + insignia `runtime-guardian`.
+---
 
-## Sistema de recompensas
-- Puntos: 0 a 1000 por Lab segun dificultad.
-- Insignias: prueba permanente de capacidad.
-- Niveles: L1 (Explorador) -> L4 (Experto).
-- Bonos: puntos extra por SCA limpio, tests y docs.
+## 3. 📜 Rúbrica de Evaluación
 
-## Rubrica de evaluacion
-- Correccion (40%): objetivos cumplidos y reproducibles.
-- Seguridad (25%): sin violaciones de politica; redaccion aplicada.
-- Calidad (20%): diffs limpios, docs claras, tests.
-- Colaboracion (15%): descripcion de PR, retroalimentacion de pares.
+La perfección no es el objetivo, la **consistencia** sí.
 
-## Roles del agente de IA
-- Agente de incorporacion: ayuda de config, prerequisitos, consentimiento.
-- Guia de Lab: pistas, planificacion de tiempo, gestion de alcance.
-- Guardia de seguridad: alerta acciones riesgosas (sync de datos en bruto, secretos).
-- Revisor: destaca brechas antes de envio.
-- Agente de carrera: sugiere el siguiente Lab segun tendencias de puntuacion.
+| Criterio | Peso | Descripción |
+| :--- | :--- | :--- |
+| **Corrección** | 40% | ¿El código hace lo que debe hacer? |
+| **Seguridad** | 25% | ¿Se respetaron las políticas de redacción? |
+| **Calidad** | 20% | Limpieza del código, tests y documentación. |
+| **Colaboración** | 15% | Claridad en la comunicación del PR. |
 
-## Cumplimiento y privacidad
-- Consentimiento explicito para puntuacion y retencion de datos.
-- Solo outputs redactados en evidencia prod.
-- Logs de auditoria por cada ejecucion de Lab.
-- Modo soberano: solo local, sin llamadas externas.
-
-## Lista de verificacion de evidencia
-- Logs de CI adjuntos
-- Artefactos SBOM
-- Resultados SCA
-- Logs de auditoria
-- PR con lista de verificacion completa
-
-## Controles anti-fraude
-- Revisiones aleatorias y tests ocultos.
-- Recompensas requieren evidencia reproducible.
-- Revision manual en patrones sospechosos.
-
-## Proximos pasos
-- Publicar Labs en un repo dedicado o carpeta `labs/`.
-- Definir registro de recompensas (JSON o CSV simple).
-- Asignar revisores para Labs L3 y L4.
+> [!CAUTION]
+> **Tolerancia Cero al Fraude:** Cualquier intento de falsificar logs de auditoría resultará en la descalificación inmediata y permanente.

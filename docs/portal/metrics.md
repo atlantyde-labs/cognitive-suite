@@ -1,143 +1,99 @@
-# 📊 Métricas (Learning + Delivery + Ecosistema)
+# 📊 Métricas de Impacto: Aprendizaje y Ecosistema
 
-> **Objetivo:** medir aprendizaje real, fiabilidad operativa y crecimiento del ecosistema
-> sin caer en “métricas vanity”.  
-> Estas métricas están pensadas para **GitHub.com** (Issues + Projects v2 + Actions).
-
----
-
-## 1) Métricas de Aprendizaje (Learning by Doing)
-
-### ✅ TTFP — Time To First PR (métrica reina de early-adopters)
-- **Definición:** tiempo desde el primer issue / primera interacción hasta el primer PR aceptable.
-- **Por qué importa:** si baja, tu onboarding funciona.
-
-**Cómo medir en GitHub**
-- Project v2: filtra cohortes (labels `good first issue` + `learning-task`)
-- Compara `created_at` del issue inicial vs `merged_at` del primer PR.
+!!! quote "Filosofía de Medición"
+    **No medimos para controlar, sino para aprender.** Buscamos capturar la velocidad de aprendizaje, la fiabilidad operativa y el crecimiento de la comunidad sin caer en métricas de vanidad.
 
 ---
 
-### ✅ Learning Velocity
-- **Definición:** nº de `learning-task` completadas por semana/mes.
-- **Instrumentación:** Project v2 + campo `Status=Done` + label `learning-task`.
+<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
+  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Ciclo de Valor Cognitivo</h3>
+  
+```mermaid
+graph TD
+    A[💡 Idea / Reto] --> B[💻 Ejecución Local]
+    B --> C[🔄 PR & Review]
+    C --> D[🚀 Merge & Deploy]
+    D --> E[🎓 Lección Aprendida]
+
+    style A fill:#e7ae4c,stroke:#333,stroke-width:2px,color:#fff
+    style B fill:#37a880,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#e0e7ff,stroke:#333,stroke-width:2px,color:#182232
+    style D fill:#f1f5f9,stroke:#182232,stroke-width:2px,color:#182232
+    style E fill:#ffffff,stroke:#182232,stroke-width:2px,stroke-dasharray: 5 5,color:#182232
+```
+</div>
+
+## 1. 🎓 Métricas de Aprendizaje (Gamificación)
+
+Instrumentamos **GitHub Projects** para que el aprendizaje sea visible y recompensado.
+
+<div class="features-grid">
+    <div class="feature-card">
+        <h3>🚀 TTFP (Time to First PR)</h3>
+        <p><strong>La Métrica Reina.</strong> Tiempo desde que un usuario dice "Hola" hasta que su primer PR es aceptado. Si baja, nuestro onboarding es de clase mundial.</p>
+    </div>
+    <div class="feature-card">
+        <h3>⚡ Learning Velocity</h3>
+        <p>Número de issues `learning-task` completados por semana. Mide la salud y curiosidad de la cohorte activa.</p>
+    </div>
+</div>
+
+### Sistema de Experiencia (XP)
+
+Recompensamos el impacto real, no el tiempo en la silla.
+
+| Nivel de Tarea | Recompensa (XP) | Ejemplo |
+| :--- | :--- | :--- |
+| **Nivel 1** | `10 XP` | Primer análisis, corrección simple |
+| **Nivel 2** | `25 XP` | Nueva visualización, mejora de docs |
+| **Nivel 3** | `50 XP` | Automatización CI/CD, nuevo modelo |
+| **Nivel 4** | `100 XP` | Arquitectura, gobernanza, mentoring |
 
 ---
 
-### ✅ XP Earned (gamificación medible)
-- **Definición:** suma de XP entregada por contributor y por mes.
-- **Instrumentación:** Project v2 campo `XP` (Number).
-- **Regla base sugerida:**
-  - Nivel 1 → 10 XP
-  - Nivel 2 → 25 XP
-  - Nivel 3 → 50 XP
-  - Nivel 4 → 100 XP
+## 2. ⚙️ Métricas de Flujo & Fiabilidad
+
+Para garantizar entregas sostenibles y prevenir el *burnout*.
+
+<div class="features-grid">
+    <div class="feature-card" style="border-left: 4px solid var(--atlantyqa-green);">
+        <h3>Cycle Time</h3>
+        <p>Tiempo de <code>In Progress</code> a <code>Done</code>. Objetivo: Reducir bloqueos y esperas externas.</p>
+    </div>
+    <div class="feature-card" style="border-left: 4px solid #182232;">
+        <h3>CI Reliability</h3>
+        <p>Porcentaje de builds verdes ('Success'). Un pipeline roto bloquea el aprendizaje.</p>
+    </div>
+    <div class="feature-card" style="border-left: 4px solid #e7ae4c;">
+        <h3>Sovereign Adoption</h3>
+        <p>% de PRs que respetan el principio <strong>Local-First</strong>. Sin dependencias ocultas de la nube.</p>
+    </div>
+</div>
 
 ---
 
-## 2) Métricas de Flujo (Delivery / Operación)
+## 3. 🌍 Métricas de Ecosistema
 
-### ✅ Cycle Time (Issue → Done)
-- **Definición:** tiempo total desde que un issue entra a `In Progress` hasta `Done`.
-- **Objetivo:** reducir bloqueos y aumentar fluidez.
+Conectando el código con el impacto territorial.
 
-### ✅ Flow Efficiency
-- **Definición:** tiempo en estado “activo” / tiempo total del ciclo.
-- **Instrumentación:** status timestamps (manual o mediante automatizaciones).
+*   ✅ **GitOps Coverage**: % de componentes con IaC y pipelines reproducibles.
+*   ✅ **Territorial Impact**: Número de eventos comunitarios y estudiantes activos en regiones objetivo (ITI Andalucía, UE, LATAM).
 
 ---
 
-## 3) Métricas de Fiabilidad (GitOps / CI)
+## 4. 🛠️ Implementación Rápida (15 min)
 
-### ✅ CI Reliability
-- **Definición:** % de runs verdes / semana + tendencia.
-- **Fuente:** GitHub Actions.
+Configura tu **GitHub Project v2** para empezar a medir hoy.
 
-### ✅ MTTR — Mean Time To Recovery (Mean time to green)
-- **Definición:** tiempo promedio en recuperar un pipeline fallido a estado verde.
-- **Fuente:** historial de runs (Actions).
+=== "1. Configurar Campos"
+    Crea las siguientes columnas personalizadas:
+    *   `Status`: Backlog, In Progress, Review, Done.
+    *   `Area`: Learning, GitOps, Docs, Backend.
+    *   `XP` (Number): Para sumar puntuaciones.
+    *   `KPI` (Text): Etiquetas como "TTFP", "Reliability".
 
-### ✅ Build Cost Guardrails (recurso / sostenibilidad)
-- **Definición:** tamaño medio de imágenes docker y tiempo de build.
-- **Objetivo:** evitar “dependency bloat” (sobre todo ML).
+=== "2. Automatizar"
+    *   Activa los workflows `add_to_project.yml`.
+    *   Usa etiquetas para asignar XP automáticamente.
 
----
-
-## 4) Métricas de Ecosistema (ATLANTYDE / ATLANTYQA)
-
-Estas métricas conectan el repositorio con el **Resumen de identidad y ecosistema**:
-misión, infraestructura soberana, expansión territorial y comunidad fundadora.
-
-### ✅ Sovereign Stack Adoption
-- **Definición:** % de contribuciones que mantienen el principio *local-first*.
-- **Señal:** PRs que:
-  - no dependen de SaaS privativos para funcionar
-  - documentan modo offline/híbrido
-  - mantienen compatibilidad MicroK8s / k3s
-
-**Instrumentación**
-- Label `local-first`
-- Checklist en PR template (opcional)
-
----
-
-### ✅ GitOps Coverage
-- **Definición:** porcentaje de componentes que tienen:
-  - manifests/helm/kustomize
-  - policies (OPA) o checks de seguridad
-  - pipelines reproducibles
-
-**Instrumentación**
-- Project v2 campo `Area=CI/GitOps`
-- checklist por componente
-
----
-
-### ✅ Community Growth (salud del colectivo)
-- **Definición:** contribuyentes activos/mes y proporción de “returning contributors”.
-- **Por qué importa:** la cooperativa vive de continuidad, no de picos.
-
----
-
-### ✅ Territorial Impact (ITI / Andalucía → EU)
-- **Definición:** # de eventos/bootcamps/labs ejecutados + # de estudiantes activos.
-- **Instrumentación recomendada**
-- “Ops Issues” por evento (label `community-event`)
-- Project v2 vista “Roadmap” por trimestre:
-  - 2025–26 Andalucía (ITI)
-  - 2026–27 Portugal/Francia/Alemania
-  - 2028+ LATAM/USA
-
----
-
-## 5) Mapa de métricas → GitHub Projects v2 (campos recomendados)
-
-**Campos**
-- `Status` (Backlog/In Progress/In Review/Done/Blocked)
-- `Area` (Learning, CI/GitOps, Docs, Backend, Frontend, LegalTech, Community)
-- `Level` (1–4)
-- `XP` (Number)
-- `KPI` (Text) → “TTFP”, “CI Reliability”, etc.
-
-**Vistas**
-- Kanban por Status
-- Table por Level/XP
-- Charts por Area y por Status
-- Roadmap por trimestre (si usas milestones)
-
----
-
-## 6) Checklist de implementación rápida (15 min)
-
-- [ ] Crear Project v2 en la org `atlantyde-labs`
-- [ ] Añadir campos `Status/Area/Level/XP/KPI`
-- [ ] Añadir secrets `PROJECT_URL` y `PROJECT_TOKEN`
-- [ ] Activar workflow `add_to_project.yml`
-- [ ] Activar workflow `labels.yml`
-- [ ] Definir XP por label/nivel en tu operativa
-
----
-
-> Si algo no se puede medir, no se puede mejorar.  
-> Y si se mide mal, se destruye la cultura.  
-> **Medimos para aprender y cooperar**, no para presionar.
+> **Recuerda:** Si se mide mal, se destruye la cultura. Medimos para mejorar el sistema, nunca para juzgar a las personas.
