@@ -1,143 +1,99 @@
-# 📊 Metrics (Learning + Delivery + Ecosystem)
+# 📊 Impact Metrics: Learning and Ecosystem
 
-> **Goal:** measure real learning, operational reliability, and ecosystem growth
-> without falling into vanity metrics.
-> These metrics are designed for **GitHub.com** (Issues + Projects v2 + Actions).
-
----
-
-## 1) Learning Metrics (Learning by Doing)
-
-### ✅ TTFP — Time To First PR (early adopter king metric)
-- **Definition:** time from first issue / first interaction to first acceptable PR.
-- **Why it matters:** if it goes down, onboarding works.
-
-**How to measure in GitHub**
-- Project v2: filter cohorts (labels `good first issue` + `learning-task`)
-- Compare `created_at` of the initial issue vs `merged_at` of the first PR.
+!!! quote "Measurement Philosophy"
+    **We don't measure to control, but to learn.** We seek to capture learning velocity, operational reliability, and community growth without falling into vanity metrics.
 
 ---
 
-### ✅ Learning Velocity
-- **Definition:** number of `learning-task` items completed per week/month.
-- **Instrumentation:** Project v2 + field `Status=Done` + label `learning-task`.
+<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
+  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Cognitive Value Cycle</h3>
+
+```mermaid
+graph TD
+    A[💡 Idea / Challenge] --> B[💻 Local Execution]
+    B --> C[🔄 PR & Review]
+    C --> D[🚀 Merge & Deploy]
+    D --> E[🎓 Lesson Learned]
+
+    style A fill:#e7ae4c,stroke:#333,stroke-width:2px,color:#fff
+    style B fill:#37a880,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#e0e7ff,stroke:#333,stroke-width:2px,color:#182232
+    style D fill:#f1f5f9,stroke:#182232,stroke-width:2px,color:#182232
+    style E fill:#ffffff,stroke:#182232,stroke-width:2px,stroke-dasharray: 5 5,color:#182232
+```
+</div>
+
+## 1. 🎓 Learning Metrics (Gamification)
+
+We instrument **GitHub Projects** to make learning visible and rewarded.
+
+<div class="features-grid">
+    <div class="feature-card">
+        <h3>🚀 TTFP (Time to First PR)</h3>
+        <p><strong>The Queen Metric.</strong> Time from when a user says "Hello" until their first PR is accepted. If it goes down, our onboarding is world-class.</p>
+    </div>
+    <div class="feature-card">
+        <h3>⚡ Learning Velocity</h3>
+        <p>Number of `learning-task` issues completed per week. Measures the health and curiosity of the active cohort.</p>
+    </div>
+</div>
+
+### Experience System (XP)
+
+We reward real impact, not time in the chair.
+
+| Task Level | Reward (XP) | Example |
+| :--- | :--- | :--- |
+| **Level 1** | `10 XP` | First analysis, simple fix |
+| **Level 2** | `25 XP` | New visualization, docs improvement |
+| **Level 3** | `50 XP` | CI/CD automation, new model |
+| **Level 4** | `100 XP` | Architecture, governance, mentoring |
 
 ---
 
-### ✅ XP Earned (measurable gamification)
-- **Definition:** sum of XP delivered per contributor per month.
-- **Instrumentation:** Project v2 field `XP` (Number).
-- **Suggested base rule:**
-  - Level 1 → 10 XP
-  - Level 2 → 25 XP
-  - Level 3 → 50 XP
-  - Level 4 → 100 XP
+## 2. ⚙️ Flow & Reliability Metrics
+
+To ensure sustainable deliveries and prevent burnout.
+
+<div class="features-grid">
+    <div class="feature-card" style="border-left: 4px solid var(--atlantyqa-green);">
+        <h3>Cycle Time</h3>
+        <p>Time from <code>In Progress</code> to <code>Done</code>. Goal: Reduce blocks and external waits.</p>
+    </div>
+    <div class="feature-card" style="border-left: 4px solid #182232;">
+        <h3>CI Reliability</h3>
+        <p>Percentage of green builds ('Success'). A broken pipeline blocks learning.</p>
+    </div>
+    <div class="feature-card" style="border-left: 4px solid #e7ae4c;">
+        <h3>Sovereign Adoption</h3>
+        <p>% of PRs that respect the <strong>Local-First</strong> principle. No hidden cloud dependencies.</p>
+    </div>
+</div>
 
 ---
 
-## 2) Flow Metrics (Delivery / Operations)
+## 3. 🌍 Ecosystem Metrics
 
-### ✅ Cycle Time (Issue → Done)
-- **Definition:** total time from when an issue enters `In Progress` to `Done`.
-- **Objective:** reduce blockers and increase flow.
+Connecting code with territorial impact.
 
-### ✅ Flow Efficiency
-- **Definition:** time in “active” status / total cycle time.
-- **Instrumentation:** status timestamps (manual or automated).
+*   ✅ **GitOps Coverage**: % of components with IaC and reproducible pipelines.
+*   ✅ **Territorial Impact**: Number of community events and active students in target regions (ITI Andalusia, EU, LATAM).
 
 ---
 
-## 3) Reliability Metrics (GitOps / CI)
+## 4. 🛠️ Quick Implementation (15 min)
 
-### ✅ CI Reliability
-- **Definition:** % of green runs per week + trend.
-- **Source:** GitHub Actions.
+Configure your **GitHub Project v2** to start measuring today.
 
-### ✅ MTTR — Mean Time To Recovery (mean time to green)
-- **Definition:** average time to recover a failed pipeline to green.
-- **Source:** Actions run history.
+=== "1. Configure Fields"
+    Create the following custom columns:
+    *   `Status`: Backlog, In Progress, Review, Done.
+    *   `Area`: Learning, GitOps, Docs, Backend.
+    *   `XP` (Number): To sum scores.
+    *   `KPI` (Text): Labels like "TTFP", "Reliability".
 
-### ✅ Build Cost Guardrails (resources / sustainability)
-- **Definition:** average docker image size and build time.
-- **Objective:** avoid dependency bloat (especially ML).
+=== "2. Automate"
+    *   Activate `add_to_project.yml` workflows.
+    *   Use labels to assign XP automatically.
 
----
-
-## 4) Ecosystem Metrics (ATLANTYDE / ATLANTYQA)
-
-These metrics connect the repository with the **Identity and ecosystem summary**:
-mission, sovereign infrastructure, territorial expansion, and founding community.
-
-### ✅ Sovereign Stack Adoption
-- **Definition:** % of contributions that preserve the *local-first* principle.
-- **Signal:** PRs that:
-  - do not depend on proprietary SaaS to function
-  - document offline/hybrid mode
-  - keep MicroK8s / k3s compatibility
-
-**Instrumentation**
-- Label `local-first`
-- Checklist in PR template (optional)
-
----
-
-### ✅ GitOps Coverage
-- **Definition:** percentage of components that have:
-  - manifests/helm/kustomize
-  - policies (OPA) or security checks
-  - reproducible pipelines
-
-**Instrumentation**
-- Project v2 field `Area=CI/GitOps`
-- checklist per component
-
----
-
-### ✅ Community Growth (collective health)
-- **Definition:** active contributors/month and ratio of returning contributors.
-- **Why it matters:** the cooperative lives on continuity, not spikes.
-
----
-
-### ✅ Territorial Impact (ITI / Andalusia → EU)
-- **Definition:** # events/bootcamps/labs executed + # active students.
-- **Recommended instrumentation**
-- “Ops Issues” per event (label `community-event`)
-- Project v2 “Roadmap” view per quarter:
-  - 2025–26 Andalusia (ITI)
-  - 2026–27 Portugal/France/Germany
-  - 2028+ LATAM/USA
-
----
-
-## 5) Metrics map → GitHub Projects v2 (recommended fields)
-
-**Fields**
-- `Status` (Backlog/In Progress/In Review/Done/Blocked)
-- `Area` (Learning, CI/GitOps, Docs, Backend, Frontend, LegalTech, Community)
-- `Level` (1–4)
-- `XP` (Number)
-- `KPI` (Text) → “TTFP”, “CI Reliability”, etc.
-
-**Views**
-- Kanban by Status
-- Table by Level/XP
-- Charts by Area and Status
-- Roadmap by quarter (if you use milestones)
-
----
-
-## 6) Quick implementation checklist (15 min)
-
-- [ ] Create a Project v2 in org `atlantyde-labs`
-- [ ] Add fields `Status/Area/Level/XP/KPI`
-- [ ] Add secrets `PROJECT_URL` and `PROJECT_TOKEN`
-- [ ] Enable workflow `add_to_project.yml`
-- [ ] Enable workflow `labels.yml`
-- [ ] Define XP per label/level in your operations
-
----
-
-> If you cannot measure it, you cannot improve it.
-> And if you measure it poorly, you destroy culture.
-> **We measure to learn and cooperate**, not to pressure.
+> **Remember:** If measured poorly, it destroys culture. We measure to improve the system, never to judge people.
