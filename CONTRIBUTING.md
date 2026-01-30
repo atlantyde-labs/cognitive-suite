@@ -46,7 +46,7 @@ Abre un Issue con tu propuesta o súmate al canal de discusión estratégica.
 > ¡Gracias por ayudar a construir herramientas que respeten nuestra inteligencia, identidad y libertad!
 # Guía para desarrolladores y colaboradores
 
-Bienvenido/a a **Cognitive GitOps Suite** 👋  
+Bienvenido/a a **Cognitive GitOps Suite** 👋
 Este proyecto se construye bajo una filosofía de **Learning by Doing**, cooperación
 y soberanía tecnológica.
 
@@ -88,7 +88,7 @@ Ejercicio inicial recomendado:
 2. Ejecuta:
 
    ```bash
-   python cogctl.py ingest data/input/tu_archivo.pdf
+   python cogctl.py tu_archivo.pdf
    python cogctl.py analyze
    ```
 3. Observa `outputs/insights/analysis.json`
@@ -99,12 +99,12 @@ Ejercicio inicial recomendado:
 
 ## 🔁 Metodología de aportación
 
-1) Elige una unidad pequeña (un script, doc, ejemplo o reto).  
+1) Elige una unidad pequeña (un script, doc, ejemplo o reto).
 2) Trabaja en rama:
 ```bash
 git checkout -b feature/nombre-claro
 ```
-3) Valida localmente y no rompas CI.  
+3) Valida localmente y no rompas CI.
 4) Describe el *por qué* en tu PR: problema, aprendizaje y siguiente paso.
 
 ---

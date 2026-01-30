@@ -1,114 +1,78 @@
-# Talent Detection Challenge (Labs + AI Agents)
+# 🏆 Talent Challenge Labs
 
-This guide defines a structured challenge for early adopters to surface talent signals through Labs, reward systems, and personal AI agents that accompany the user experience.
+!!! abstract "Training Ground"
+    Prove your worth in real scenarios. These Labs aren't theoretical simulations; they're **operational missions** where your performance is measured with cryptographic evidence.
 
-## Goals
-- Detect technical talent using practical Labs.
-- Provide a personal AI agent for guidance and feedback.
-- Award transparent, auditable rewards based on evidence.
-- Maintain privacy, compliance, and sovereign constraints.
+---
 
-## Core concept
-- Labs are short, practical missions that mirror real workflows.
-- Each Lab produces evidence via GitOps (PRs, logs, artifacts).
-- Rewards are granted from evidence, not opinions.
-- The personal agent is a companion: coach, reviewer, and safety guard.
+<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
+  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Evaluation Ecosystem</h3>
 
-## User journey
-1) Onboarding
-   - Select track (Data, DevSecOps, ML, Product, Frontend, Docs).
-   - Create a profile with opt-in consent for scoring.
+```mermaid
+graph TD
+    User[👤 Talent] -->|Executes Lab| Agent[🤖 AI Agent]
+    Agent -->|Validates Evidence| Score[💯 Score]
+    Score -->|Unlocks| Badge[🏅 Verified Badge]
 
-2) Lab selection
-   - Choose a Lab from a difficulty ladder.
-   - The agent explains objectives, risks, and reward rules.
+    style User fill:#e7ae4c,stroke:#333,stroke-width:2px,color:#fff
+    style Agent fill:#e0e7ff,stroke:#333,stroke-width:2px,color:#182232
+    style Score fill:#37a880,stroke:#333,stroke-width:2px,color:#fff
+    style Badge fill:#f1f5f9,stroke:#182232,stroke-width:2px,color:#182232
+```
+</div>
 
-3) Execution
-   - User completes tasks in a fork or sandbox branch.
-   - Agent supports with hints, guardrails, and validation checks.
+## 1. 📂 Available Missions
 
-4) Evidence submission
-   - Submit via PR or GitOps sync.
-   - CI records evidence: SBOM, SCA, tests, audit logs.
+Choose your difficulty level. Each completed mission forges your reputation in the community.
 
-5) Scoring and rewards
-   - Automated scoring from evidence logs.
-   - Manual review only for edge cases.
+<div class="features-grid">
+    <div class="feature-card" style="border-top: 5px solid #e7ae4c;">
+        <h3>🟢 Lab 01: Deep Dive</h3>
+        <p><strong>Objective:</strong> Configure the <em>Secure Pipeline</em>. Establish a baseline and run local analysis with active redaction.</p>
+        <p><strong>Reward:</strong> <code>50 XP</code> + Badge 🛡️</p>
+        <a href="../lab-01-deep-dive/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Start Mission</a>
+    </div>
+    <div class="feature-card" style="border-top: 5px solid #37a880;">
+        <h3>🔵 Lab 02: GitOps Steward</h3>
+        <p><strong>Objective:</strong> Sync results to the cloud without leaking a single sensitive byte. Master the secure GitOps flow.</p>
+        <p><strong>Reward:</strong> <code>100 XP</code> + Badge ☁️</p>
+        <a href="../lab-02-gitops-steward/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Start Mission</a>
+    </div>
+    <div class="feature-card" style="border-top: 5px solid #182232;">
+        <h3>🟣 Lab 03: Bootstrap Dashboard</h3>
+        <p><strong>Objective:</strong> Create a visual command center with Streamlit. Visualize insights without touching code.</p>
+        <p><strong>Reward:</strong> <code>75 XP</code> + Badge 📊</p>
+        <a href="../lab-03-bootstrap-dashboard/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Start Mission</a>
+    </div>
+</div>
 
-6) Growth
-   - Next Lab is tailored from observed strengths and gaps.
+---
 
-## Lab structure (template)
-- Title:
-- Difficulty: L1 / L2 / L3 / L4
-- Objective:
-- Required outputs:
-- Evidence sources:
-- Risk and compliance guardrails:
-- Reward:
+## 2. 🤖 Your AI Copilot
 
-## Example Labs
+You're not alone. A personal agent will accompany you during the challenge.
 
-### Lab 01 - Secure pipeline baseline
-- Difficulty: L1
-- Objective: run pipeline with redaction and audit logs.
-- **Detailed Guide**: [lab-01-deep-dive.md](lab-01-deep-dive.md)
-- Required outputs: analysis.json, audit log entries.
-- Evidence: `outputs/audit/analysis.jsonl` + GitOps PR.
-- Reward: 50 points + badge `secure-runner`.
+=== "🧭 Guide"
+    Will explain the mission context and give you hints if you get stuck, without solving the problem for you.
 
-### Lab 02 - GitOps redacted sync
-- Difficulty: L2
-- Objective: sync redacted outputs to a remote repo.
-- Required outputs: PR with redacted outputs only.
-- Evidence: CI logs, gitops/sync.sh evidence.
-- Reward: 100 points + badge `gitops-steward`.
+=== "🛡️ Guardian"
+    If you try to `git push` confidential data, the agent will block the action and explain the risk.
 
-### Lab 03 - Hardening runbook
-- Difficulty: L3
-- Objective: apply container hardening and document risks.
-- Required outputs: updated compose and a short risk note.
-- Evidence: `docker-compose.prod.yml` diff + review notes.
-- Reward: 200 points + badge `runtime-guardian`.
+=== "⚖️ Judge"
+    Will analyze your audit logs and `commit message` quality to calculate your final score.
 
-## Rewards system
-- Points: 0 to 1000 per Lab depending on difficulty.
-- Badges: permanent proof of capability.
-- Levels: L1 (Explorer) -> L4 (Expert).
-- Bonuses: extra points for clean SCA, tests, and docs.
+---
 
-## Scoring rubric
-- Correctness (40%): objectives met and reproducible.
-- Security (25%): no policy violations; redaction applied.
-- Quality (20%): clean diffs, clear docs, tests.
-- Collaboration (15%): PR description, peer feedback.
+## 3. 📜 Evaluation Rubric
 
-## AI agent roles
-- Onboarding agent: config help, prerequisites, consent.
-- Lab coach: hints, time planning, scope management.
-- Security guard: flags risky actions (raw data sync, secrets).
-- Reviewer: highlights gaps before submission.
-- Career agent: suggests next Lab based on score trends.
+Perfection isn't the goal, **consistency** is.
 
-## Compliance and privacy
-- Explicit opt-in for scoring and data retention.
-- Only redacted outputs in prod evidence.
-- Audit logs for each Lab run.
-- Sovereign mode: local-only, no external calls.
+| Criterion | Weight | Description |
+| :--- | :--- | :--- |
+| **Correctness** | 40% | Does the code do what it should? |
+| **Security** | 25% | Were redaction policies respected? |
+| **Quality** | 20% | Code cleanliness, tests, and documentation. |
+| **Collaboration** | 15% | Clarity in PR communication. |
 
-## Evidence checklist
-- CI logs attached
-- SBOM artifacts
-- SCA results
-- Audit logs
-- PR with checklist completed
-
-## Anti-gaming controls
-- Randomized checks and hidden tests.
-- Rewards require reproducible evidence.
-- Manual review for suspicious patterns.
-
-## Next steps
-- Publish Labs to a dedicated repo or `labs/` folder.
-- Define reward ledger (JSON or simple CSV).
-- Assign reviewers for L3 and L4 Labs.
+> [!CAUTION]
+> **Zero Tolerance for Fraud:** Any attempt to falsify audit logs will result in immediate and permanent disqualification.

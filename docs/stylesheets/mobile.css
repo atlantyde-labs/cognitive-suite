@@ -1,0 +1,103 @@
+/* ============================================
+   MOBILE RESPONSIVENESS
+   Optimized for 320px-767px (mobile) and 768px-1023px (tablet)
+   ============================================ */
+
+/* Mobile: 320px - 767px */
+@media (max-width: 767px) {
+
+    /* Tactical Container - Reduce padding on mobile */
+    .tactical-container {
+        padding: 1.5rem 1rem !important;
+        margin: 2rem 0 !important;
+    }
+
+    /* Features Grid - Single column on mobile */
+    .features-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    /* Feature Cards - Reduce padding */
+    .feature-card {
+        padding: 1.5rem !important;
+    }
+
+    /* Hero CTA - Stack buttons vertically */
+    .hero-cta {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    .hero-cta a {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    /* Mermaid Diagrams - Ensure they fit */
+    .mermaid svg {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Typography - Slightly smaller on mobile */
+    .md-typeset h1 {
+        font-size: 1.75rem !important;
+    }
+
+    .md-typeset h2 {
+        font-size: 1.35rem !important;
+    }
+
+    .md-typeset h3 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Code blocks - Ensure horizontal scroll */
+    .md-typeset pre {
+        overflow-x: auto !important;
+    }
+
+    /* Tables - Make scrollable */
+    .md-typeset table {
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+    }
+
+    /* Admonitions - Reduce padding */
+    .md-typeset .admonition {
+        padding: 0.8rem !important;
+    }
+
+    /* Tabs - Ensure they wrap */
+    .tabbed-set {
+        overflow-x: auto !important;
+    }
+}
+
+/* Tablet: 768px - 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+
+    /* Features Grid - Two columns on tablet */
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Tactical Container - Moderate padding */
+    .tactical-container {
+        padding: 2rem 1.5rem !important;
+    }
+}
+
+/* Landscape Mobile: Special handling for horizontal phones */
+@media (max-width: 767px) and (orientation: landscape) {
+    .tactical-container {
+        padding: 1rem !important;
+        margin: 1rem 0 !important;
+    }
+
+    .md-typeset h1 {
+        font-size: 1.5rem !important;
+    }
+}

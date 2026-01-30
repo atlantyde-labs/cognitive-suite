@@ -62,8 +62,10 @@ def cmd_ingest(args: argparse.Namespace) -> None:
             str(target),
             '--output',
             str(RAW_DIR)
-        ], check=True, capture_output=True)
-        print(f'✅ Ingesta completada: {RAW_DIR / args.file}')
+        ], check=True)  # Removed capture_output=True to show errors
+        # Output file will be .txt, not the original extension
+        output_file = RAW_DIR / Path(args.file).with_suffix('.txt').name
+        print(f'✅ Ingesta completada: {output_file}')
     except subprocess.CalledProcessError as e:
         print(f'❌ Error en la ingesta: {e}')
         raise SystemExit(1)
@@ -99,7 +101,7 @@ def cmd_status(args: argparse.Namespace) -> None:
 def cmd_verify(args: argparse.Namespace) -> None:
     """Valida la evidencia generada durante un Lab."""
     print("🔍 Validando Lab 01 - Línea base de pipeline seguro...")
-    
+
     # Check analysis.json
     analysis_file = INSIGHTS_DIR / 'analysis.json'
     if not analysis_file.exists():
@@ -113,7 +115,7 @@ def cmd_verify(args: argparse.Namespace) -> None:
             print("⚠️ ADVERTENCIA: 'analysis.json' está vacío. No hay archivos procesados.")
         else:
             print(f"✅ 'analysis.json' encontrado con {len(data)} registros.")
-            
+
             # Check for redaction
             redacted_count = sum(1 for r in data if r.get('redacted'))
             if redacted_count > 0:

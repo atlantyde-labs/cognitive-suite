@@ -1,5 +1,6 @@
 site_name: Atlantyqa Cognitive Suite
 site_description: Digital Sovereignty · Cognitive Governance · Local-First AI
+site_url: https://atlantyde-labs.github.io/cognitive-suite/
 # repo_url: https://github.com/atlantyde-labs/cognitive-suite
 # repo_name: atlantyde-labs/cognitive-suite
 
@@ -10,7 +11,7 @@ theme:
     primary: custom
     accent: custom
   language: es
-  
+
   features:
     - navigation.sections
     - navigation.expand
@@ -21,16 +22,17 @@ theme:
     - search.highlight
     - content.code.copy
     - content.code.annotate
-  
+
   font:
     text: Inter
     code: Roboto Mono
-  
+
   icon:
     repo: fontawesome/brands/github
 
 extra_css:
   - stylesheets/custom.css
+  - stylesheets/mobile.css
 
 extra_javascript:
   - javascripts/custom.js
@@ -70,12 +72,12 @@ extra:
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/atlantyqa
       name: Atlantyqa on Twitter
-  
+
 copyright: |
   <span class="atlantyqa-copyright-wrapper">
-    &copy; 2026 Atlantyqa Labs.  | 
-    <a href="#">Política de Privacidad</a> · 
-    <a href="#">Términos de Servicio</a>
+    &copy; 2026 Atlantyqa Labs. |
+    <a href="privacy-policy/">Política de Privacidad</a> ·
+    <a href="terms-of-service/">Términos de Servicio</a>
   </span>
 
 plugins:
@@ -93,10 +95,10 @@ plugins:
                 - Ruta de aprendizaje: portal/learning-path.md
                 - Identidad y ecosistema: portal/identity-ecosystem.md
                 - Métricas: portal/metrics.md
-                - GitOps + Streamlit: portal/learning-gitops-streamlit.md
                 - Labs de desafío de talento: portal/talent-challenge-labs.md
                 - "Lab 01: Inmersión profunda": portal/lab-01-deep-dive.md
-                - Bootstrap de Streamlit: portal/bootstrap-streamlit.md
+                - "Lab 02: GitOps Steward": portal/lab-02-gitops-steward.md
+                - "Lab 03: Bootstrap Dashboard": portal/lab-03-bootstrap-dashboard.md
                 - Contribuir: portal/contributing.md
             - Guías:
                 - Instalación: installation.md
@@ -143,10 +145,10 @@ plugins:
                 - Learning Path: portal/learning-path.en.md
                 - Identity and Ecosystem: portal/identity-ecosystem.en.md
                 - Metrics: portal/metrics.en.md
-                - GitOps + Streamlit: portal/learning-gitops-streamlit.en.md
                 - Talent Challenge Labs: portal/talent-challenge-labs.en.md
                 - "Lab 01: Deep Dive": portal/lab-01-deep-dive.en.md
-                - Bootstrap Streamlit: portal/bootstrap-streamlit.en.md
+                - "Lab 02: GitOps Steward": portal/lab-02-gitops-steward.en.md
+                - "Lab 03: Bootstrap Dashboard": portal/lab-03-bootstrap-dashboard.en.md
                 - Contributing: portal/contributing.en.md
             - Guides:
                 - Installation: installation.en.md

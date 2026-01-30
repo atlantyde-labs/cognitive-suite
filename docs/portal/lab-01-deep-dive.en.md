@@ -1,56 +1,86 @@
-# Lab 01: Deep Dive - Secure Pipeline Baseline
+# 🤿 Lab 01: Deep Dive - Secure Pipeline
 
-Welcome to the first real challenge of the **Cognitive Suite**. This Lab is not just a software test; it is your gateway to **Cognitive Sovereignty**.
-
-## 🧠 Philosophy: Learn by Doing
-In this Lab, you will transform a plain text document into **Structured Cognitive Capital**. You will learn how local AI can protect your privacy while extracting value from your data.
-
-## 🛠️ Prerequisites
-Before starting, make sure you have your "superpowers" installed:
-- [x] Active virtual environment.
-- [x] Dependencies installed (`pip install -r requirements.txt`).
-- [x] AI model downloaded (`python -m spacy download es_core_news_md`).
+!!! tip "Mission Scenario"
+    You are the new **Data Guardian** of Atlantyqa. You've been entrusted with a confidential document containing financial and personal data. Your mission: process it and extract intelligence without a single figure or real name touching the cloud.
 
 ---
 
-## 🚀 Step by Step: The Data Lifecycle
+## 1. 🗺️ Operations Map
 
-### 1. Ingestion (Preparing the Raw Material)
-Create a file at `data/input/my_lab.txt` with sensitive content (names, budgets, emails). Then, "present it" to the Suite:
-```powershell
-python cogctl.py ingest my_lab.txt
-```
-*Why? Because the system must centralize and normalize files before analyzing them.*
+Before touching a key, visualize the secure data flow.
 
-### 2. Secured Analysis (The Brain of the Suite)
-Run the pipeline activating the **Redaction** layer:
-```powershell
-$env:COGNITIVE_REDACT="1"; python cogctl.py analyze
-```
-*This is where spaCy looks for entities, Transformers analyze sentiment, and our rules block financial leaks.*
+```mermaid
+graph TD
+    Input[📄 Raw Document] -->|Ingest| Clean[🧹 Cleaning]
+    Clean -->|Redaction with SpaCy| Safe[🛡️ Secure Tokens]
+    Safe -->|Analysis| Json[💎 Final JSON]
 
-### 3. Instant Validation (Feedback Loop)
-Use our validation tool to see if you have met the technical objectives:
-```powershell
-python cogctl.py verify
+    style Input fill:#e7ae4c,stroke:#333,stroke-width:2px,color:#fff
+    style Clean fill:#37a880,stroke:#333,stroke-width:2px,color:#fff
+    style Safe fill:#e0e7ff,stroke:#333,stroke-width:2px,color:#182232
+    style Json fill:#f1f5f9,stroke:#182232,stroke-width:2px,color:#182232
 ```
-*If you see all green checks, you have successfully configured the AI and Privacy engine!*
+
+## 2. ⚔️ Mission Execution
+
+Follow the steps with surgical precision.
+
+=== "Step 1: Ingest"
+    Create a `confidential.txt` file in `data/input/` with fake (but realistic) data and execute it.
+
+    ```bash
+    python cogctl.py ingest confidential.txt
+    ```
+
+=== "Step 2: Armored Analysis"
+    Activate the privacy shield. The `COGNITIVE_REDACT` variable is your best friend.
+
+    ```bash
+    # In PowerShell
+    $env:COGNITIVE_REDACT="1"; python cogctl.py analyze
+
+    # In Bash
+    COGNITIVE_REDACT=1 python cogctl.py analyze
+    ```
+
+=== "Step 3: Verification"
+    Check that the system worked. Open the resulting JSON.
+
+    *   **Expected:** `"PERSON": "[REDACTED]"`
+    *   **Failed:** `"PERSON": "Juan Pérez"`
 
 ---
 
-## 🏆 Extra Challenges (For Advanced Talent)
-If you want to prove that you understand the system as well as its creator, try this:
+## 3. 📸 Evidence Collection
 
-1. **The Multi-Tag**: Write a text that forces the AI to put 4 or more tags (e.g., talking about an idea, a legal risk, and a pending action).
-2. **Extreme Sentiment**: Try to write a text that gets a sentiment `score` greater than 0.85. What keywords "excite" the AI the most?
-3. **The Dashboard**: Open Streamlit (`streamlit run frontend/streamlit_app.py`) and verify that characters (like the € symbol) look perfect thanks to our UTF-8 improvement.
+To claim your reward (XP), you must present proof.
 
-## 📝 Evidence for your PR
-For your team to validate this Lab, your Pull Request must include:
-1. The resulting `outputs/insights/analysis.json` file.
-2. The audit logs in `outputs/audit/analysis.jsonl`.
-3. A screenshot of your Dashboard with the redacted data.
+### Delivery Checklist
+- [ ] **Output JSON**: Confirm there are no real names.
+- [ ] **Audit Log**: Verify that `outputs/audit/` has a new entry.
+- [ ] **Screenshot**: Show your terminal with the "Success" message.
+
+<div class="feature-card">
+    <h3>📝 Template for your Pull Request</h3>
+    <pre><code>
+## 🛡️ Lab 01 Mission Completed
+
+- **File Hash:** [Insert Hash]
+- **Redaction Status:** ✅ Activated
+- **Incidents:** None
+
+Evidence attached in /evidence folder.
+    </code></pre>
+</div>
 
 ---
-> [!IMPORTANT]
-> Remember that in this project **evidence rules over opinion**. If there are no logs, there is no Lab.
+
+### 🆘 Common Problems?
+
+??? question "My document isn't processing"
+    *   Is it in `data/input`?
+    *   Does it have a `.txt` or `.pdf` extension?
+    *   Do you have write permissions on `outputs/`?
+
+??? question "I don't see redacted data"
+    Make sure the environment variable is properly set. Do an `echo $env:COGNITIVE_REDACT` to check.

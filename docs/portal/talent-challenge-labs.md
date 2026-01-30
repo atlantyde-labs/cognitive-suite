@@ -7,7 +7,7 @@
 
 <div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
   <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">El Ecosistema de Evaluación</h3>
-  
+
 ```mermaid
 graph TD
     User[👤 Talento] -->|Ejecuta Lab| Agent[🤖 Agente IA]
@@ -34,15 +34,15 @@ Elige tu nivel de dificultad. Cada misión completada forja tu reputación en la
     </div>
     <div class="feature-card" style="border-top: 5px solid #37a880;">
         <h3>🔵 Lab 02: GitOps Steward</h3>
-        <p><strong>Objetivo:</strong> Sincronizar resultados a la nube sin filtrar ni un solo byte sensible.</p>
+        <p><strong>Objetivo:</strong> Sincronizar resultados a la nube sin filtrar ni un solo byte sensible. Dominar el flujo GitOps seguro.</p>
         <p><strong>Recompensa:</strong> <code>100 XP</code> + Insignia ☁️</p>
-        <span style="display:block; text-align:center; margin-top:1rem; opacity:0.6;">(Próximamente)</span>
+        <a href="../lab-02-gitops-steward/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Iniciar Misión</a>
     </div>
     <div class="feature-card" style="border-top: 5px solid #182232;">
-        <h3>🔴 Lab 03: Runtime Guardian</h3>
-        <p><strong>Objetivo:</strong> Endurecer contenedores Docker y bloquear vectores de ataque.</p>
-        <p><strong>Recompensa:</strong> <code>200 XP</code> + Insignia 💂</p>
-        <span style="display:block; text-align:center; margin-top:1rem; opacity:0.6;">(Solo Expertos)</span>
+        <h3>🟣 Lab 03: Bootstrap Dashboard</h3>
+        <p><strong>Objetivo:</strong> Crear un centro de comando visual con Streamlit. Visualizar insights sin tocar código.</p>
+        <p><strong>Recompensa:</strong> <code>75 XP</code> + Insignia 📊</p>
+        <a href="../lab-03-bootstrap-dashboard/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Iniciar Misión</a>
     </div>
 </div>
 
