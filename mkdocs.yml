@@ -6,11 +6,14 @@ site_url: https://atlantyde-labs.github.io/cognitive-suite/
 
 theme:
   name: material
+  custom_dir: docs/overrides
   palette:
     scheme: light
     primary: custom
     accent: custom
   language: es
+  logo: assets/logo.svg
+  favicon: assets/favicon.png
 
   features:
     - navigation.sections
@@ -61,6 +64,7 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 extra:
+  social_image: assets/social-card.png
   generator: false
   social:
     - icon: fontawesome/brands/github

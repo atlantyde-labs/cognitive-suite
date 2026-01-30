@@ -95,25 +95,48 @@ h6 {
   --md-primary-fg-color: var(--atlantyqa-navy);
   --md-accent-fg-color: var(--atlantyqa-green);
   --md-default-bg-color: #ffffff;
+  --md-header-bg-color: var(--atlantyqa-navy);
+  --md-header-fg-color: var(--atlantyqa-white);
 }
 
 /* Header Styling */
 .md-header {
-  background: var(--atlantyqa-green) !important;
+  background: var(--atlantyqa-navy) !important;
 }
 
+.md-header__button.md-icon,
+.md-header__topic,
 .md-header__title {
-  font-weight: 700;
-  color: var(--atlantyqa-navy) !important;
+  color: var(--atlantyqa-white) !important;
+}
+
+/* Custom GitHub Button in Header */
+.custom-github-btn {
+  color: var(--atlantyqa-white) !important;
+  opacity: 0.7;
+  margin-left: 0.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.custom-github-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.custom-github-btn svg {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 /* Navigation Tabs */
 .md-tabs {
-  background: var(--atlantyqa-gold) !important;
+  background: #36a77f !important;
 }
 
 .md-tabs__link {
-  color: var(--atlantyqa-navy) !important;
+  color: var(--atlantyqa-white) !important;
   font-weight: 600;
 }
 
