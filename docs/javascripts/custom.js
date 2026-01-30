@@ -1,11 +1,12 @@
 // Custom JavaScript for Atlantyqa website
 // Set search placeholder to Spanish
 document.addEventListener('DOMContentLoaded', function () {
-  // Search placeholder
+  // Search placeholder bilingual support
   const checkSearchInput = setInterval(function () {
     const searchInput = document.querySelector('.md-search__input');
     if (searchInput) {
-      searchInput.placeholder = 'Buscar';
+      const isEnglish = window.location.pathname.includes('/en/');
+      searchInput.placeholder = isEnglish ? 'Search' : 'Buscar';
       clearInterval(checkSearchInput);
     }
   }, 100);
