@@ -19,17 +19,52 @@ streamlit run frontend/streamlit_app.py --server.headless true --server.port 850
 Al ejecutar dentro del contenedor Docker de ``frontend`` se utiliza
 ``streamlit run`` en el ``CMD``.
 """
-
+import time
+from alerts import get_analysis_signature
 import hashlib
 import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-
 import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
 from fpdf import FPDF
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ANALYSIS_PATH = REPO_ROOT / Path(os.getenv("COGNITIVE_OUTPUTS", "outputs")) / "insights" / "analysis.json"
+
+
+if "analysis_signature" not in st.session_state:
+    st.session_state.analysis_signature = {
+        "exists": False,
+        "mtime": None,
+        "hash": None,
+        "human_time": None
+    }
+current_signature = get_analysis_signature(str(ANALYSIS_PATH))
+
+if current_signature["exists"]:
+    last_time = st.session_state.analysis_signature["human_time"]
+    st.info(f"Último análisis: {current_signature['human_time']}")
+
+    if current_signature["hash"] != st.session_state.analysis_signature["hash"]:
+        st.toast("🔔 Nuevo análisis detectado. Dashboard actualizado.")
+        st.session_state.analysis_signature = current_signature
+else:
+    st.warning("No hay análisis todavía. Ejecuta el pipeline.")
+
+# --- AUTO REFRESH ---
+if "auto_refresh" not in st.session_state:
+    st.session_state.auto_refresh = True
+
+st.checkbox("Auto-refresh (cada 10s)", key="auto_refresh")
+
+if st.session_state.auto_refresh:
+    time.sleep(10)
+    st.rerun()
+
+
 
 ROLE_PERMS = {
     "viewer": {"view_details": False, "view_entities": False, "view_file": False},
