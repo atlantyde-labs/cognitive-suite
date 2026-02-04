@@ -134,7 +134,7 @@ def ensure_auth(
                 },
                 audit_path,
             )
-            st.experimental_rerun()
+            st.rerun()
         else:
             write_audit_event(
                 {
@@ -181,10 +181,13 @@ def main() -> None:
         st.session_state.pop("auth_role", None)
         st.session_state.pop("auth_user", None)
         st.session_state.pop("access_logged", None)
-        st.experimental_rerun()
+        st.rerun()
 
     analysis_path = base / "insights" / "analysis.json"
     data = load_data(analysis_path)
+    st.subheader("🎯 Mi Métrica Custom")
+    st.metric("Total Registros", len(data))
+
     if not data:
         msg = (
             f"No se encontró el archivo de análisis en: {analysis_path}."
