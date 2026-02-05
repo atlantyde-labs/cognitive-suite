@@ -126,3 +126,5 @@ urllib3==2.6.3
     # via requests
 watchdog==6.0.0
     # via streamlit
+streamlit-autorefresh>=1.0.1
+
