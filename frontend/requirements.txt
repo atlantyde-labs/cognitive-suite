@@ -127,4 +127,6 @@ urllib3==2.6.3
 watchdog==6.0.0
     # via streamlit
 streamlit-autorefresh>=1.0.1
+fpdf2>=2.7.8
+
 
