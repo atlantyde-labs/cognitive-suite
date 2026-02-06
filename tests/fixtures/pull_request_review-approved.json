@@ -3,7 +3,7 @@
   "review": {
     "state": "approved",
     "user": {
-      "login": "codeowner-user"
+      "login": "octocat"
     }
   },
   "pull_request": {
