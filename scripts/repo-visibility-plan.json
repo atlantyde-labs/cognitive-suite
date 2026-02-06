@@ -1,0 +1,65 @@
+{
+  "gitea_base_url": "https://gitea.example.local",
+  "gitea_clone_url_template": "https://gitea.example.local/{owner}/{repo}.git",
+  "defaults": {
+    "branch": "main",
+    "commit_message": "sync repo visibility split snapshot"
+  },
+  "targets": [
+    {
+      "id": "secret-core",
+      "name": "cognitive-suite-secret",
+      "description": "Scripts, secrets tooling and docs that should never be public.",
+      "github_owner": "founders-secret",
+      "gitea_owner": "founders-secret",
+      "visibility": "secret",
+      "platforms": ["github", "gitea"],
+      "paths": [
+        "bash/GitDevSecDataAIOps/**",
+        "docs/internal/**",
+        "ops/**",
+        "tooling/**",
+        "pipeline/**"
+      ],
+      "exclude": [
+        "docs/internal/public/**",
+        "docs/internal/learning-by-doing-proxmox.md"
+      ]
+    },
+    {
+      "id": "internal-core",
+      "name": "cognitive-suite-internal",
+      "description": "Internal guides, quality reports, and strategy notes shared across leadership.",
+      "github_owner": "founders-internal",
+      "gitea_owner": "founders-internal",
+      "visibility": "internal",
+      "platforms": ["github", "gitea"],
+      "paths": [
+        "docs/**/*.md",
+        "frontend/**",
+        "vectorstore/**",
+        "schemas/**"
+      ],
+      "exclude": [
+        "docs/public/**",
+        "docs/internal/puiblic/**",
+        "docs/internal/learning-by-doing-proxmox.md"
+      ]
+    },
+    {
+      "id": "public-core",
+      "name": "cognitive-suite-public",
+      "description": "Approved docs and frontend assets that can live in public repos.",
+      "github_owner": "founders",
+      "gitea_owner": "founders",
+      "visibility": "public",
+      "platforms": ["github"],
+      "paths": [
+        "docs/public/**",
+        "README.md",
+        "LICENSE",
+        "CONTRIBUTING.md"
+      ]
+    }
+  ]
+}
