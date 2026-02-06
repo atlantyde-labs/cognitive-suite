@@ -1,0 +1,500 @@
+name: "Early Adopter CODEOWNERS Approval"
+
+on:
+  pull_request_review:
+    types: [submitted]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  repository-projects: write
+
+jobs:
+  gamify-approval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Evaluate CODEOWNERS approval
+        id: evaluate
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.CODEOWNERS_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const review = context.payload.review;
+            const pr = context.payload.pull_request;
+            if (!review || !pr) {
+              core.info('No pull request review payload found.');
+              return;
+            }
+
+            if ((review.state || '').toLowerCase() !== 'approved') {
+              core.info(`Review state is '${review.state || 'undefined'}'; only approved reviews trigger this workflow.`);
+              return;
+            }
+
+            const labels = (pr.labels || []).map((label) => {
+              if (typeof label === 'string') return label;
+              return (label && label.name) || '';
+            }).filter(Boolean);
+            const normalizedLabels = labels.map((label) => label.toLowerCase());
+            const labelSet = new Set(normalizedLabels);
+
+            if (!labelSet.has('early-adopter')) {
+              core.info('PR is not tagged as early-adopter; skipping gamification step.');
+              return;
+            }
+
+            if (labelSet.has('codeowner-approved')) {
+              core.info('This PR already has the codeowner-approved marker. Skipping duplicate award.');
+              return;
+            }
+
+            const reviewer = review.user?.login;
+            if (!reviewer) {
+              core.info('Reviewer login is not available; aborting.');
+              return;
+            }
+
+            const codeownersPath = path.join(process.cwd(), '.github', 'CODEOWNERS');
+            if (!fs.existsSync(codeownersPath)) {
+              core.warning('CODEOWNERS file is missing; cannot verify reviewer membership.');
+              return;
+            }
+
+            const rawOwners = fs.readFileSync(codeownersPath, 'utf8')
+              .split(/\r?\n/)
+              .map((raw) => raw.replace(/#.*/g, '').trim())
+              .filter((line) => line.length > 0)
+              .map((line) => line.split(/\s+/).slice(1))
+              .flat()
+              .map((owner) => owner && owner.trim())
+              .filter(Boolean);
+
+            const uniqueOwners = [...new Set(rawOwners)];
+
+            const isDirectOwner = uniqueOwners.some((owner) => owner.toLowerCase() === `@${reviewer.toLowerCase()}`);
+            if (isDirectOwner) {
+              core.info(`${reviewer} is explicitly declared in CODEOWNERS.`);
+            }
+
+            let isTeamMember = false;
+            for (const owner of uniqueOwners) {
+              if (!owner.startsWith('@') || !owner.includes('/')) continue;
+              const [org, ...teamParts] = owner.slice(1).split('/');
+              if (!org || teamParts.length === 0) continue;
+              const teamSlug = teamParts.join('/');
+              try {
+                const membership = await github.rest.teams.getMembershipForUserInOrg({
+                  org,
+                  team_slug: teamSlug,
+                  username: reviewer,
+                });
+                if (membership.data.state === 'active') {
+                  core.info(`${reviewer} is a CODEOWNERS team member (${owner}).`);
+                  isTeamMember = true;
+                  break;
+                }
+              } catch (error) {
+                if (error.status === 404) {
+                  continue; // team not found / user not part of the team
+                }
+                if (error.status === 403) {
+                  core.warning('GitHub token lacks read:org to verify CODEOWNERS team membership.');
+                  continue;
+                }
+                throw error;
+              }
+            }
+
+            if (!isDirectOwner && !isTeamMember) {
+              core.info('Reviewer is not listed in CODEOWNERS and is not a member of the listed teams.');
+              return;
+            }
+
+            const badgeMap = [
+              { labels: ['lab-1'], level: '1', badge: 'Lab 1 Explorer', badgeKey: 'lab_1_badge' },
+              { labels: ['lab-2'], level: '2', badge: 'Lab 2 Navigator', badgeKey: 'lab_2_badge' },
+              { labels: ['lab-3'], level: '3', badge: 'Lab 3 Orchestrator', badgeKey: 'lab_3_badge' },
+            ];
+
+            let mapped = badgeMap.find((entry) => entry.labels.some((expected) => labelSet.has(expected)));
+            if (!mapped) {
+              mapped = { level: '2', badge: 'Early Adopter', badgeKey: 'early_adopter' };
+            }
+
+            core.setOutput('should_run', 'true');
+            core.setOutput('pr_number', pr.number.toString());
+            core.setOutput('pr_node_id', pr.node_id);
+            core.setOutput('pr_author', (pr.user?.login || '').toLowerCase());
+            core.setOutput('reviewer', reviewer.toLowerCase());
+            core.setOutput('selected_badge_key', mapped.badgeKey || 'early_adopter');
+            core.setOutput('selected_badge_level', mapped.level);
+            core.setOutput('selected_badge_label', mapped.badge || 'Early Adopter');
+
+            core.info(`CODEOWNERS approval by ${reviewer} passed for @${pr.user?.login}; selected badge ${mapped.badge || 'Early Adopter'} (level ${mapped.level}).`);
+
+      - name: Count author contributions
+        if: steps.evaluate.outputs.should_run == 'true'
+        id: contributions
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const author = context.payload.pull_request.user.login;
+            const commits = await github.paginate(
+              github.rest.repos.listCommits,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                author,
+                per_page: 100,
+              }
+            );
+            core.info(`Total commits for ${author}: ${commits.length}`);
+            core.setOutput('count', `${commits.length}`);
+
+      - name: Install js-yaml
+        if: steps.evaluate.outputs.should_run == 'true'
+        run: npm install -g js-yaml
+
+      - name: Calculate XP for owner badge
+        if: steps.evaluate.outputs.should_run == 'true'
+        id: xp_calc
+        env:
+          COMMIT_COUNT: ${{ steps.contributions.outputs.count }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+
+            const commitCount = Number(process.env.COMMIT_COUNT || "0") || 0;
+            const config = yaml.load(fs.readFileSync("metrics/xp-rules.yml", "utf8")) || {};
+            const badges = config.badges || {};
+            const levels = config.levels || {};
+
+            const ownerCfg = badges.owner_badge || {};
+            const conditions = ownerCfg.conditions || {};
+            let ownerBadge = true;
+            if (conditions.max_commits !== undefined) {
+              ownerBadge = ownerBadge && commitCount <= Number(conditions.max_commits);
+            }
+
+            const badgeKey = ownerBadge ? "owner_badge" : "early_adopter";
+            const badgeCfg = badges[badgeKey] || {};
+            let xp = Number(badgeCfg.base_xp ?? 0);
+            const multiplier = (badgeCfg.multiplier || {}).early_adopter || 1;
+            xp = Math.floor(xp * multiplier);
+
+            if (badgeCfg.max_xp !== undefined) {
+              xp = Math.min(xp, Number(badgeCfg.max_xp));
+            }
+            xp = Math.max(0, xp);
+
+            let levelKey = "L0";
+            const levelEntries = Object.entries(levels).sort((a, b) => {
+              const aMin = Number(a[1].min_xp ?? 0);
+              const bMin = Number(b[1].min_xp ?? 0);
+              return aMin - bMin;
+            });
+            for (const [key, info] of levelEntries) {
+              if (Number(info.min_xp ?? 0) <= xp) {
+                levelKey = key;
+              }
+            }
+
+            const badgeLabel = badgeCfg.label || badgeKey.replace(/_/g, " ").replace(/\b(\w)/g, (m) => m.toUpperCase());
+
+            core.setOutput("owner_badge", ownerBadge ? "true" : "false");
+            core.setOutput("badge_key", badgeKey);
+            core.setOutput("badge_label", badgeLabel);
+            core.setOutput("xp_value", xp.toString());
+            core.setOutput("level_key", levelKey);
+
+      - name: Mark project item as Done
+        if: steps.evaluate.outputs.should_run == 'true'
+        uses: actions/github-script@v7
+        env:
+          PROJECT_URL: ${{ secrets.PROJECT_URL }}
+          PR_NODE_ID: ${{ steps.evaluate.outputs.pr_node_id }}
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            function parseProjectUrl(projectUrl) {
+              const match = projectUrl.match(/github\.com\/orgs\/([^/]+)\/projects\/(\d+)/i);
+              if (!match) {
+                throw new Error(`PROJECT_URL='${projectUrl}' no coincide con el patrón https://github.com/orgs/<org>/projects/<number>`);
+              }
+              return { org: match[1], number: parseInt(match[2], 10) };
+            }
+
+            async function findProjectItemId(projectId, contentId) {
+              let cursor = null;
+              while (true) {
+                const response = await github.graphql(
+                  `query($projectId: ID!, $after: String) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        items(first: 100, after: $after) {
+                          pageInfo { hasNextPage endCursor }
+                          nodes {
+                            id
+                            content {
+                              ... on Issue { id }
+                              ... on PullRequest { id }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }`,
+                  { projectId, after: cursor }
+                );
+
+                const node = response.node;
+                if (!node) break;
+                const items = node.items.nodes || [];
+                for (const item of items) {
+                  if (item.content?.id === contentId) {
+                    return item.id;
+                  }
+                }
+
+                if (!node.items.pageInfo.hasNextPage) break;
+                cursor = node.items.pageInfo.endCursor;
+              }
+              return null;
+            }
+
+            const projectUrl = process.env.PROJECT_URL || 'https://github.com/orgs/atlantyde-labs/projects/2';
+            const { org, number } = parseProjectUrl(projectUrl);
+            const projectQuery = await github.graphql(
+              `query($org: String!, $number: Int!) {
+                organization(login: $org) {
+                  projectV2(number: $number) {
+                    id
+                    fields(first: 50) {
+                      nodes {
+                        __typename
+                        ... on ProjectV2Field { id name }
+                        ... on ProjectV2SingleSelectField { id name options { id name } }
+                      }
+                    }
+                  }
+                }
+              }`,
+              { org, number }
+            );
+
+            const project = projectQuery.organization.projectV2;
+            if (!project) throw new Error(`No se encontró el proyecto v2 ${projectUrl}`);
+            const projectId = project.id;
+            const fields = project.fields.nodes;
+            const statusField = fields.find((field) => field.name === 'Status' && field.__typename === 'ProjectV2SingleSelectField');
+            if (!statusField) throw new Error('Campo Status no encontrado en el proyecto (single select).');
+            const doneOption = (statusField.options || []).find((opt) => opt.name === 'Done');
+            if (!doneOption) throw new Error('Opción "Done" no encontrada en el campo Status.');
+
+            const contentId = process.env.PR_NODE_ID;
+            if (!contentId) throw new Error('No se recibió pr_node_id para buscar el item del proyecto.');
+
+            let itemId = await findProjectItemId(projectId, contentId);
+            if (!itemId) {
+              core.info('El ítem no estaba en el proyecto. Lo agrego...');
+              const addResp = await github.graphql(
+                `mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                    item { id }
+                  }
+                }`,
+                { projectId, contentId }
+              );
+              itemId = addResp.addProjectV2ItemById.item.id;
+            }
+
+            await github.graphql(
+              `mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId,
+                  itemId: $itemId,
+                  fieldId: $fieldId,
+                  value: { singleSelectOptionId: $optionId }
+                }) {
+                  projectV2Item { id }
+                }
+              }`,
+              { projectId, itemId, fieldId: statusField.id, optionId: doneOption.id }
+            );
+
+            core.info('Status actualizado a Done por la aprobación de CODEOWNERS.');
+
+      - name: Ensure ledger directory exists
+        if: steps.evaluate.outputs.should_run == 'true'
+        run: mkdir -p metrics/users
+
+      - name: Install jq for ledger update
+        if: steps.evaluate.outputs.should_run == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Apply XP to user profile
+        if: steps.evaluate.outputs.should_run == 'true' && steps.xp_calc.outputs.owner_badge == 'true'
+        run: |
+          USER="${{ github.event.pull_request.user.login }}"
+          XP_VALUE="${{ steps.xp_calc.outputs.xp_value }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          LEDGER="metrics/users/${USER}.json"
+          TIMESTAMP="$(date -u +%FT%TZ)"
+
+          mkdir -p "$(dirname "${LEDGER}")"
+          if [ ! -f "${LEDGER}" ]; then
+          cat <<'JSON' > "${LEDGER}"
+          {
+            "user": "${USER}",
+            "xp_total": 0,
+            "xp_effective": 0,
+            "xp_regulatory": 0,
+            "level": "L0",
+            "last_seen": "${TIMESTAMP}",
+            "badges": {},
+            "history": [],
+            "feedback": [],
+            "domains": [],
+            "labs_unlocked": [],
+            "labs_locked": [],
+            "lab_credits": []
+          }
+          JSON
+          fi
+
+          jq \
+            --arg xp "${XP_VALUE}" \
+            --arg pr "${PR_NUMBER}" \
+            --arg ts "${TIMESTAMP}" \
+            '.xp_total = ((.xp_total // 0) + ($xp | tonumber)) |
+             .xp_effective = ((.xp_effective // 0) + ($xp | tonumber)) |
+             .badges.owner_badge = {
+               earned_at: $ts,
+               xp_awarded: ($xp | tonumber),
+               source_pr: ($pr | tonumber)
+             } |
+             .history += [{
+               type: "badge",
+               badge: "owner_badge",
+               xp: ($xp | tonumber),
+               pr: ($pr | tonumber),
+               timestamp: $ts,
+               non_decay: false,
+               source_pr: ($pr | tonumber)
+             }] |
+             .last_seen = $ts' \
+            "${LEDGER}" > "${LEDGER}.tmp" && mv "${LEDGER}.tmp" "${LEDGER}"
+
+      - name: Recalculate level
+        if: steps.evaluate.outputs.should_run == 'true' && steps.xp_calc.outputs.owner_badge == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const yaml = require('js-yaml');
+
+            const user = context.payload.pull_request.user.login;
+            const file = path.join("metrics", "users", `${user}.json`);
+            if (!fs.existsSync(file)) {
+              throw new Error(`Ledger file not found for ${user}`);
+            }
+
+            const rules = yaml.load(fs.readFileSync("metrics/xp-rules.yml", "utf8")) || {};
+            const levels = rules.levels || {};
+            const data = JSON.parse(fs.readFileSync(file, "utf8"));
+            const xp = Number(data.xp_total ?? 0);
+
+            let level = "L0";
+            const entries = Object.entries(levels).sort((a, b) => {
+              const aMin = Number(a[1].min_xp ?? 0);
+              const bMin = Number(b[1].min_xp ?? 0);
+              return aMin - bMin;
+            });
+            for (const [key, info] of entries) {
+              if (xp >= Number(info.min_xp ?? 0)) {
+                level = key;
+              }
+            }
+
+            data.level = level;
+            fs.writeFileSync(file, JSON.stringify(data, null, 2));
+
+      - name: Commit XP update
+        if: steps.evaluate.outputs.should_run == 'true' && steps.xp_calc.outputs.owner_badge == 'true'
+        run: |
+          set -e
+          git config user.name "atlantic-bot"
+          git config user.email "bot@atlantic.ai"
+          git add metrics/users/
+          if git diff --cached --quiet; then
+            echo "No ledger changes to commit."
+          else
+            git commit -m "xp: award owner badge XP to early adopter"
+            git push
+          fi
+
+      - name: Comment and label PR
+        if: steps.evaluate.outputs.should_run == 'true'
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.evaluate.outputs.pr_number }}
+          PR_AUTHOR: ${{ steps.evaluate.outputs.pr_author }}
+          XP: ${{ steps.xp_calc.outputs.xp_value }}
+          BADGE_LABEL: ${{ steps.xp_calc.outputs.badge_label }}
+          BADGE_KEY: ${{ steps.xp_calc.outputs.badge_key }}
+          LEVEL: ${{ steps.xp_calc.outputs.level_key }}
+          OWNER_BADGE: ${{ steps.xp_calc.outputs.owner_badge }}
+          REVIEWER: ${{ steps.evaluate.outputs.reviewer }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt(process.env.PR_NUMBER || '0', 10);
+            if (!prNumber) throw new Error('PR number missing.');
+
+            const xp = parseInt(process.env.XP || '0', 10);
+            const badgeLabel = process.env.BADGE_LABEL || 'Early Adopter';
+            const badgeKey = process.env.BADGE_KEY || 'early_adopter';
+            const level = process.env.LEVEL || 'L0';
+            const reviewer = process.env.REVIEWER || 'CODEOWNERS';
+            const author = process.env.PR_AUTHOR || '';
+            const ownerBadge = process.env.OWNER_BADGE === 'true';
+            const ownerSection = ownerBadge
+              ? `🏅 **Owner Badge concedido**\n🎯 **+${xp} XP** (Early Adopter multiplier aplicado)\n📈 Nivel actual: **${level}**\n\nEsto se ha registrado automáticamente en tu perfil de talento.\n\n`
+              : '';
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              labels: ['codeowner-approved'],
+            });
+
+            const body = `${ownerSection}` +
+              `🎮 **XP adjudicado** — CODEOWNERS (@${reviewer}) aprobó esta contribución early-adopter para @${author}.\n` +
+              `Badge activo: ${badgeLabel} (${badgeKey})\n` +
+              `XP total: **${xp}** (nivel ${level}).\n` +
+              `Se movió el ítem del Project v2 a \`Done\` (Status) para que la gamificación lo contabilice en la tabla de [metrics](https://github.com/atlantyde-labs/cognitive-suite/docs/portal/metrics.md).\n` +
+              `¡Gracias por jugar, aprender y colaborar!`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body,
+            });
