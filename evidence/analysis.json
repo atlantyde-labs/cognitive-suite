@@ -1,8 +1,8 @@
 [
   {
-    "uuid": "d377be2a8a77",
-    "file": "file_92cac3300330",
-    "title": "document_92cac3300330",
+    "uuid": "4e41e49c9440",
+    "file": "file_cec0f20e89df",
+    "title": "document_cec0f20e89df",
     "content_type": "txt",
     "word_count": 29,
     "char_count": 235,
@@ -47,7 +47,7 @@
     "redacted": true,
     "redaction": {
       "enabled": true,
-      "env": "prod",
+      "env": "dev",
       "methods": [
         "spacy_entities",
         "regex_email",
@@ -56,7 +56,7 @@
         "regex_ssn",
         "luhn_credit_card"
       ],
-      "hash_salt_set": true
+      "hash_salt_set": false
     },
     "idea_summary": "",
     "risk_flags": [],
@@ -111,13 +111,13 @@
       "level": "none"
     },
     "gitops_trace": {
-      "run_id": "1f38d105-1722-4bfb-8004-2476691ec007",
-      "generated_at": "2026-02-04T12:27:51.951347+00:00",
+      "run_id": "2426d708-88f8-4880-b1b0-ac948ae89022",
+      "generated_at": "2026-02-04T02:01:14.674727+00:00",
       "actor": "atlantiqa",
-      "env": "prod",
+      "env": "dev",
       "source": {
-        "path": "file_92cac3300330",
-        "sha256": "f1b2020b1130698a8bdcca617726d594ac07051dc35cf36e163d9bcc0a6899dd"
+        "path": "file_cec0f20e89df",
+        "sha256": "b23c9f99e5e6a56a46d79df13121b9b15f589c4d36e159af3c8ef6e6674ddbf1"
       },
       "git": {
         "commit": "",
