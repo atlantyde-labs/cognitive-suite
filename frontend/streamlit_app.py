@@ -19,8 +19,6 @@ streamlit run frontend/streamlit_app.py --server.headless true --server.port 850
 Al ejecutar dentro del contenedor Docker de ``frontend`` se utiliza
 ``streamlit run`` en el ``CMD``.
 """
-import time
-from alerts import get_analysis_signature
 import hashlib
 import json
 import os
@@ -29,6 +27,8 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
+from streamlit_autorefresh import st_autorefresh  # type: ignore
+from frontend.alerts import get_analysis_signature
 from fpdf import FPDF
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -53,17 +53,6 @@ if current_signature["exists"]:
         st.session_state.analysis_signature = current_signature
 else:
     st.warning("No hay análisis todavía. Ejecuta el pipeline.")
-
-# --- AUTO REFRESH ---
-if "auto_refresh" not in st.session_state:
-    st.session_state.auto_refresh = True
-
-st.checkbox("Auto-refresh (cada 10s)", key="auto_refresh")
-
-if st.session_state.auto_refresh:
-    time.sleep(10)
-    st.rerun()
-
 
 
 ROLE_PERMS = {
@@ -193,16 +182,46 @@ def export_pdf(data):
     pdf.ln(5)
 
     for item in data:
-        line = f"{item.get('archivo')} | {item.get('etiquetas')} | {item.get('sentimiento')}"
+        line = f"{item.get('file')} | {item.get('intent_tags')} | {item.get('sentiment')}"
         pdf.multi_cell(0, 8, line)
 
-    output_path = "outputs/dashboard_export.pdf"
-    pdf.output(output_path)
-    return output_path
+
+    outputs_dir = Path(os.environ.get("COGNITIVE_OUTPUTS", "outputs"))
+    outputs_dir.mkdir(parents=True, exist_ok=True)
+
+    output_path = outputs_dir / "dashboard_export.pdf"
+    pdf.output(str(output_path))
+    return str(output_path)
+
 
 
 def main() -> None:
     st.set_page_config(page_title="Cognitive Suite Analysis", layout="wide")
+    # --- Realtime analysis alert (Issue #55) ---
+    if "analysis_signature" not in st.session_state:
+        st.session_state.analysis_signature = None
+    if "analysis_last_notified_hash" not in st.session_state:
+        st.session_state.analysis_last_notified_hash = None
+
+    # Light polling every 2s (non-blocking)
+    st_autorefresh(interval=2000, key="analysis_poll")
+
+    current_signature = get_analysis_signature(str(ANALYSIS_PATH))
+    if current_signature and current_signature.get("exists"):
+        prev_hash = (
+            st.session_state.analysis_signature.get("hash")
+            if st.session_state.analysis_signature
+            else None
+        )
+        curr_hash = current_signature.get("hash")
+
+        if prev_hash and curr_hash and prev_hash != curr_hash:
+            if st.session_state.analysis_last_notified_hash != curr_hash:
+                st.toast("🔔 Nuevo análisis disponible")
+                st.session_state.analysis_last_notified_hash = curr_hash
+
+        st.session_state.analysis_signature = current_signature
+
     st.title("📊 Cognitive Suite – Resultados del Análisis")
 
     # 🌙 Modo oscuro
