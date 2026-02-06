@@ -138,12 +138,16 @@ jobs:
   bot-review-gitea:
     runs-on: [self-hosted, linux]
     needs: bot-review-github
+    env:
+      GITEA_URL: ${{ secrets.GITEA_URL }}
+      GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+      GITEA_EVIDENCE_TOKEN: ${{ secrets.GITEA_EVIDENCE_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Validate Gitea secrets
-        if: ${{ secrets.GITEA_URL == '' || secrets.GITEA_TOKEN == '' || secrets.GITEA_EVIDENCE_TOKEN == '' }}
+        if: ${{ env.GITEA_URL == '' || env.GITEA_TOKEN == '' || env.GITEA_EVIDENCE_TOKEN == '' }}
         run: |
           echo "Skipping Gitea job because secrets are not configured."
           exit 0
