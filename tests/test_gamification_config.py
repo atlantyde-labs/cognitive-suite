@@ -63,7 +63,6 @@ def test_labs_unlock_matrix():
 def test_ledgers_follow_template():
     template_path = METRICS_DIR / "users" / "template.json"
     assert template_path.exists()
-    template = json.loads(template_path.read_text(encoding="utf-8"))
     for ledger_path in sorted((METRICS_DIR / "users").glob("*.json")):
         if ledger_path.name == "template.json":
             continue
