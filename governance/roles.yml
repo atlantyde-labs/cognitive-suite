@@ -1,0 +1,21 @@
+roles:
+  reviewer:
+    requires:
+      xp_regulatory: 150
+      domains:
+        - qa
+        - compliance
+    grants:
+      - can_review_prs
+      - can_label_compliance
+
+  auditor:
+    requires:
+      xp_regulatory: 300
+      domains:
+        - security
+        - GDPR
+        - AI_ACT
+    grants:
+      - can_approve_compliance
+      - can_block_merge

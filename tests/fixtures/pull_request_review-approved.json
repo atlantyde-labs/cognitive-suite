@@ -1,0 +1,28 @@
+{
+  "action": "submitted",
+  "review": {
+    "state": "approved",
+    "user": {
+      "login": "codeowner-user"
+    }
+  },
+  "pull_request": {
+    "number": 42,
+    "node_id": "PR_node_42",
+    "user": {
+      "login": "early-adopter-user"
+    },
+    "labels": [
+      {
+        "name": "early-adopter"
+      }
+    ]
+  },
+  "repository": {
+    "full_name": "atlantyde-labs/cognitive-suite",
+    "owner": {
+      "login": "atlantyde-labs"
+    },
+    "name": "cognitive-suite"
+  }
+}

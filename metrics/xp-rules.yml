@@ -1,0 +1,30 @@
+version: 1
+
+badges:
+  owner_badge:
+    base_xp: 150
+    label: "Owner Badge"
+    multiplier:
+      early_adopter: 1.2
+    max_xp: 200
+    conditions:
+      max_commits: 10
+      requires_codeowner: true
+  early_adopter:
+    base_xp: 50
+    label: "Early Adopter"
+    multiplier:
+      early_adopter: 1.0
+    max_xp: 120
+    conditions:
+      requires_codeowner: true
+
+levels:
+  L0:
+    min_xp: 0
+  L1:
+    min_xp: 250
+  L2:
+    min_xp: 600
+  L3:
+    min_xp: 1200

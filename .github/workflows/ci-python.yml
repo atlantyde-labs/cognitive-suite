@@ -46,6 +46,14 @@ jobs:
             echo "Knowledge validator not present. Skipping."
           fi
 
+      - name: Validate gamification ledger/config
+        run: |
+          if [ -f scripts/validate-gamification.py ]; then
+            python scripts/validate-gamification.py
+          else
+            echo "Gamification validator not present. Skipping."
+          fi
+
       - name: CLI smoke (help)
         run: |
           python cogctl.py --help >/dev/null 2>&1 || true

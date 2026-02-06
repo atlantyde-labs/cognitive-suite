@@ -1,0 +1,41 @@
+name: "XP Decay Monthly"
+
+on:
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-decay:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Apply XP decay
+        run: |
+          python scripts/apply-xp-decay.py
+
+      - name: Commit decay updates
+        run: |
+          git config user.name "atlantic-bot"
+          git config user.email "bot@atlantic.ai"
+          git add metrics/users/
+          if git diff --cached --quiet; then
+            echo "No decay changes to persist."
+          else
+            git commit -m "xp: apply scheduled decay"
+            git push
+          fi
