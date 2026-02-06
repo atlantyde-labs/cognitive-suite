@@ -10,6 +10,8 @@ badges:
     conditions:
       max_commits: 10
       requires_codeowner: true
+    asset: docs/assets/badge-owner.svg
+    doc: docs/portal/metrics.md
   early_adopter:
     base_xp: 50
     label: "Early Adopter"
@@ -18,6 +20,23 @@ badges:
     max_xp: 120
     conditions:
       requires_codeowner: true
+    asset: docs/assets/badge-owner.svg
+    doc: docs/portal/metrics.md
+  lab_1_badge:
+    base_xp: 80
+    label: "Lab 1 Explorer"
+    asset: docs/assets/badge-cognitive-explore-level1.png
+    doc: docs/portal/lab-01-deep-dive.md
+  lab_2_badge:
+    base_xp: 120
+    label: "Lab 2 Navigator"
+    asset: docs/assets/badge-cognitive-explore-level2.png
+    doc: docs/portal/lab-02-gitops-steward.md
+  lab_3_badge:
+    base_xp: 160
+    label: "Lab 3 Orchestrator"
+    asset: docs/assets/badge-cognitive-explore-level3.png
+    doc: docs/portal/lab-03-bootstrap-dashboard.md
 
 levels:
   L0:

@@ -119,28 +119,24 @@ jobs:
             }
 
             const badgeMap = [
-              { labels: ['good first issue'], xp: 10, level: '1', badge: 'Cognitive Explorer' },
-              { labels: ['learning-task'], xp: 25, level: '2', badge: 'Sense Builder' },
-              { labels: ['ci-gitops', 'automation'], xp: 50, level: '3', badge: 'Cognitive Engineer' },
-              { labels: ['ci-boott'], xp: 25, level: '2', badge: 'Ops Constellator' },
+              { labels: ['lab-1'], level: '1', badge: 'Lab 1 Explorer', badgeKey: 'lab_1_badge' },
+              { labels: ['lab-2'], level: '2', badge: 'Lab 2 Navigator', badgeKey: 'lab_2_badge' },
+              { labels: ['lab-3'], level: '3', badge: 'Lab 3 Orchestrator', badgeKey: 'lab_3_badge' },
             ];
 
             let mapped = badgeMap.find((entry) => entry.labels.some((expected) => labelSet.has(expected)));
             if (!mapped) {
-              mapped = { xp: 25, level: '2', badge: 'Early Adopter' };
+              mapped = { level: '2', badge: 'Early Adopter', badgeKey: 'early_adopter' };
             }
-
-            const earlyAdopterBonus = 30;
-            const totalXp = mapped.xp + earlyAdopterBonus;
 
             core.setOutput('should_run', 'true');
             core.setOutput('pr_number', pr.number.toString());
             core.setOutput('pr_node_id', pr.node_id);
             core.setOutput('pr_author', (pr.user?.login || '').toLowerCase());
             core.setOutput('reviewer', reviewer.toLowerCase());
-            core.setOutput('xp', totalXp.toString());
-            core.setOutput('level', mapped.level);
-            core.setOutput('badge', mapped.badge);
+            core.setOutput('selected_badge_key', mapped.badgeKey || 'early_adopter');
+            core.setOutput('selected_badge_level', mapped.level);
+            core.setOutput('selected_badge_label', mapped.badge || 'Early Adopter');
 
             core.info(`Awarding ${totalXp} XP to @${pr.user?.login} thanks to CODEOWNERS approval by ${reviewer}.`);
 
