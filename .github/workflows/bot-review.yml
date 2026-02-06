@@ -136,6 +136,7 @@ jobs:
           path: outputs/bot-evidence
 
   bot-review-gitea:
+    if: ${{ secrets.GITEA_URL != '' && secrets.GITEA_TOKEN != '' && secrets.GITEA_EVIDENCE_TOKEN != '' }}
     runs-on: [self-hosted, linux]
     needs: bot-review-github
     env:
