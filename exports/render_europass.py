@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
 data_dir = Path("metrics/users")
@@ -69,7 +69,12 @@ def main() -> int:
     if not data_dir.exists():
         print("No metrics/users directory found.")
         return 1
-    template_env = Environment(loader=FileSystemLoader(str(template_dir)), trim_blocks=True, lstrip_blocks=True)
+    template_env = Environment(
+        loader=FileSystemLoader(str(template_dir)),
+        autoescape=select_autoescape(["html", "xml"]),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
     template = template_env.get_template("europass.xml")
     out_dir.mkdir(parents=True, exist_ok=True)
 
