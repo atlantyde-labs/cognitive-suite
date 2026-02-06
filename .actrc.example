@@ -1,0 +1,9 @@
+# Secrets required by the gamification workflows and ledger scripts
+-s GITHUB_TOKEN=ghp_localgithubtoken
+-s CODEOWNERS_TOKEN=ghp_localcodeowners
+-s PROJECT_TOKEN=ghp_localproject
+-s PROJECT_URL=https://github.com/orgs/atlantic-labs/projects/2
+# Optional if you keep signatures/offline badges locally
+# -s PAYLOAD_PRIVATE_KEY="$(cat secrets/private.key)"
+# Default image override for act (matches run-local-workflow.sh medium profile)
+-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-22.04

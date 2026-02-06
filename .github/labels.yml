@@ -170,3 +170,7 @@
 - name: ci-boott
   color: "b60205"
   description: "Legacy alias (usar contrib-review + compute-medium)"
+
+- name: codeowner-approved
+  color: "0c4a6e"
+  description: "Marca automática que indica que CODEOWNERS aprobó el PR early-adopter"

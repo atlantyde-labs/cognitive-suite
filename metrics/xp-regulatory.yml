@@ -1,0 +1,26 @@
+version: 1
+regulatory_xp:
+  security_review:
+    xp: 120
+    label: security-review
+    requires_labels:
+      - security-label
+      - passed-ci
+    domain: security
+  compliance_check:
+    xp: 150
+    label: compliance-approved
+    requires_labels:
+      - compliance-approved
+    domains:
+      - GDPR
+      - AI_ACT
+      - NIS2
+    domain: compliance
+  qa_audit:
+    xp: 90
+    label: qa-audit
+    requires_labels:
+      - qa-audit
+      - test-coverage-80
+    domain: quality
