@@ -148,8 +148,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate Gitea secrets
-        if: ${{ env.GITEA_URL == '' || env.GITEA_TOKEN == '' || env.GITEA_EVIDENCE_TOKEN == '' }}
-        run: |
+               run: |
           echo "Skipping Gitea job because secrets are not configured."
           exit 0
 
