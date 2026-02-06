@@ -17,6 +17,7 @@ __pycache__/
 .venv/
 
 # Artefactos de construcción y empaquetado
+bin/
 dist/
 build/
 *.deb
