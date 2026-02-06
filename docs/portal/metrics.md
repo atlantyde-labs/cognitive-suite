@@ -156,6 +156,16 @@ La hoja `labs/lab-unlocks.yml` define requisitos claros (`xp_effective`, `xp_reg
 ### 📊 Dashboard vivo y trazabilidad
 La single source of truth está en `metrics/users/*.json`, `metrics/xp-rules.yml` y `labs/lab-unlocks.yml`. El validator `scripts/validate-gamification.py` (ejecutado desde `ci-python`) asegura que la configuración, el decay y cada ledger cumplen con el esquema esperado. Con esos artefactos puedes construir un dashboard local (Streamlit + JSON) o público (Astro/Next.js) que muestre XP total/efectivo/regulatorio, niveles, timeline del decay, labs desbloqueados/próximos y gobernanza (badges y dominios). Además, cada ledger registra `last_seen`, `feedback`, `domains` y `lab_credits` para mantener la conversación humana alrededor del talento.
 
+### 🇪🇺 Exportaciones y dossiers
+Hemos añadido la carpeta `exports/` para transformar el ledger en evidencias de valor europeo.  
+
+- `exports/templates/europass.xml` y `exports/render_europass.py` generan `exports/out/<user>-europass.xml` a partir de cada `metrics/users/<user>.json` y de las credenciales en `credentials/users/<user>`. Los XML resultantes pueden subirse directamente al portal Europass, FP Dual o Erasmus+, ya que incluyen identificación, labs completados y skills reputadas.  
+- `exports/templates/dossier.md` y `exports/render_dossier.py` consolidan métricas (perfiles, auditores, revisores) y evidencias firmadas en un dossier Markdown que se puede convertir a PDF (`pandoc exports/out/dossier.md -o exports/out/dossier.pdf`), perfecto para licitaciones o convenios.  
+- `exports/generate_zk_proof.py` publica `dashboard/public/zk-proof.json` con hashes de usuarios que cumplen el umbral de auditores (xp_regulatory ≥300), habilitando transparencia sin revelar identidades.  
+- `exports/generate_territorial_kpis.py` consolida territorios (región/provincia/programas ITI/FP_DUAL) y escribe `dashboard/public/kpis-territorial.json`, ideal para informes territoriales y fondos europeos.  
+
+Usa `exports/run_exports.py` para ejecutar todo el pipeline a la vez y mantener los artefactos en `exports/out/` y `dashboard/public/` listos para distribuir o versionar.
+
 ---
 
 ## 2. ⚙️ Métricas de Flujo & Fiabilidad

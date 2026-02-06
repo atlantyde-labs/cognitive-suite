@@ -4,6 +4,8 @@
 
 # Output files
 /outputs/*
+exports/out/
+dashboard/public/
 
 /qdrant_storage/
 __pycache__/
