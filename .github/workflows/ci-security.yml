@@ -47,6 +47,7 @@ jobs:
           path: .
           severity-cutoff: critical
           fail-build: true
+          only-fixed: true
           output-format: sarif
 
       - name: Upload SARIF

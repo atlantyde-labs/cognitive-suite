@@ -1,0 +1,10 @@
+version: 1
+
+decay:
+  default:
+    half_life_days: 180        # cada 6 meses pierde el 50% de peso
+    floor_ratio: 0.4           # nunca baja del 40% del XP original
+
+  exemptions:
+    regulatory: true           # XP regulatorio NO decae
+    certifications: true       # títulos / auditorías no decaen

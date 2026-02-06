@@ -1,0 +1,15 @@
+{
+  "user": "<username>",
+  "xp_total": 0,
+  "xp_effective": 0,
+  "xp_regulatory": 0,
+  "level": "L0",
+  "last_seen": "<ISO8601>",
+  "badges": {},
+  "history": [],
+  "feedback": [],
+  "domains": [],
+  "labs_unlocked": [],
+  "labs_locked": [],
+  "lab_credits": []
+}
