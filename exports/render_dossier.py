@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 metrics_dir = Path("metrics/users")
 creds_dir = Path("credentials/users")
@@ -45,7 +45,12 @@ def _collect_credentials() -> list[dict]:
 
 def main() -> int:
     ledgers = _collect_ledgers()
-    template_env = Environment(loader=FileSystemLoader(str(template_dir)), trim_blocks=True, lstrip_blocks=True)
+    template_env = Environment(
+        loader=FileSystemLoader(str(template_dir)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+        autoescape=select_autoescape(["md", "gfm", "html", "xml"]),
+    )
     template = template_env.get_template("dossier.md")
     data = {
         "users_total": len(ledgers),

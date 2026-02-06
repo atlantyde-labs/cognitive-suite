@@ -138,7 +138,7 @@ jobs:
             core.setOutput('selected_badge_level', mapped.level);
             core.setOutput('selected_badge_label', mapped.badge || 'Early Adopter');
 
-            core.info(`Awarding ${totalXp} XP to @${pr.user?.login} thanks to CODEOWNERS approval by ${reviewer}.`);
+            core.info(`CODEOWNERS approval by ${reviewer} passed for @${pr.user?.login}; selected badge ${mapped.badge || 'Early Adopter'} (level ${mapped.level}).`);
 
       - name: Count author contributions
         if: steps.evaluate.outputs.should_run == 'true'
@@ -418,7 +418,7 @@ jobs:
             const rules = yaml.load(fs.readFileSync("metrics/xp-rules.yml", "utf8")) || {};
             const levels = rules.levels || {};
             const data = JSON.parse(fs.readFileSync(file, "utf8"));
-            const xp = Number(data.xp || 0);
+            const xp = Number(data.xp_total ?? 0);
 
             let level = "L0";
             const entries = Object.entries(levels).sort((a, b) => {
