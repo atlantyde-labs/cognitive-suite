@@ -57,16 +57,16 @@ jobs:
           cat "$RESULT_FILE"
           export RESULT_FILE
           python - <<'PY' >> $GITHUB_OUTPUT
-import json, os
-path = os.environ['RESULT_FILE']
-data = json.loads(open(path).read())
-print(f"awarded={'true' if data.get('awarded') else 'false'}")
-print(f"xp_awarded={data.get('xp', 0)}")
-entries = [entry.get('type') or entry.get('badge') or '' for entry in data.get('entries', [])]
-print(f"entries={','.join(e for e in entries if e)}")
-domains = [str(domain) for domain in data.get('domains', []) if domain]
-print(f"domains={','.join(domains)}")
-PY
+            import json, os
+            path = os.environ['RESULT_FILE']
+            data = json.loads(open(path).read())
+            print(f"awarded={'true' if data.get('awarded') else 'false'}")
+            print(f"xp_awarded={data.get('xp', 0)}")
+            entries = [entry.get('type') or entry.get('badge') or '' for entry in data.get('entries', [])]
+            print(f"entries={','.join(e for e in entries if e)}")
+            domains = [str(domain) for domain in data.get('domains', []) if domain]
+            print(f"domains={','.join(domains)}")
+          PY
           echo "result=$(cat $RESULT_FILE)" >> $GITHUB_OUTPUT
 
       - name: Recalculate level after award
@@ -74,22 +74,22 @@ PY
         run: |
           PR_USER="${{ steps.pr-info.outputs.user }}"
           python - <<'PY'
-import json, pathlib, yaml, os
-user = os.environ['PR_USER']
-path = pathlib.Path('metrics/users') / f"{user}.json"
-if not path.exists():
-    raise SystemExit(f"Ledger missing for {user}")
-data = json.loads(path.read_text())
-rules = yaml.safe_load(pathlib.Path('metrics/xp-rules.yml').read_text()) or {}
-levels = rules.get('levels', {})
-xp = data.get('xp_total', 0)
-level = 'L0'
-for key, info in sorted(levels.items(), key=lambda item: float(item[1].get('min_xp', 0))):
-    min_xp = float(info.get('min_xp', 0))
-    if xp >= min_xp:
-        level = key
-path.write_text(json.dumps({**data, 'level': level}, indent=2, ensure_ascii=False))
-PY
+            import json, pathlib, yaml, os
+            user = os.environ['PR_USER']
+            path = pathlib.Path('metrics/users') / f"{user}.json"
+            if not path.exists():
+                raise SystemExit(f"Ledger missing for {user}")
+            data = json.loads(path.read_text())
+            rules = yaml.safe_load(pathlib.Path('metrics/xp-rules.yml').read_text()) or {}
+            levels = rules.get('levels', {})
+            xp = data.get('xp_total', 0)
+            level = 'L0'
+            for key, info in sorted(levels.items(), key=lambda item: float(item[1].get('min_xp', 0))):
+                min_xp = float(info.get('min_xp', 0))
+                if xp >= min_xp:
+                    level = key
+            path.write_text(json.dumps({**data, 'level': level}, indent=2, ensure_ascii=False))
+          PY
 
       - name: Commit regulatory ledger changes
         if: steps.award.outputs.awarded == 'true'
