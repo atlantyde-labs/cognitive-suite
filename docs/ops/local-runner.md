@@ -44,6 +44,10 @@ Ejemplo mínimo de `.actrc`:
 -s PROJECT_URL=https://github.com/orgs/atlantic-labs/projects/2
 ```
 
+Copias ese bloque en el template `./.actrc.example` incluido en el repositorio y reemplázalo por tus tokens reales. Ese ejemplo también define `-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-22.04`, que coincide con la opción `--image-mode medium` de `run-local-workflow.sh` y evita que `act` vuelva a pedir la imagen por interactivo.
+
+> **Tip operativo:** la acción `actions/github-script@v7` que valida CODEOWNERS exige un `github-token` como input explícito, así que `GITHUB_TOKEN` debe estar presente en `.actrc`. Si falta ese secreto, el job aborta con `Input required and not supplied: github-token`.
+
 Si necesitas simular `github.event` (PR, etiquetas, review), usa `act` con `--eventpath` apuntando a un JSON que imite el payload (`tests/fixtures/pr-codeowner.json` por ejemplo).
 
 ## 3. Ejecutar los workflows
@@ -53,6 +57,8 @@ Si necesitas simular `github.event` (PR, etiquetas, review), usa `act` con `--ev
 ```bash
 ./run-local-workflow.sh --job gamify-approval --event tests/fixtures/pull_request_review-approved.json
 ```
+
+Ese script ya carga `.actrc` y respeta los modos (`--image-mode`/`--image`), así que basta con ajustar los secretos en el archivo y cambiar la imagen con `--image-mode medium` para usar `ghcr.io/catthehacker/ubuntu:act-22.04` sin volver a pasar la opción `-P`.
 
 ### Elegir modo de imagen
 
