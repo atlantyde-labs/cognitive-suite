@@ -19,16 +19,41 @@ streamlit run frontend/streamlit_app.py --server.headless true --server.port 850
 Al ejecutar dentro del contenedor Docker de ``frontend`` se utiliza
 ``streamlit run`` en el ``CMD``.
 """
-
 import hashlib
 import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-
 import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
+from streamlit_autorefresh import st_autorefresh  # type: ignore
+from frontend.alerts import get_analysis_signature
+from fpdf import FPDF
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ANALYSIS_PATH = REPO_ROOT / Path(os.getenv("COGNITIVE_OUTPUTS", "outputs")) / "insights" / "analysis.json"
+
+
+if "analysis_signature" not in st.session_state:
+    st.session_state.analysis_signature = {
+        "exists": False,
+        "mtime": None,
+        "hash": None,
+        "human_time": None
+    }
+current_signature = get_analysis_signature(str(ANALYSIS_PATH))
+
+if current_signature["exists"]:
+    last_time = st.session_state.analysis_signature["human_time"]
+    st.info(f"Último análisis: {current_signature['human_time']}")
+
+    if current_signature["hash"] != st.session_state.analysis_signature["hash"]:
+        st.toast("🔔 Nuevo análisis detectado. Dashboard actualizado.")
+        st.session_state.analysis_signature = current_signature
+else:
+    st.warning("No hay análisis todavía. Ejecuta el pipeline.")
+
 
 ROLE_PERMS = {
     "viewer": {"view_details": False, "view_entities": False, "view_file": False},
@@ -134,7 +159,7 @@ def ensure_auth(
                 },
                 audit_path,
             )
-            st.experimental_rerun()
+            st.rerun()
         else:
             write_audit_event(
                 {
@@ -148,11 +173,73 @@ def ensure_auth(
             st.sidebar.error("Invalid token.")
 
     st.stop()
+def export_pdf(data):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    pdf.cell(200, 10, txt="Cognitive Suite - Resumen de Análisis", ln=True)
+    pdf.ln(5)
+
+    for item in data:
+        line = f"{item.get('file')} | {item.get('intent_tags')} | {item.get('sentiment')}"
+        pdf.multi_cell(0, 8, line)
+
+
+    outputs_dir = Path(os.environ.get("COGNITIVE_OUTPUTS", "outputs"))
+    outputs_dir.mkdir(parents=True, exist_ok=True)
+
+    output_path = outputs_dir / "dashboard_export.pdf"
+    pdf.output(str(output_path))
+    return str(output_path)
+
 
 
 def main() -> None:
     st.set_page_config(page_title="Cognitive Suite Analysis", layout="wide")
+    # --- Realtime analysis alert (Issue #55) ---
+    if "analysis_signature" not in st.session_state:
+        st.session_state.analysis_signature = None
+    if "analysis_last_notified_hash" not in st.session_state:
+        st.session_state.analysis_last_notified_hash = None
+
+    # Light polling every 2s (non-blocking)
+    st_autorefresh(interval=2000, key="analysis_poll")
+
+    current_signature = get_analysis_signature(str(ANALYSIS_PATH))
+    if current_signature and current_signature.get("exists"):
+        prev_hash = (
+            st.session_state.analysis_signature.get("hash")
+            if st.session_state.analysis_signature
+            else None
+        )
+        curr_hash = current_signature.get("hash")
+
+        if prev_hash and curr_hash and prev_hash != curr_hash:
+            if st.session_state.analysis_last_notified_hash != curr_hash:
+                st.toast("🔔 Nuevo análisis disponible")
+                st.session_state.analysis_last_notified_hash = curr_hash
+
+        st.session_state.analysis_signature = current_signature
+
     st.title("📊 Cognitive Suite – Resultados del Análisis")
+
+    # 🌙 Modo oscuro
+    dark_mode = st.toggle("🌙 Modo oscuro")
+
+    if dark_mode:
+        st.markdown(
+            """
+            <style>
+            .stApp { background-color: #0e1117; color: #ffffff; }
+            [data-testid="stSidebar"] { background-color: #111827; }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+
     base = Path(os.getenv("COGNITIVE_OUTPUTS", "outputs"))
     env = normalize_env(os.getenv("COGNITIVE_ENV", "dev"))
     tokens = load_auth_tokens()
@@ -181,16 +268,29 @@ def main() -> None:
         st.session_state.pop("auth_role", None)
         st.session_state.pop("auth_user", None)
         st.session_state.pop("access_logged", None)
-        st.experimental_rerun()
+        st.rerun()
 
     analysis_path = base / "insights" / "analysis.json"
     data = load_data(analysis_path)
+
+    st.subheader("🎯 Mi Métrica Custom")
+    st.metric("Total Registros", len(data))
+
+    # 📥 Exportar PDF
+    if data and st.button("📥 Exportar dashboard a PDF"):
+        pdf_path = export_pdf(data)
+        st.success(f"PDF generado: {pdf_path}")
+
+
     if not data:
         msg = (
             f"No se encontró el archivo de análisis en: {analysis_path}."
             "\n\nEjecuta primero el pipeline o monta outputs en Docker y define COGNITIVE_OUTPUTS."
         )
+
         st.warning(msg)
+        st.stop()
+
         return
     if not st.session_state.get("access_logged"):
         write_audit_event(
