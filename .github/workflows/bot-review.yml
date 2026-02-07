@@ -139,27 +139,6 @@ jobs:
           name: bot-evidence
           path: outputs/bot-evidence
 
-<<<<<<< Updated upstream
-  bot-review-gitea:
-    if: ${{ env.GITEA_URL != '' && env.GITEA_TOKEN != '' && env.GITEA_EVIDENCE_TOKEN != '' }}
-    runs-on: [self-hosted, linux]
-    needs: bot-review-github
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Validate Gitea secrets
-        if: ${{ env.GITEA_URL == '' || env.GITEA_TOKEN == '' || env.GITEA_EVIDENCE_TOKEN == '' }}
-        run: |
-          echo "Skipping Gitea job because secrets are not configured."
-          exit 0
-
-      - name: Download evidence
-        uses: actions/download-artifact@v4
-        with:
-          name: bot-evidence
-          path: outputs/bot-evidence
-=======
   # bot-review-gitea:
   #   runs-on: [self-hosted, linux]
   #   needs: bot-review-github
@@ -181,7 +160,6 @@ jobs:
       #   with:
       #     name: bot-evidence
       #     path: outputs/bot-evidence
->>>>>>> Stashed changes
 
       # - name: Resolve Gitea PR index
       #   id: gitea
@@ -197,30 +175,6 @@ jobs:
       #     fi
       #     echo "pr_index=${pr_index}" >> "$GITHUB_OUTPUT"
 
-<<<<<<< Updated upstream
-      - name: Bot review (Gitea)
-        env:
-          PLATFORM: gitea
-          BOT_NAME: ops-bot
-          BOT_ACTION: comment
-          DRY_RUN: ${{ inputs.dry_run || 'false' }}
-          ALLOW_BOT_APPROVE: ${{ needs.bot-review-github.outputs.allow_bot_approve }}
-          HITL_APPROVE: ${{ needs.bot-review-github.outputs.hitl_approve }}
-          GITEA_URL: ${{ secrets.GITEA_URL }}
-          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
-          REPO_OWNER: ${{ vars.GITEA_REPO_OWNER || 'founders' }}
-          REPO_NAME: ${{ vars.GITEA_REPO_NAME || 'repo' }}
-          PR_INDEX: ${{ steps.gitea.outputs.pr_index }}
-          EVIDENCE_DIR: outputs/bot-evidence/gitea
-          REVIEW_BODY: "Ops review. Evidence recorded."
-        run: |
-          set -euo pipefail
-          if [[ "${ALLOW_BOT_APPROVE}" == "YES" && "${HITL_APPROVE}" == "YES" ]]; then
-            BOT_ACTION="approve"
-          fi
-          export BOT_ACTION
-          bash bash/GitDevSecDataAIOps/tooling/bots/bot-review.sh
-=======
       # - name: Bot review (Gitea)
       #   env:
       #     PLATFORM: gitea
@@ -243,7 +197,6 @@ jobs:
       #     fi
       #     export BOT_ACTION
       #     bash bash/GitDevSecDataAIOps/tooling/bots/bot-review.sh
->>>>>>> Stashed changes
 
       # - name: Publish evidence to Gitea (private)
       #   env:
