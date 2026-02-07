@@ -17,38 +17,20 @@ jobs:
   add-to-project:
     runs-on: ubuntu-latest
     steps:
-      - name: Determine PROJECT_URL (org project)
-        id: determine_project_url
-        run: |
-          if [ -n "${{ secrets.PROJECT_URL }}" ]; then
-            echo "project_url=${{ secrets.PROJECT_URL }}" >> $GITHUB_OUTPUT
-          else
-            echo "project_url=https://github.com/orgs/atlantyde-labs/projects/2" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Check for PROJECT_TOKEN presence
-        id: check_token
-        run: |
-          if [ -n "${{ secrets.PROJECT_TOKEN }}" ]; then
-            echo "has_token=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_token=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Add Issue/PR to Org Project (by labels)
-        if: ${{ steps.check_token.outputs.has_token == 'true' && steps.determine_project_url.outputs.project_url != '' }}
+        if: ${{ secrets.PROJECT_TOKEN != '' }}
         uses: actions/add-to-project@v1.0.2
         with:
-          project-url: ${{ steps.determine_project_url.outputs.project_url }}
+          project-url: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || 'https://github.com/orgs/atlantyde-labs/projects/2' }}
           github-token: ${{ secrets.PROJECT_TOKEN }}
           labeled: good-first-issue, learning-task, ci-gitops, automation, ci-boott
           label-operator: OR
 
       - name: Set Project fields (Level/XP) in Org Project v2 (GraphQL)
-        if: ${{ steps.check_token.outputs.has_token == 'true' && steps.determine_project_url.outputs.project_url != '' }}
+        if: ${{ secrets.PROJECT_TOKEN != '' }}
         uses: actions/github-script@v7
         env:
-          PROJECT_URL: ${{ steps.determine_project_url.outputs.project_url }}
+          PROJECT_URL: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || 'https://github.com/orgs/atlantyde-labs/projects/2' }}
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
