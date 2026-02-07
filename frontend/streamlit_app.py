@@ -134,7 +134,7 @@ def ensure_auth(
                 },
                 audit_path,
             )
-            st.experimental_rerun()
+            st.rerun()
         else:
             write_audit_event(
                 {
@@ -153,6 +153,22 @@ def ensure_auth(
 def main() -> None:
     st.set_page_config(page_title="Cognitive Suite Analysis", layout="wide")
     st.title("📊 Cognitive Suite – Resultados del Análisis")
+
+    # 🌙 Modo oscuro
+    dark_mode = st.toggle("🌙 Modo oscuro")
+
+    if dark_mode:
+        st.markdown(
+            """
+            <style>
+            .stApp { background-color: #0e1117; color: #ffffff; }
+            [data-testid="stSidebar"] { background-color: #111827; }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+
     base = Path(os.getenv("COGNITIVE_OUTPUTS", "outputs"))
     env = normalize_env(os.getenv("COGNITIVE_ENV", "dev"))
     tokens = load_auth_tokens()
@@ -181,10 +197,13 @@ def main() -> None:
         st.session_state.pop("auth_role", None)
         st.session_state.pop("auth_user", None)
         st.session_state.pop("access_logged", None)
-        st.experimental_rerun()
+        st.rerun()
 
     analysis_path = base / "insights" / "analysis.json"
     data = load_data(analysis_path)
+    st.subheader("🎯 Mi Métrica Custom")
+    st.metric("Total Registros", len(data))
+
     if not data:
         msg = (
             f"No se encontró el archivo de análisis en: {analysis_path}."

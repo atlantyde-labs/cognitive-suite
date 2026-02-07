@@ -1,0 +1,2 @@
+st.subheader("🎯 Mi Métrica Custom")
+st.metric("Total Registros", len(data))

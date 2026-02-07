@@ -1,59 +1,20 @@
 [
   {
-    "uuid": "2331b1ba7de2",
-    "file": "file_5181a8a720c0",
-    "title": "document_5181a8a720c0",
+    "uuid": "d377be2a8a77",
+    "file": "file_92cac3300330",
+    "title": "document_92cac3300330",
     "content_type": "txt",
-    "word_count": 521,
-    "char_count": 3466,
+    "word_count": 29,
+    "char_count": 235,
     "intent_tags": [
-      "riesgo",
-      "legal",
-      "viabilidad",
-      "proyecto"
+      "otros"
     ],
     "sentiment": {
       "label": "NEUTRAL",
-      "score": 0.6746385097503662
+      "score": 0.6115055680274963
     },
     "entities": [
       [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "PER",
-        "[REDACTED]"
-      ],
-      [
         "PER",
         "[REDACTED]"
       ],
@@ -62,10 +23,6 @@
         "[REDACTED]"
       ],
       [
-        "PER",
-        "[REDACTED]"
-      ],
-      [
         "LOC",
         "[REDACTED]"
       ],
@@ -78,111 +35,7 @@
         "[REDACTED]"
       ],
       [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "PER",
-        "[REDACTED]"
-      ],
-      [
-        "ORG",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
         "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "PER",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "ORG",
-        "[REDACTED]"
-      ],
-      [
-        "LOC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
-        "[REDACTED]"
-      ],
-      [
-        "ORG",
-        "[REDACTED]"
-      ],
-      [
-        "MISC",
         "[REDACTED]"
       ],
       [
@@ -190,7 +43,7 @@
         "[REDACTED]"
       ]
     ],
-    "summary": "CONTRATO DE TRABAJO POR TIEMPO INDEFINIDO En [REDACTED_LOC], a 1 de marzo de 2026, se reúnen las siguientes partes: De una parte, la Empresa: [REDACTED_ORG].L. CIF: [REDACTED_CIF], 28013 [REDACTED_LOC] Representada por: [REDACTED_PER], en calidad de [REDACTED_PER]. Y de otra parte, la Persona Trabajadora: Nombre y apellidos: [REDACTED_PER]...",
+    "summary": "Nombre: [REDACTED_PER] DNI: [REDACTED_ID], [REDACTED_LOC] [REDACTED_LOC]: [REDACTED_PHONE] Empresa: [REDACTED_ORG]",
     "redacted": true,
     "redaction": {
       "enabled": true,
@@ -206,68 +59,14 @@
       "hash_salt_set": true
     },
     "idea_summary": "",
-    "risk_flags": [
-      [
-        "LEGAL",
-        "[REDACTED]"
-      ]
-    ],
-    "legal_reference": [
-      [
-        "LEGAL",
-        "[REDACTED]"
-      ],
-      [
-        "LEGAL",
-        "[REDACTED]"
-      ],
-      [
-        "LEGAL",
-        "[REDACTED]"
-      ]
-    ],
+    "risk_flags": [],
+    "legal_reference": [],
     "author_signature": "",
-    "relevance_score": 0.7,
+    "relevance_score": 0.15,
     "schema_version": "1.0",
     "cognitive_entities": {
       "entities": [
         [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "PER",
-          "[REDACTED]"
-        ],
-        [
           "PER",
           "[REDACTED]"
         ],
@@ -276,10 +75,6 @@
           "[REDACTED]"
         ],
         [
-          "PER",
-          "[REDACTED]"
-        ],
-        [
           "LOC",
           "[REDACTED]"
         ],
@@ -292,111 +87,7 @@
           "[REDACTED]"
         ],
         [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "PER",
-          "[REDACTED]"
-        ],
-        [
-          "ORG",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
           "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "PER",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "ORG",
-          "[REDACTED]"
-        ],
-        [
-          "LOC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
-          "[REDACTED]"
-        ],
-        [
-          "ORG",
-          "[REDACTED]"
-        ],
-        [
-          "MISC",
           "[REDACTED]"
         ],
         [
@@ -404,55 +95,29 @@
           "[REDACTED]"
         ]
       ],
-      "legal_reference": [
-        [
-          "LEGAL",
-          "[REDACTED]"
-        ],
-        [
-          "LEGAL",
-          "[REDACTED]"
-        ],
-        [
-          "LEGAL",
-          "[REDACTED]"
-        ]
-      ],
-      "risk_flags": [
-        [
-          "LEGAL",
-          "[REDACTED]"
-        ]
-      ]
+      "legal_reference": [],
+      "risk_flags": []
     },
     "idea_analysis": {
       "has_idea": false,
       "summary": "",
       "tags": [
-        "riesgo",
-        "legal",
-        "viabilidad",
-        "proyecto"
+        "otros"
       ]
     },
     "risk_analysis": {
-      "has_risk": true,
-      "flags": [
-        [
-          "LEGAL",
-          "[REDACTED]"
-        ]
-      ],
-      "level": "medium"
+      "has_risk": false,
+      "flags": [],
+      "level": "none"
     },
     "gitops_trace": {
-      "run_id": "1c05a006-fc56-4ef6-82bc-804597d2c313",
-      "generated_at": "2026-01-29T17:20:02.005080+00:00",
-      "actor": "jose",
+      "run_id": "1f38d105-1722-4bfb-8004-2476691ec007",
+      "generated_at": "2026-02-04T12:27:51.951347+00:00",
+      "actor": "atlantiqa",
       "env": "prod",
       "source": {
-        "path": "file_5181a8a720c0",
-        "sha256": "8d5b78c5f2b7bb680357e3a7522465f263eda7c4917ef6815dd6ad7c5de9e8f9"
+        "path": "file_92cac3300330",
+        "sha256": "f1b2020b1130698a8bdcca617726d594ac07051dc35cf36e163d9bcc0a6899dd"
       },
       "git": {
         "commit": "",
