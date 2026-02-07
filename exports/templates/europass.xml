@@ -1,0 +1,31 @@
+<EuropassCV xmlns="http://europass.cedefop.europa.eu/Europass">
+  <Identification>
+    <PersonName>
+      <FirstName>{{ first_name }}</FirstName>
+      <Surname>{{ surname }}</Surname>
+    </PersonName>
+  </Identification>
+
+  <WorkExperience>
+    <Position>
+      <Title>Technical Contributor</Title>
+      <Description>Validated contributions in open technical labs and regulated workflows.</Description>
+    </Position>
+  </WorkExperience>
+
+  <Education>
+{% for lab in labs %}
+    <EducationItem>
+      <Title>{{ lab.lab }}</Title>
+      <Credits>{{ lab.credits }}</Credits>
+      <ECTS>{{ lab.ects }}</ECTS>
+    </EducationItem>
+{% endfor %}
+  </Education>
+
+  <Skills>
+{% for skill in skills %}
+    <Skill>{{ skill }}</Skill>
+{% endfor %}
+  </Skills>
+</EuropassCV>

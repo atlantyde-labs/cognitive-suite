@@ -1,0 +1,33 @@
+labs:
+  LAB-000:
+    unlock:
+      xp_effective: 0
+      credits:
+        credits: 0
+        eu_ects_equivalent: 0
+
+  LAB-010:
+    unlock:
+      xp_effective: 300
+      badges:
+        - owner_badge
+      credits:
+        credits: 2
+        eu_ects_equivalent: 0.5
+
+  LAB-020:
+    unlock:
+      xp_effective: 600
+      regulatory_xp: 150
+      credits:
+        credits: 3
+        eu_ects_equivalent: 0.75
+
+  LAB-SEC-030:
+    unlock:
+      xp_regulatory: 300
+      domains:
+        - security
+      credits:
+        credits: 4
+        eu_ects_equivalent: 1.0

@@ -17,7 +17,7 @@ source "${CS_ROOT}/lib/cs-common.sh"
 # shellcheck disable=SC2034
 CS_LOG_PREFIX="jsonl-validate"
 
-ROOT_DIR=$(cd "${SCRIPT_DIR}/../../.." && pwd)
+ROOT_DIR=$(cd "${SCRIPT_DIR}/../../../../" && pwd)
 VALIDATOR="${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/forensics/validate-jsonl.py"
 
 INPUT_PATH=${INPUT_PATH:-""}
