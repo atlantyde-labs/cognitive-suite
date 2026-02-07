@@ -29,6 +29,7 @@ from typing import List, Dict, Any, Optional
 
 import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
+from fpdf import FPDF
 
 ROLE_PERMS = {
     "viewer": {"view_details": False, "view_entities": False, "view_file": False},
@@ -134,7 +135,7 @@ def ensure_auth(
                 },
                 audit_path,
             )
-            st.experimental_rerun()
+            st.rerun()
         else:
             write_audit_event(
                 {
@@ -148,11 +149,43 @@ def ensure_auth(
             st.sidebar.error("Invalid token.")
 
     st.stop()
+def export_pdf(data):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    pdf.cell(200, 10, txt="Cognitive Suite - Resumen de Análisis", ln=True)
+    pdf.ln(5)
+
+    for item in data:
+        line = f"{item.get('archivo')} | {item.get('etiquetas')} | {item.get('sentimiento')}"
+        pdf.multi_cell(0, 8, line)
+
+    output_path = "outputs/dashboard_export.pdf"
+    pdf.output(output_path)
+    return output_path
 
 
 def main() -> None:
     st.set_page_config(page_title="Cognitive Suite Analysis", layout="wide")
     st.title("📊 Cognitive Suite – Resultados del Análisis")
+
+    # 🌙 Modo oscuro
+    dark_mode = st.toggle("🌙 Modo oscuro")
+
+    if dark_mode:
+        st.markdown(
+            """
+            <style>
+            .stApp { background-color: #0e1117; color: #ffffff; }
+            [data-testid="stSidebar"] { background-color: #111827; }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+
     base = Path(os.getenv("COGNITIVE_OUTPUTS", "outputs"))
     env = normalize_env(os.getenv("COGNITIVE_ENV", "dev"))
     tokens = load_auth_tokens()
@@ -181,16 +214,29 @@ def main() -> None:
         st.session_state.pop("auth_role", None)
         st.session_state.pop("auth_user", None)
         st.session_state.pop("access_logged", None)
-        st.experimental_rerun()
+        st.rerun()
 
     analysis_path = base / "insights" / "analysis.json"
     data = load_data(analysis_path)
+
+    st.subheader("🎯 Mi Métrica Custom")
+    st.metric("Total Registros", len(data))
+
+    # 📥 Exportar PDF
+    if data and st.button("📥 Exportar dashboard a PDF"):
+        pdf_path = export_pdf(data)
+        st.success(f"PDF generado: {pdf_path}")
+
+
     if not data:
         msg = (
             f"No se encontró el archivo de análisis en: {analysis_path}."
             "\n\nEjecuta primero el pipeline o monta outputs en Docker y define COGNITIVE_OUTPUTS."
         )
+
         st.warning(msg)
+        st.stop()
+
         return
     if not st.session_state.get("access_logged"):
         write_audit_event(
