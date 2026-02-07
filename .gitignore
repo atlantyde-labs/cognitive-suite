@@ -10,11 +10,14 @@ __pycache__/
 *.pyc
 /*.zip
 *.env
+*.actrc
+
 
 # Entorno virtual de Python creado por bootstrap-dev
 .venv/
 
 # Artefactos de construcción y empaquetado
+bin/*
 dist/
 build/
 *.deb
