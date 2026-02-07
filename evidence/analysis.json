@@ -1,0 +1,128 @@
+[
+  {
+    "uuid": "4e41e49c9440",
+    "file": "file_cec0f20e89df",
+    "title": "document_cec0f20e89df",
+    "content_type": "txt",
+    "word_count": 29,
+    "char_count": 235,
+    "intent_tags": [
+      "otros"
+    ],
+    "sentiment": {
+      "label": "NEUTRAL",
+      "score": 0.6115055680274963
+    },
+    "entities": [
+      [
+        "PER",
+        "[REDACTED]"
+      ],
+      [
+        "MISC",
+        "[REDACTED]"
+      ],
+      [
+        "LOC",
+        "[REDACTED]"
+      ],
+      [
+        "LOC",
+        "[REDACTED]"
+      ],
+      [
+        "LOC",
+        "[REDACTED]"
+      ],
+      [
+        "LOC",
+        "[REDACTED]"
+      ],
+      [
+        "MISC",
+        "[REDACTED]"
+      ]
+    ],
+    "summary": "Nombre: [REDACTED_PER] DNI: [REDACTED_ID], [REDACTED_LOC] [REDACTED_LOC]: [REDACTED_PHONE] Empresa: [REDACTED_ORG]",
+    "redacted": true,
+    "redaction": {
+      "enabled": true,
+      "env": "dev",
+      "methods": [
+        "spacy_entities",
+        "regex_email",
+        "regex_phone",
+        "regex_ip",
+        "regex_ssn",
+        "luhn_credit_card"
+      ],
+      "hash_salt_set": false
+    },
+    "idea_summary": "",
+    "risk_flags": [],
+    "legal_reference": [],
+    "author_signature": "",
+    "relevance_score": 0.15,
+    "schema_version": "1.0",
+    "cognitive_entities": {
+      "entities": [
+        [
+          "PER",
+          "[REDACTED]"
+        ],
+        [
+          "MISC",
+          "[REDACTED]"
+        ],
+        [
+          "LOC",
+          "[REDACTED]"
+        ],
+        [
+          "LOC",
+          "[REDACTED]"
+        ],
+        [
+          "LOC",
+          "[REDACTED]"
+        ],
+        [
+          "LOC",
+          "[REDACTED]"
+        ],
+        [
+          "MISC",
+          "[REDACTED]"
+        ]
+      ],
+      "legal_reference": [],
+      "risk_flags": []
+    },
+    "idea_analysis": {
+      "has_idea": false,
+      "summary": "",
+      "tags": [
+        "otros"
+      ]
+    },
+    "risk_analysis": {
+      "has_risk": false,
+      "flags": [],
+      "level": "none"
+    },
+    "gitops_trace": {
+      "run_id": "2426d708-88f8-4880-b1b0-ac948ae89022",
+      "generated_at": "2026-02-04T02:01:14.674727+00:00",
+      "actor": "atlantiqa",
+      "env": "dev",
+      "source": {
+        "path": "file_cec0f20e89df",
+        "sha256": "b23c9f99e5e6a56a46d79df13121b9b15f589c4d36e159af3c8ef6e6674ddbf1"
+      },
+      "git": {
+        "commit": "",
+        "ref": ""
+      }
+    }
+  }
+]
