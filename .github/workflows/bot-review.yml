@@ -135,6 +135,7 @@ jobs:
           name: bot-evidence
           path: outputs/bot-evidence
 
+<<<<<<< Updated upstream
   bot-review-gitea:
     runs-on: [self-hosted, linux]
     needs: bot-review-github
@@ -148,21 +149,45 @@ jobs:
         with:
           name: bot-evidence
           path: outputs/bot-evidence
+=======
+  # bot-review-gitea:
+  #   runs-on: [self-hosted, linux]
+  #   needs: bot-review-github
+  #   env:
+  #     GITEA_TARGET_REPO_OWNER: ${{ vars.GITEA_REPO_OWNER || 'founders' }}
+  #     GITEA_TARGET_REPO_NAME: ${{ vars.GITEA_REPO_NAME || 'repo' }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Resolve Gitea PR index
-        id: gitea
-        run: |
-          set -euo pipefail
-          pr_index="${{ github.event.pull_request.number }}"
-          if [[ "${{ inputs.gitea_pr_index }}" != "" ]]; then
-            pr_index="${{ inputs.gitea_pr_index }}"
-          fi
-          if [[ -z "${pr_index}" ]]; then
-            echo "Gitea PR index is required" >&2
-            exit 1
-          fi
-          echo "pr_index=${pr_index}" >> "$GITHUB_OUTPUT"
+      # - name: Validate Gitea secrets
+      #   if: secrets.GITEA_URL == '' || secrets.GITEA_TOKEN == '' || secrets.GITEA_EVIDENCE_TOKEN == ''
+      #   run: |
+      #     echo "Skipping Gitea job because secrets are not configured."
+      #     exit 0
 
+      # - name: Download evidence
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: bot-evidence
+      #     path: outputs/bot-evidence
+>>>>>>> Stashed changes
+
+      # - name: Resolve Gitea PR index
+      #   id: gitea
+      #   run: |
+      #     set -euo pipefail
+      #     pr_index="${{ github.event.pull_request.number }}"
+      #     if [[ "${{ inputs.gitea_pr_index }}" != "" ]]; then
+      #       pr_index="${{ inputs.gitea_pr_index }}"
+      #     fi
+      #     if [[ -z "${pr_index}" ]]; then
+      #       echo "Gitea PR index is required" >&2
+      #       exit 1
+      #     fi
+      #     echo "pr_index=${pr_index}" >> "$GITHUB_OUTPUT"
+
+<<<<<<< Updated upstream
       - name: Bot review (Gitea)
         env:
           PLATFORM: gitea
@@ -185,17 +210,41 @@ jobs:
           fi
           export BOT_ACTION
           bash bash/GitDevSecDataAIOps/tooling/bots/bot-review.sh
+=======
+      # - name: Bot review (Gitea)
+      #   env:
+      #     PLATFORM: gitea
+      #     BOT_NAME: ops-bot
+      #     BOT_ACTION: comment
+      #     DRY_RUN: ${{ inputs.dry_run || 'false' }}
+      #     ALLOW_BOT_APPROVE: ${{ needs.bot-review-github.outputs.allow_bot_approve }}
+      #     HITL_APPROVE: ${{ needs.bot-review-github.outputs.hitl_approve }}
+      #     GITEA_URL: ${{ secrets.GITEA_URL }}
+      #     GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+      #     REPO_OWNER: ${{ env.GITEA_TARGET_REPO_OWNER }}
+      #     REPO_NAME: ${{ env.GITEA_TARGET_REPO_NAME }}
+      #     PR_INDEX: ${{ steps.gitea.outputs.pr_index }}
+      #     EVIDENCE_DIR: outputs/bot-evidence/gitea
+      #     REVIEW_BODY: "Ops review. Evidence recorded."
+      #   run: |
+      #     set -euo pipefail
+      #     if [[ "${ALLOW_BOT_APPROVE}" == "YES" && "${HITL_APPROVE}" == "YES" ]]; then
+      #       BOT_ACTION="approve"
+      #     fi
+      #     export BOT_ACTION
+      #     bash bash/GitDevSecDataAIOps/tooling/bots/bot-review.sh
+>>>>>>> Stashed changes
 
-      - name: Publish evidence to Gitea (private)
-        env:
-          DRY_RUN: ${{ inputs.dry_run || 'false' }}
-          EVIDENCE_SOURCE_DIR: outputs/bot-evidence
-          GITEA_URL: ${{ secrets.GITEA_URL }}
-          GITEA_EVIDENCE_REPO: ${{ secrets.GITEA_EVIDENCE_REPO || 'founders/evidence' }}
-          GITEA_EVIDENCE_USER: ${{ secrets.GITEA_EVIDENCE_USER || 'bot' }}
-          GITEA_EVIDENCE_TOKEN: ${{ secrets.GITEA_EVIDENCE_TOKEN }}
-          BOT_NAME: ops-bot
-          BOT_EMAIL: ops-bot@example.local
-        run: |
-          set -euo pipefail
-          bash bash/GitDevSecDataAIOps/tooling/bots/bot-evidence-publish.sh
+      # - name: Publish evidence to Gitea (private)
+      #   env:
+      #     DRY_RUN: ${{ inputs.dry_run || 'false' }}
+      #     EVIDENCE_SOURCE_DIR: outputs/bot-evidence
+      #     GITEA_URL: ${{ secrets.GITEA_URL }}
+      #     GITEA_EVIDENCE_REPO: ${{ secrets.GITEA_EVIDENCE_REPO || 'founders/evidence' }}
+      #     GITEA_EVIDENCE_USER: ${{ secrets.GITEA_EVIDENCE_USER || 'bot' }}
+      #     GITEA_EVIDENCE_TOKEN: ${{ secrets.GITEA_EVIDENCE_TOKEN }}
+      #     BOT_NAME: ops-bot
+      #     BOT_EMAIL: ops-bot@example.local
+      #   run: |
+      #     set -euo pipefail
+      #     bash bash/GitDevSecDataAIOps/tooling/bots/bot-evidence-publish.sh
