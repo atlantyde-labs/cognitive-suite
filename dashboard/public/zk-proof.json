@@ -1,0 +1,7 @@
+{
+  "statement": "≥5 auditors with xp_regulatory ≥300",
+  "proof_type": "range_commitment",
+  "result": false,
+  "total_auditors": 0,
+  "hashes": []
+}

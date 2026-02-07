@@ -1,0 +1,15 @@
+{
+  "global": {
+    "participants": 1,
+    "auditors": 0,
+    "labs_completed": 2,
+    "provinces": {
+      "unknown": {
+        "participants": 1,
+        "iti": 0,
+        "fp_dual": 0
+      }
+    },
+    "employability_rate": 1.0
+  }
+}

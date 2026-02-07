@@ -1,0 +1,26 @@
+<EuropassCV xmlns="http://europass.cedefop.europa.eu/Europass">
+  <Identification>
+    <PersonName>
+      <FirstName>Octocat</FirstName>
+      <Surname>Contributor</Surname>
+    </PersonName>
+  </Identification>
+
+  <WorkExperience>
+    <Position>
+      <Title>Technical Contributor</Title>
+      <Description>Validated contributions in open technical labs and regulated workflows.</Description>
+    </Position>
+  </WorkExperience>
+
+  <Education>
+    <EducationItem>
+      <Title>LAB-010</Title>
+      <Credits>2</Credits>
+      <ECTS>0.5</ECTS>
+    </EducationItem>
+  </Education>
+
+  <Skills>
+  </Skills>
+</EuropassCV>
