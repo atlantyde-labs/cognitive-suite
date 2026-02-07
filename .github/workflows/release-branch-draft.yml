@@ -2,7 +2,7 @@ name: Draft Release (Branch Push)
 
 on:
   push:
-    branches-ignore:
+    branches:
       - main
 
 permissions:
