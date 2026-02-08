@@ -10,7 +10,7 @@ badges:
     conditions:
       max_commits: 10
       requires_codeowner: true
-    asset: docs/assets/badge-owner.svg
+    asset: docs/assets/badge-owner.png
     doc: docs/portal/metrics.md
   early_adopter:
     base_xp: 50
@@ -20,7 +20,7 @@ badges:
     max_xp: 120
     conditions:
       requires_codeowner: true
-    asset: docs/assets/badge-owner.svg
+    asset: docs/assets/badge-owner.png
     doc: docs/portal/metrics.md
   lab_1_badge:
     base_xp: 80

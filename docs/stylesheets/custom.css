@@ -11,18 +11,18 @@
    ============================================ */
 :root {
   /* Corporate Colors */
-  --atlantyqa-navy: #182232;
-  --atlantyqa-green: #37a880;
-  --atlantyqa-gold: #e7ae4c;
+  --atlantyqa-navy: #2f387c;
+  --atlantyqa-green: #5dc6d1;
+  --atlantyqa-gold: #ffce55;
   --atlantyqa-white: #ffffff;
 
   /* Extended Palette */
-  --atlantyqa-navy-light: #2a3a52;
-  --atlantyqa-navy-dark: #121926;
-  --atlantyqa-green-light: #4bc99a;
-  --atlantyqa-green-dark: #2a8a66;
-  --atlantyqa-gold-light: #f0c066;
-  --atlantyqa-gold-dark: #d49a38;
+  --atlantyqa-navy-light: #2f387c;
+  --atlantyqa-navy-dark: #2b3370;
+  --atlantyqa-green-light: #5dc6d1;
+  --atlantyqa-green-dark: #4babb6;
+  --atlantyqa-gold-light: #ffce55;
+  --atlantyqa-gold-dark: rgb(192, 139, 48);
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--atlantyqa-navy) 0%, var(--atlantyqa-navy-light) 100%);

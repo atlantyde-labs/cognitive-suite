@@ -1,12 +1,17 @@
 ---
-title: Atlantyqa Cognitive Suite
+hide:
+  - title
 ---
+
+<style>
+  .md-content h1 { display: none !important; }
+</style>
 
 <div class="hero-sov" markdown="1">
 
 <span class="sovereignty-badge">Local Enclave · Digital Sovereignty</span>
 
-# Atlantyqa Cognitive Suite
+![Atlantyqa Cognitive Suite](assets/logo-h.svg)
 
 <p class="hero-subtitle">
 The <strong>Cognitive Sovereignty</strong> platform that transforms raw data into structured cognitive capital, operating under absolute control of your infrastructure.
@@ -37,7 +42,7 @@ graph TD
     Enclave --> Analyze[Cognitive Brain]
     Analyze --> Insights[Structured Cognitive Capital]
     Insights --> GitOps[GitOps Governance]
-    
+
     style Input fill:#f8f9fa,stroke:#cbd5e0,stroke-width:1px,color:#182232
     style Ingestor fill:#f8f9fa,stroke:#cbd5e0,stroke-width:1px,color:#182232
     style Enclave fill:#eef9f5,stroke:#37a880,stroke-width:2px,color:#182232
