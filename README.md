@@ -79,10 +79,10 @@ Cada contribución es un paso en tu evolución como profesional de la Era Cognit
 
 | Nivel | Rol | Badge | Reto Sugerido |
 | :---: | :--- | :---: | :--- |
-| **1** | **Explorador** | <img src="docs/assets/badge-cognitive-explore-level1.png" width="80"> | Ejecuta el flujo `init → ingest → analyze` y valida los resultados. |
-| **2** | **Constructor** | <img src="docs/assets/badge-cognitive-explore-level2.png" width="80"> | Ajusta pesos o categorías en el pipeline de análisis semántico. |
-| **3** | **Ingeniero** | <img src="docs/assets/badge-cognitive-explore-level3.png" width="80"> | Desarrolla un nuevo conector de ingesta o mejora los tests de CI. |
-| **4** | **Steward** | <img src="docs/assets/badge-owner.png" width="80"> | Lidera la gobernanza de datos y mentoriza a nuevos compañeros. |
+| **1** | **Cognitive Explorer** | <img src="docs/assets/badge-cognitive-explore-level1.png" width="80"> | Ejecuta el flujo `init → ingest → analyze` y valida los resultados. |
+| **2** | **Cognitive Builder** | <img src="docs/assets/badge-cognitive-explore-level2.png" width="80"> | Ajusta pesos o categorías en el pipeline de análisis semántico. |
+| **3** | **Cognitive Engineer** | <img src="docs/assets/badge-cognitive-explore-level3.png" width="80"> | Desarrolla un nuevo conector de ingesta o mejora los tests de CI. |
+| **4** | **Cognitive Steward** | <img src="docs/assets/badge-owner.png" width="80"> | Lidera la gobernanza de datos y mentoriza a nuevos compañeros. |
 
 ---
 
