@@ -23,7 +23,6 @@ ruta del directorio; todos los archivos serán procesados recursivamente.
 
 import argparse
 import html
-import os
 import re
 import zipfile
 from pathlib import Path
@@ -121,8 +120,10 @@ def extract_video_text(file_path: Path) -> str:
     # Transcribir audio
     text = extract_audio_text(tmp_path)
     try:
-        tmp_path.unlink()
+        if tmp_path.exists():
+            tmp_path.unlink()
     except Exception:
+        # Silently fail if temporary file cleanup fails
         pass
     return text
 

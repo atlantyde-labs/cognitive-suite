@@ -10,7 +10,7 @@
 
 from __future__ import annotations
 
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Tuple
 
 import faiss  # type: ignore
 import numpy as np

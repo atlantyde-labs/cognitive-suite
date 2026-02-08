@@ -78,8 +78,6 @@ def write_audit_event(event: Dict[str, Any], audit_path: Path) -> None:
         audit_path.parent.mkdir(parents=True, exist_ok=True)
         with audit_path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(event, ensure_ascii=False) + "\n")
-    except Exception:
-        pass
 
 
 def load_auth_tokens() -> Dict[str, str]:
@@ -146,8 +144,8 @@ def ensure_auth(
                 audit_path,
             )
             st.sidebar.error("Invalid token.")
-
     st.stop()
+    return ""  # Satisfy type hint although st.stop() halts execution
 
 
 def main() -> None:

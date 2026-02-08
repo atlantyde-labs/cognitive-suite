@@ -11,14 +11,14 @@
    ============================================ */
 :root {
   /* Corporate Colors */
-  --atlantyqa-navy: #2f387c;
+  --atlantyqa-navy: #010115;
   --atlantyqa-green: #5dc6d1;
   --atlantyqa-gold: #ffce55;
   --atlantyqa-white: #ffffff;
 
   /* Extended Palette */
-  --atlantyqa-navy-light: #2f387c;
-  --atlantyqa-navy-dark: #2b3370;
+  --atlantyqa-navy-light: #040433;
+  --atlantyqa-navy-dark: #010115;
   --atlantyqa-green-light: #5dc6d1;
   --atlantyqa-green-dark: #4babb6;
   --atlantyqa-gold-light: #ffce55;

@@ -45,7 +45,7 @@ def main():
         (r'\b(Fecha)\b\s*:\s*(?!\s*\[REDACTED)[^",\n]+', "Fechas detectadas (sin redactar)"),
         (r'(?<!\[REDACTED_)\b\d{1,2}\s+de\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b', "Fecha sin redactar detectada"),
         (r'("EMAIL"|EMAIL):\s*(?!\s*\[REDACTED)[^",\n]+', "Emails detectados (sin redactar)"),
-        (r'\b(?<!\[REDACTED_CIF\])[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-JA-J]\b', "CIF detectado"),
+        (r'\b(?<!\[REDACTED_CIF\])[ABCDEFGHJKLMNPQRSUVW][0-9]{7}[0-9A-J]\b', "CIF detectado"),
         (r'\b(?<!\[REDACTED_DNI\])[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]\b', "DNI detectado"),
         (r'\b(?<!\[REDACTED_ZIP\])(0[1-9]|[1-4][0-9]|5[0-2])[0-9]{3}\b', "Código Postal detectado"),
         (r'("password"|"secret"|"token"):\s*"[^"]+"', "Posible secreto o token detectado")
