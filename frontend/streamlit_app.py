@@ -146,8 +146,8 @@ def ensure_auth(
                 audit_path,
             )
             st.sidebar.error("Invalid token.")
-
     st.stop()
+    return ""  # Satisfy type hint although st.stop() halts execution
 
 
 def main() -> None:
