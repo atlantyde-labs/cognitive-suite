@@ -1,379 +1,118 @@
-[![CI](https://github.com/atlantyde-labs/cognitive-suite/actions/workflows/ci.yml/badge.svg)](https://github.com/atlantyde-labs/cognitive-suite/actions)
-[![License: EUPL](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](LICENSE)
-[![Learning By Doing](https://img.shields.io/badge/learning-by_doing-orange)](#ruta-de-aprendizaje-gamificada)
-[![Cooperative Ready](https://img.shields.io/badge/model-cooperative-green)](#modelo-cooperativo)
+<p align="center">
+  <img src="docs/assets/logo-h.svg" alt="Atlantyqa Cognitive Suite" width="600">
+</p>
 
-# 🧠 Cognitive GitOps Suite
-Learning by Doing · Cooperativismo · Soberanía Digital y Cognitiva
+<p align="center">
+  <strong>Soberanía Digital · Capital Cognitivo · Local-First Enclave</strong>
+</p>
 
-> **No venimos solo a construir software.  
-> Entrenamos criterio humano para cooperar con sistemas inteligentes.**
+<p align="center">
+  <a href="https://github.com/atlantyde-labs/cognitive-suite/actions"><img src="https://img.shields.io/github/actions/workflow/status/atlantyde-labs/cognitive-suite/ci.yml?branch=main&label=CI&style=flat-square" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-EUPL--1.2-blue?style=flat-square" alt="License"></a>
+  <img src="https://img.shields.io/badge/Learning-By_Doing-orange?style=flat-square" alt="Learning">
+  <img src="https://img.shields.io/badge/Sovereignty-High-purple?style=flat-square" alt="Sovereignty">
+</p>
 
-Cognitive GitOps Suite es un conjunto de herramientas local-first
-para ingestar, analizar y gobernar tus datos personales y profesionales de
-forma reproducible. Esta versión incluye automatización completa tanto
-para desarrollo local como para despliegues productivos y ejecución en
-GitHub Actions.
+---
 
-**TL;DR para devs con prisa**
-- Local-first para trabajar sin fricción en tu máquina.
-- Pipeline cognitivo reproducible (ingesta → análisis → insights).
-- GitOps opcional para sincronizar resultados.
-- CI/CD listo para GitHub Actions.
+## 🧠 Atlantyqa Cognitive Suite
 
-**Tips rápidos (pa' ir fino)**
-- Tip 1: Arquitectura local-first con foco en seguridad, trazabilidad y cumplimiento, alineada con la soberanía digital europea.
-- Tip 2: Diseñado con principios de control de datos, auditabilidad y compliance, orientado a soberanía digital europea.
-- Tip 3: Prioriza seguridad, privacidad y cumplimiento normativo como base para soberanía digital europea.
+> **No venimos solo a construir software. Entrenamos criterio humano para cooperar con sistemas inteligentes.**
 
-## Índice
-- [Quick Start (demo local con GHCR)](#quick-start-demo-local-ghcr)
-- [Modo Early Adopters (CLI local)](#modo-early-adopters-cli-local)
-- [Artefactos generados y dónde mirarlos](#artefactos-generados-y-donde-mirarlos)
-- [¿Qué es Cognitive GitOps Suite?](#que-es-cognitive-gitops-suite)
-- [Por qué este proyecto existe](#por-que-este-proyecto-existe)
-- [Flujos de ejecución](#flujos-de-ejecucion)
-- [Esquemas y validación](#esquemas-y-validacion)
-- [Estructura del repositorio](#estructura-del-repositorio)
-- [Ruta de Aprendizaje Gamificada](#ruta-de-aprendizaje-gamificada)
-- [Cómo contribuir](#como-contribuir)
-- [Upgrades y rollbacks seguros](#upgrades-y-rollbacks-seguros)
-- [Paquetización Debian](#paquetizacion-debian)
-- [Docs (GitHub Pages)](#docs-github-pages)
-- [Modelo cooperativo](#modelo-cooperativo)
-- [Licencia](#licencia)
+**Atlantyqa Cognitive Suite** es un ecosistema *local-first* diseñado para la ingesta, análisis semántico y gobernanza de capital cognitivo. Este proyecto permite a individuos y cooperativas gestionar sus datos de forma soberana, reproducible y auditable, alineándose con los estándares de privacidad y soberanía digital europea.
 
-<a id="quick-start-demo-local-ghcr"></a>
-## ⚡ Quick Start (demo local con GHCR)
+### 🌟 Pilares del Proyecto
 
-Ideal para probar sin build local. Nota: si los paquetes de GHCR son privados,
-necesitas un PAT con `read:packages` para descargar los artefactos. Evita pegar
-tokens en claro.
+- **Soberanía Digital**: Ejecución local (Enclave) sin dependencia de nubes externas para el procesamiento crítico.
+- **Aprendizaje Gamificado**: Ruta de aprendizaje basada en la práctica ("Learning by Doing").
+- **Ecosistema Cooperativo**: Diseñado para el capital compartido en comunidades técnicas y sociales.
+
+---
+
+## 🔁 Flujo de Inteligencia
+
+La suite automatiza el ciclo de vida del dato desde su origen hasta su visualización y persistencia segura:
+
+```mermaid
+graph LR
+    A[Fuentes de Datos] -->|Ingesta| B[Ingestor Multi-formato]
+    B -->|Normalización| C[Pipeline Cognitivo]
+    C -->|NLP / Semántica| D[Análisis & Insights]
+    D -->|Visualización| E[UX Prototype]
+    D -->|Persistencia| F[GitOps Sync]
+```
+
+---
+
+## ⚡ Quick Start
+
+### A. Demo Local (Docker)
+Ideal para una primera exploración sin configurar el entorno de desarrollo.
 
 ```bash
-# Si hace falta acceso a GHCR (usa sudo si tu Docker lo requiere)
+# 1. Login en el registro (requiere PAT si es privado)
 docker login ghcr.io
-# o
-sudo docker login ghcr.io
 
-# Opcional: fija tag (release, rc, commit)
-export COGNITIVE_IMAGE_TAG=latest
-
-# Arranca la demo/lite
-docker compose -f docker-compose.local-demo.yml pull
+# 2. Desplegar servicios demo
 docker compose -f docker-compose.local-demo.yml up -d
 ```
+> [!TIP]
+> Accede a la interfaz en `http://localhost:8501` tras el despliegue.
 
-Checklist rapido:
-- UI en `http://localhost:8501`.
-- Resultado en `outputs/insights/analysis.json`.
-- Puedes usar `data/input/demo_input.json` como ejemplo.
-
-Recarga ingesta/análisis tras añadir archivos:
-```bash
-docker compose -f docker-compose.local-demo.yml up -d --force-recreate ingestor pipeline
-```
-
-Modo full (si quieres modelos completos):
-```bash
-COGNITIVE_SKIP_MODELS=0 COGNITIVE_FAST_MODE=0 \
-TRANSFORMERS_OFFLINE=0 HF_HUB_OFFLINE=0 \
-docker compose -f docker-compose.local-demo.yml up -d
-```
-
-GitOps opcional:
-```bash
-GIT_REPO_URL=git@github.com:TU_USUARIO/mi-cerebro-digital.git \
-GIT_BRANCH=main \
-docker compose -f docker-compose.local-demo.yml --profile gitops up -d
-```
-
-Checklist PR (demo/lite, GHCR):
-- `docker login ghcr.io` si hace falta acceso (usa `sudo` si el daemon lo requiere).
-- `export COGNITIVE_IMAGE_TAG=latest` (o tu tag).
-- `docker compose -f docker-compose.local-demo.yml pull`.
-- `docker compose -f docker-compose.local-demo.yml up -d`.
-- Añade un archivo en `data/input/` y relanza `ingestor`/`pipeline` con `--force-recreate`.
-- Valida `outputs/insights/analysis.json` con `python3 -m json.tool` y la UI; limpieza: `docker compose -f docker-compose.local-demo.yml down`.
-
-<a id="modo-early-adopters-cli-local"></a>
-## ⚡ Modo Early Adopters (CLI local)
-
-Arranca en 5 minutos, pensado para aprender haciendo:
+### B. Modo Desarrollador (Python CLI)
+Para aquellos que quieren entrar directo al código y personalizar el pipeline.
 
 ```bash
-git clone https://github.com/atlantyde-labs/cognitive-suite.git
-cd cognitive-suite
-
-# Inicializa estructura de carpetas y dependencias
+# Sincroniza y prepara el entorno
 python cogctl.py init
 
-# Coloca archivos a procesar en data/input/
-
-# Ingiere un archivo concreto
-python cogctl.py ingest mi_archivo.pdf
-
-# Ejecuta el análisis y genera insights en outputs/insights/analysis.json
+# Ingesta y análisis
+python cogctl.py ingest data/input/mi_archivo.pdf
 python cogctl.py analyze
 ```
 
-Mini reto:
-1. Añade un PDF o texto en `data/input/`.
-2. Ejecuta `ingest → analyze`.
-3. Observa `outputs/insights/analysis.json`.
+---
 
-👉 Si llegas hasta aquí, **ya estás aprendiendo haciendo**.
+## 🎮 Ruta de Aprendizaje (Gamified)
 
-Opcional: bootstrap rápido.
-```bash
-# Script de bootstrap para desarrolladores
-bash dev/bootstrap.sh
-```
+Cada contribución es un paso en tu evolución como profesional de la Era Cognitiva.
 
-<a id="artefactos-generados-y-donde-mirarlos"></a>
-## 📦 Artefactos generados y dónde mirarlos
+| Nivel | Rol | Badge | Reto Sugerido |
+| :---: | :--- | :---: | :--- |
+| **1** | **Explorador** | <img src="docs/assets/badge-cognitive-explore-level1.png" width="80"> | Ejecuta el flujo `init → ingest → analyze` y valida los resultados. |
+| **2** | **Constructor** | <img src="docs/assets/badge-cognitive-explore-level2.png" width="80"> | Ajusta pesos o categorías en el pipeline de análisis semántico. |
+| **3** | **Ingeniero** | <img src="docs/assets/badge-cognitive-explore-level3.png" width="80"> | Desarrolla un nuevo conector de ingesta o mejora los tests de CI. |
+| **4** | **Steward** | <img src="docs/assets/badge-owner.png" width="80"> | Lidera la gobernanza de datos y mentoriza a nuevos compañeros. |
 
-Este repositorio ya está preparado para que puedas inspeccionar resultados locales
-sin depender de infraestructura externa:
+---
 
-- `data/input/` → tus archivos de entrada.
-- `outputs/insights/analysis.json` → insight principal generado por el pipeline.
-- `outputs/` → directorio de resultados (raw + insights según el flujo).
-- `dist/` → paquetes generados (p. ej. `.deb`) cuando empaquetas.
+## � Arquitectura
 
-<a id="que-es-cognitive-gitops-suite"></a>
-## 🌍 ¿Qué es Cognitive GitOps Suite?
+| Directorio | Propósito |
+| :--- | :--- |
+| `docs/` | Documentación técnica y estratégica (MkDocs). |
+| `ingestor/` | Extracción de contenido (PDF, DOCX, Audio, Vídeo). |
+| `pipeline/` | Motor de análisis cognitivo (spaCy + Transformers). |
+| `frontend/` | UI interactiva basada en Streamlit. |
+| `gitops/` | Automatización de flujos de sincronización. |
+| `schemas/` | Definición de contratos de datos (JSON Schema). |
 
-**Cognitive GitOps Suite** es un **laboratorio open-source de aprendizaje práctico** para personas que quieren:
+---
 
-- Aprender a **pensar con IA**, no solo usarla.
-- Construir **pipelines cognitivos reproducibles**.
-- Cooperar en lugar de competir.
-- Prepararse para un futuro tecnológico, legal y social que ya está aquí.
+## 📚 Documentación Expandida
 
-Este proyecto nace en el ecosistema **ATLANTYDE / ATLANTYQA** como infraestructura
-de **capital cognitivo compartido** para cooperativas, comunidades y talento técnico
-que quiere aprender haciendo.
+La suite cuenta con un portal de documentación completo generado con MkDocs Material:
 
-<a id="por-que-este-proyecto-existe"></a>
-## 🧭 Por qué este proyecto existe (contexto real)
+- 📖 **Portal de Docs**: `https://atlantyde-labs.github.io/cognitive-suite/`
+- 🛠️ [Guía de Instalación](docs/installation.md)
+- 🧭 [Visión de Usuario](docs/user-vision.md)
+- 🤝 [Cómo Contribuir](CONTRIBUTING.md)
 
-El contexto real ahora mismo:
-- Automatización masiva.
-- IA como infraestructura básica.
-- Desplazamiento de roles tradicionales.
-- Necesidad urgente de **criterio humano entrenado**.
+---
 
-👉 **La respuesta no es más herramientas.  
-Es mejor aprendizaje, mejor cooperación y soberanía tecnológica.**
+## ⚖️ Licencia y Modelo
 
-Este repo es un **campo de entrenamiento cognitivo**.
+Este proyecto es software libre bajo la licencia **EUPL-1.2**.
+Desarrollado dentro del ecosistema **ATLANTYQA** como infraestructura de capital cognitivo compartido.
 
-<a id="flujos-de-ejecucion"></a>
-## 🔁 Flujos de ejecución
-
-### Prueba de extremo a extremo (Docker Compose)
-
-Para validar el stack completo en local con Docker Compose:
-
-```bash
-bash test-bootstrap.sh
-```
-
-El script espera el resultado en `outputs/insights/analysis.json`. El timeout por
-defecto es `21600` segundos (6 horas), alineado con el máximo de ejecución de
-los runners públicos de GitHub Actions. Si quieres reducirlo:
-
-```bash
-BOOTSTRAP_TIMEOUT_SECS=900 bash test-bootstrap.sh
-```
-
-### Producción
-
-Se incluye un archivo `docker-compose.prod.yml` con políticas de reinicio y
-volúmenes preparados para despliegues persistentes. Para desplegar:
-
-```bash
-docker compose -f docker-compose.prod.yml up -d
-```
-
-Asegúrate de establecer las variables de entorno `GIT_REPO_URL` y
-`GIT_BRANCH` si utilizas el servicio GitOps para sincronizar resultados
-automáticamente.
-
-### CI/CD en GitHub Actions
-
-El workflow `.github/workflows/ci.yml` define un pipeline que:
-
-1. Instala las dependencias necesarias de Python.
-2. Inicializa la estructura de carpetas.
-3. Ejecuta el bootstrap de desarrollo (`dev/bootstrap.sh`).
-4. Construye las imágenes Docker y lanza un test de extremo a extremo (`test-bootstrap.sh`).
-5. Publica el resultado del análisis como artefacto.
-
-Este workflow se ejecuta en cada `push` o `pull_request` contra `main`.
-
-<a id="esquemas-y-validacion"></a>
-## 🧪 Esquemas y validación
-
-El output principal de análisis sigue el esquema `schemas/insight.schema.json`
-(JSON Schema 2020-12). Para validar los datasets de `knowledge/` y el ejemplo de
-insight incluido:
-
-```bash
-python scripts/validate-knowledge.py
-```
-
-Necesita `jsonschema>=4.18` (ver `requirements.txt`/`requirements-ci.txt`).
-
-<a id="estructura-del-repositorio"></a>
-## 📂 Estructura del repositorio
-
-- `ingestor/` – Conversión de PDF, DOCX, TXT y otros formatos a texto.
-- `pipeline/` – Análisis semántico y clasificación en categorías cognitivas.
-- `frontend/` – Interfaz mínima (actualmente en consola).
-- `gitops/` – Sincronización de resultados a repositorios Git remotos.
-- `schemas/` – Definición del esquema cognitivo (etiquetas).
-- `data/` – Entradas locales para ingesta.
-- `outputs/` – Artefactos generados por la suite.
-- `dev/` – Scripts de bootstrap para desarrolladores.
-- `ops/` – Scripts para DevOps y operaciones.
-- `docker-compose.yml` – Orquestación de servicios para desarrollo.
-- `docker-compose.local-demo.yml` – Demo/lite local con imágenes de GHCR.
-- `docker-compose.prod.yml` – Orquestación resiliente para producción.
-- `.github/workflows/ci.yml` – Workflow de CI para GitHub.
-
-<a id="ruta-de-aprendizaje-gamificada"></a>
-## 🎮 Ruta de Aprendizaje Gamificada
-
-> La ruta está diseñada para que cada contribución sea aprendizaje aplicado.
-> Puedes usar Issues con etiquetas para elegir tu siguiente reto.
-
-### 🟢 Nivel 1 — Explorador Cognitivo
-- [ ] Ejecutar `init → ingest → analyze`.
-- [ ] Leer `outputs/insights/analysis.json`.
-- [ ] Abrir un Issue con etiqueta `learning-task`.## Evidencias de ejecución (demo/lite GHCR)
-- Fecha UTC (del run): 2026-01-23T11:47:23Z
-- Auth GHCR:
-  - `sudo docker login ghcr.io -u kabehz` ✅ (warning: creds sin cifrar en `/root/.docker/config.json`)
-- Pull:
-  - `cognitive-pipeline:latest` ✅
-  - `cognitive-frontend:latest` ✅
-  - `cognitive-ingestor:latest` ✅
-- Up:
-  - `ingestor` ejecuta y termina ✅
-  - `pipeline` recreado ✅
-- Validación:
-  - `outputs/insights/analysis.json` generado ✅
-  - `python -m json.tool outputs/insights/analysis.json` ✅
-  - 2 registros (`demo_input`, `sample`)
-- Down:
-  - contenedores eliminados ✅
-  - red en proceso de eliminación ✅
-
-
-🏅 Badge sugerido: `cognitive-explorer`
-
-### 🔵 Nivel 2 — Constructor de Sentido
-- [ ] Ajustar reglas / prompts / categorías.
-- [ ] Añadir una categoría cognitiva.
-- [ ] Documentar el aprendizaje en el PR.
-
-🏅 Badge sugerido: `sense-builder`
-
-### 🟣 Nivel 3 — Ingeniero Cognitivo
-- [ ] Añadir un nuevo tipo de ingesta.
-- [ ] Integrar embeddings / RAG / notebooks.
-- [ ] Mejorar CI / GitOps.
-
-🏅 Badge sugerido: `cognitive-engineer`
-
-### ⚫ Nivel 4 — Cooperador Estratégico
-- [ ] Proponer retos de aprendizaje.
-- [ ] Mentorar a otros.
-- [ ] Mejorar documentación pedagógica.
-
-🏅 Badge sugerido: `cooperative-mentor`
-
-<a id="como-contribuir"></a>
-## 🧩 Cómo contribuir
-
-📄 Lee: [`CONTRIBUTING.md`](CONTRIBUTING.md)
-🧪 Tests: [`TESTING_GUIDE.md`](TESTING_GUIDE.md)
-
-Y para entrar rápido:
-- Abre un Issue con `good first issue` o `learning-task`.
-- Haz un PR pequeño, trazable y con contexto.
-
-<a id="upgrades-y-rollbacks-seguros"></a>
-## 🔄 Upgrades y rollbacks seguros
-
-```bash
-./upgrade_rollback.sh upgrade bundle.zip
-```
-
-Rollback:
-```bash
-./upgrade_rollback.sh rollback backup-YYYYMMDD-HHMMSS
-```
-
-<a id="paquetizacion-debian"></a>
-## 📦 Paquetización Debian
-
-Si deseas distribuir o instalar la suite como un paquete Debian, se incluye
-el script `scripts/build-deb.sh`. Este script genera un paquete `.deb` con
-todos los componentes de la suite y un ejecutable `cogctl` en tu PATH.
-
-Para generar el paquete especificando un número de versión:
-
-```bash
-chmod +x scripts/build-deb.sh
-./scripts/build-deb.sh 0.1.0
-```
-
-El paquete resultante se guarda en el directorio `dist/` con el nombre
-`cognitive-suite_0.1.0_all.deb`. Instálalo en un equipo basado en Debian o
-Ubuntu con:
-
-```bash
-sudo apt install ./dist/cognitive-suite_0.1.0_all.deb
-```
-
-Esto copiará los archivos de la suite a `/usr/local/lib/cognitive-suite` y
-creará un wrapper `cogctl` en `/usr/local/bin`. Una vez instalado podrás
-ejecutar la CLI desde cualquier ubicación con `cogctl`.
-
-<a id="docs-github-pages"></a>
-## 📚 Docs (GitHub Pages)
-
-La carpeta `docs/` contiene la documentación oficial de la suite. Un
-workflow de GitHub Actions (`.github/workflows/pages.yml`) despliega automáticamente
-estos documentos en GitHub Pages cada vez que se modifican. Podrás
-consultar la documentación pública en:
-
-```
-https://<TU_USUARIO>.github.io/<TU_REPOSITORIO>/
-```
-
-El portal se genera desde `docs/` y `mkdocs.yml`.
-
-Documentos clave:
-- [docs/installation.md](docs/installation.md)
-- [docs/adoption-plan.md](docs/adoption-plan.md)
-- [docs/execution-plan-early-adopters.md](docs/execution-plan-early-adopters.md)
-- [docs/open_notebook_integration.md](docs/open_notebook_integration.md)
-- [docs/internal/compute-strategy.md](docs/internal/compute-strategy.md)
-- [docs/internal/execution-plan.md](docs/internal/execution-plan.md)
-
-<a id="modelo-cooperativo"></a>
-## 🏛️ Modelo cooperativo (ATLANTYDE / ATLANTYQA)
-
-Este proyecto **no es un producto**, es un **ecosistema cooperativo**.
-Contribuir aquí significa: aprender · enseñar · construir futuro compartido.
-
-> *El futuro no se predice. Se entrena. Y se entrena mejor en cooperación.*
-
-<a id="licencia"></a>
-## ✅ Licencia
-
-Este proyecto está licenciado bajo los términos definidos en `LICENSE`.
+> *"El futuro no se predice. Se entrena. Y se entrena mejor en cooperación."*
