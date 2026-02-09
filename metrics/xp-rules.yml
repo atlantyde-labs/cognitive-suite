@@ -23,17 +23,17 @@ badges:
     asset: docs/assets/badge-owner.png
     doc: docs/portal/metrics.md
   lab_1_badge:
-    base_xp: 80
+    base_xp: 150
     label: "Cognitive Explorer (Lab 1)"
     asset: docs/assets/badge-cognitive-explore-level1.png
     doc: docs/portal/lab-01-deep-dive.md
   lab_2_badge:
-    base_xp: 120
+    base_xp: 250
     label: "Cognitive Builder (Lab 2)"
     asset: docs/assets/badge-cognitive-explore-level2.png
     doc: docs/portal/lab-02-gitops-steward.md
   lab_3_badge:
-    base_xp: 160
+    base_xp: 200
     label: "Cognitive Engineer (Lab 3)"
     asset: docs/assets/badge-cognitive-explore-level3.png
     doc: docs/portal/lab-03-bootstrap-dashboard.md
@@ -57,11 +57,14 @@ levels:
     min_xp: 0
     label: "Aspirante"
   L1:
-    min_xp: 250
+    min_xp: 100
     label: "Explorador"
   L2:
-    min_xp: 600
+    min_xp: 300
     label: "Constructor"
   L3:
-    min_xp: 1200
+    min_xp: 600
     label: "Ingeniero"
+  L4:
+    min_xp: 1200
+    label: "Maestro"

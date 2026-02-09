@@ -315,7 +315,7 @@ def main() -> None:
             df_display = df[mask]
         else:
             df_display = df
-        st.dataframe(df_display, use_column_width=True)
+        st.dataframe(df_display, use_container_width=True)
         if not perms["view_details"]:
             st.info("Your role does not allow access to record details.")
         else:
