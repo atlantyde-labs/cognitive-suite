@@ -11,31 +11,30 @@ from pathlib import Path
 
 def verify():
     insights_file = Path("outputs/insights/analysis.json")
+    analysis_file = Path("outputs/insights/analysis.json")
     audit_file = Path("outputs/audit/analysis.jsonl")
 
-    if not insights_file.exists():
-        return False, "Evidence missing: outputs/insights/analysis.json not found. Run 'python cogctl.py analyze' first."
+    if not analysis_file.exists():
+        return False, "Evidencia ausente: No se encontró el archivo analysis.json. Ejecuta el pipeline primero."
 
     try:
-        with open(insights_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
+        data = json.loads(analysis_file.read_text(encoding="utf-8"))
+        if not data:
+            return False, "Evidencia inválida: El archivo de análisis está vacío."
+
+        # Check for redaction (Lab 01 core requirement)
+        v = any(rec.get("redacted") for rec in data)
+        if v:
+            count = sum(1 for rec in data if rec.get("redacted"))
+            # Audit trail check (optional but recommended for Phase 2)
+            if not audit_file.exists():
+                return False, "Fallo de auditoría: No se encontró outputs/audit/analysis.jsonl. La misión requiere un registro de auditoría."
+            return True, f"Éxito: {count} registros verificados con redacción segura."
+        else:
+            return False, "Fallo técnico: No se detectó redacción de datos sensibles. Revisa el Paso 3 del Lab 01."
+
     except Exception as e:
-        return False, f"Error reading evidence: {e}"
-
-    if not data:
-        return False, "Evidence empty: No processed records found in analysis.json."
-
-    # Check for redaction
-    redacted_records = [r for r in data if r.get("redacted") is True]
-
-    if not redacted_records:
-        return False, "Security failure: No records were redacted. Did you set COGNITIVE_REDACT=1?"
-
-    # Audit trail check (optional but recommended for Phase 2)
-    if not audit_file.exists():
-         return False, "Audit failure: outputs/audit/analysis.jsonl not found. The mission requires an audit trail."
-
-    return True, f"Success: {len(redacted_records)} records verified with secure redaction."
+        return False, f"Error de análisis: {str(e)}"
 
 if __name__ == "__main__":
     success, message = verify()

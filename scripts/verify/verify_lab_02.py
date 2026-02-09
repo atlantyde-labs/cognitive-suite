@@ -28,15 +28,29 @@ def verify():
     for record in data:
         redaction = record.get("redaction", {})
         if redaction.get("env") != "prod":
-            return False, f"Environment mismatch: Expected 'prod', found '{redaction.get('env')}'. Missions in Lab 02 must be prod-ready."
+            return False, f"Desajuste de entorno: Se esperaba 'prod', se encontró '{redaction.get('env')}'. Las misiones en el Laboratorio 02 deben estar listas para producción."
 
         if not redaction.get("enabled"):
-             return False, "Security failure: Redaction must be enabled in Lab 02."
+            return False, "Fallo de seguridad: La redacción debe estar habilitada en el Laboratorio 02."
 
         if not redaction.get("hash_salt_set"):
-             return False, "Privacy failure: COGNITIVE_HASH_SALT must be set to ensure irreversible IDs."
+            return False, "Fallo de privacidad: COGNITIVE_HASH_SALT debe configurarse para garantizar IDs irreversibles."
 
-    return True, "Success: Phase 2 production alignment verified. Data is safe for GitOps synchronization."
+    # The instruction provided a snippet that seems to replace the final success message
+    # and also introduces new logic related to COGNITIVE_ENV.
+    # I will interpret this as replacing the final success message and adding the new env check.
+    # The new env check seems to be a general check, not tied to a specific record in the loop.
+    # I will place it before the final success message.
+
+    # Simulación simple: verificar si COGNITIVE_ENV es 'prod'
+    env = os.getenv("COGNITIVE_ENV", "dev").lower()
+
+    if env not in ["prod", "production"]:
+        return False, "Fallo operacional: El entorno no está en modo PRODUCCIÓN (COGNITIVE_ENV != 'prod')."
+
+    # Podríamos verificar si hay un log de auditoría reciente
+    return True, "Éxito: Modo PRODUCCIÓN de GitOps verificado correctamente. Los datos están seguros para la sincronización de GitOps."
+
 
 if __name__ == "__main__":
     success, message = verify()

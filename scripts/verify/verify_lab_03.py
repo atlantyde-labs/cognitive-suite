@@ -13,10 +13,10 @@ def verify():
     insights_file = Path("outputs/insights/analysis.json")
 
     if not dashboard_file.exists():
-        return False, "Evidence missing: frontend/streamlit_app.py not found."
+        return False, "Evidencia ausente: No se encontró frontend/streamlit_app.py."
 
     if not insights_file.exists():
-        return False, "Evidence missing: No data to visualize (analysis.json missing)."
+        return False, "Evidencia ausente: No hay datos para visualizar (análisis ausente)."
 
     # Check for customization (Paso 4)
     content = dashboard_file.read_text(encoding="utf-8")
@@ -36,14 +36,14 @@ def verify():
     # st.metric("Total Entidades", ...)
 
     if "🎯" in content or "Mi Métrica Custom" in content:
-        return True, "Success: Dashboard customization detected. mission Lab 03 completed!"
+        return True, "Éxito: Personalización del Dashboard detectada. ¡Misión Lab 03 completada! 🎉"
 
     # Fallback: check if the file was modified recently? No, better check for content.
     # Let's count metrics. If they added a NEW metric.
     if content.count("st.metric") > 0: # The baseline might not have any. Let's check.
-         return True, "Success: Custom metrics detected in dashboard."
+         return True, "Éxito: Se han detectado métricas personalizadas en el Dashboard."
 
-    return False, "Technical failure: No dashboard customizations found. Did you complete Paso 4 of the mission?"
+    return False, "Fallo técnico: No se encontraron personalizaciones en el Dashboard. ¿Has completado el Paso 4 de la misión?"
 
 if __name__ == "__main__":
     success, message = verify()

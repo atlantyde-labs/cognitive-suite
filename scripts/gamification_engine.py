@@ -41,7 +41,7 @@ class GamificationEngine:
             elif norm_key in ["4", "l4", "steward"]:
                 reward = tasks.get("level_4")
 
-        return reward or {"xp": 0, "label": "Unknown"}
+        return reward or {"xp": 0, "label": "Desconocido"}
 
     def get_badge_info(self, badge_id):
         """Returns info for a specific badge."""
@@ -73,14 +73,14 @@ class GamificationEngine:
 
         # Note: xp_regulatory might be a subset, but xp_total should match history
         if calculated_xp != ledger_data.get("xp_total", 0):
-            return False, f"XP mismatch: total={ledger_data.get('xp_total')}, history_sum={calculated_xp}"
+            return False, f"Desajuste de XP: total={ledger_data.get('xp_total')}, suma_historial={calculated_xp}"
 
         # 2. Level Consistency
         expected_level = self.get_level_for_xp(calculated_xp)
         if expected_level != ledger_data.get("level"):
-            return False, f"Level mismatch: expected={expected_level}, found={ledger_data.get('level')}"
+            return False, f"Desajuste de Nivel: esperado={expected_level}, encontrado={ledger_data.get('level')}"
 
-        return True, "Valid"
+        return True, "Válido"
 
     def verify_lab(self, lab_id):
         """
@@ -89,7 +89,7 @@ class GamificationEngine:
         """
         validator_path = Path(f"scripts/verify/verify_{lab_id}.py")
         if not validator_path.exists():
-            return False, f"Validator not implemented for {lab_id}"
+            return False, f"Validador no implementado para {lab_id}"
 
         try:
             result = subprocess.run(
@@ -102,7 +102,7 @@ class GamificationEngine:
             message = result.stdout.strip() or result.stderr.strip()
             return success, message
         except Exception as e:
-            return False, f"Execution error: {str(e)}"
+            return False, f"Error de ejecución: {str(e)}"
 
     def get_user_ledger(self, user_name):
         """Loads a user ledger file from metrics/users/."""

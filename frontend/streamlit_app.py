@@ -23,6 +23,7 @@ Al ejecutar dentro del contenedor Docker de ``frontend`` se utiliza
 import hashlib
 import json
 import os
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -161,6 +162,21 @@ def ensure_auth(
     return ""  # Satisfy type hint although st.stop() halts execution
 
 
+def get_git_username() -> str:
+    """Intenta obtener el nombre de usuario de Git o el del sistema."""
+    try:
+        res = subprocess.run(["git", "config", "user.name"], capture_output=True, text=True, check=False)
+        if res.returncode == 0 and res.stdout.strip():
+            return res.stdout.strip()
+    except Exception:
+        pass
+
+    try:
+        return os.getlogin()
+    except Exception:
+        return "Guardian"
+
+
 def main() -> None:
     st.set_page_config(page_title="Cognitive Suite Analysis", layout="wide")
     st.title("📊 Cognitive Suite – Resultados del Análisis")
@@ -186,25 +202,26 @@ def main() -> None:
     engine = GamificationEngine() if GamificationEngine else None
     user_data = None
     if engine:
-        # Por ahora cargamos octocat como demo/admin
-        user_name = "octocat"
+        # Descubrimiento automático del usuario
+        user_name = get_git_username()
         user_data = engine.get_user_ledger(user_name)
+        if not user_data:
+            # Fallback a L0kyLuke si el real no tiene ledger aún
+            user_data = engine.get_user_ledger("L0kyLuke")
 
     # --- SIDEBAR: Profile Card ---
     if user_data:
+        display_name = user_data.get('user', 'Usuario')
         st.sidebar.markdown(f"""
         <div class="glass-card profile-card">
-            <div class="badge-label">Avatar</div>
-            <div class="profile-avatar">{user_data.get('user', 'U')[0].upper()}</div>
-            <div class="badge-label">Rango Actual</div>
+            <div class="profile-avatar">{display_name[0].upper()}</div>
             <div class="level-badge">{user_data.get('level', 'L0')}</div>
-            <div class="badge-label">Usuario Corresponsal</div>
-            <h3 style="margin:0;">{user_data.get('user', 'User')}</h3>
+            <h3 style="margin:0;">{display_name}</h3>
             <p style="color:#94a3b8; font-size:12px;">{user_data.get('xp_total', 0)} XP Acumulados</p>
         </div>
         """, unsafe_allow_html=True)
 
-    st.sidebar.markdown(f"**Role:** {role}")
+    st.sidebar.markdown(f"**Rol:** {role}")
     if auth_required and st.sidebar.button("Sign out"):
         write_audit_event(
             {
@@ -328,7 +345,7 @@ def main() -> None:
                     <div class="glass-card mission-card">
                         <h3>{lab['icon']} {lab['id'].upper()}</h3>
                         <p>{lab['name']}</p>
-                        <p class="xp-label">Reward: {lab['xp']}</p>
+                        <p class="xp-label">Recompensa: {lab['xp']}</p>
                     </div>
                     """, unsafe_allow_html=True)
 
