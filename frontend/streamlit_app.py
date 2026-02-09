@@ -225,22 +225,30 @@ def main() -> None:
         </div>
         """, unsafe_allow_html=True)
 
-        # --- SECCIÓN DE MEDALLAS (GALLERY) ---
+        # --- SECCIÓN DE MEDALLAS (FULL WIDTH) ---
         badges = user_data.get("badges", {})
         if badges:
-            st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:5px; font-size:14px;">🏅 MEDALLAS</p>', unsafe_allow_html=True)
-            cols = st.sidebar.columns(3)
-            for i, badge_id in enumerate(badges):
+            st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:5px; font-size:14px;">🏅 MIS MEDALLAS</p>', unsafe_allow_html=True)
+            for badge_id in badges:
                 badge_info = engine.get_badge_info(badge_id)
                 if badge_info:
                     asset_path = badge_info.get("asset")
-                    with cols[i % 3]:
-                        if asset_path and Path(asset_path).exists():
-                            st.image(str(Path(asset_path)), use_container_width=True)
-                            # Tooltip-like caption
-                            st.caption(f"<div style='font-size:8px; line-height:1; text-align:center;'>{badge_info.get('label')}</div>", unsafe_allow_html=True)
-                        else:
-                            st.write(f"🔹")
+                    if asset_path and Path(asset_path).exists():
+                        st.sidebar.image(str(Path(asset_path)), use_column_width=True, caption=badge_info.get("label"))
+                    else:
+                        st.sidebar.write(f"🔹 {badge_info.get('label')}")
+
+        # --- GUÍA DE RANGOS ---
+        with st.sidebar.expander("📖 Guía de Rangos"):
+            st.markdown("""
+            **Subir de nivel requiere XP:**
+            - **Aspirante**: (L0) 0 XP
+            - **Explorador**: (L1) 250 XP
+            - **Constructor**: (L2) 600 XP
+            - **Ingeniero**: (L3) 1200 XP
+
+            *Gana XP completando misiones y validando tus laboratorios.*
+            """)
 
         st.sidebar.markdown("---")
     if auth_required and st.sidebar.button("Sign out"):
@@ -307,7 +315,7 @@ def main() -> None:
             df_display = df[mask]
         else:
             df_display = df
-        st.dataframe(df_display, use_container_width=True)
+        st.dataframe(df_display, use_column_width=True)
         if not perms["view_details"]:
             st.info("Your role does not allow access to record details.")
         else:

@@ -100,7 +100,8 @@ class GamificationEngine:
                 [sys.executable, str(validator_path)],
                 capture_output=True,
                 text=True,
-                check=False
+                check=False,
+                encoding='utf-8'
             )
             success = result.returncode == 0
             message = result.stdout.strip() or result.stderr.strip()
