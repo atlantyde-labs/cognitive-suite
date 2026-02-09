@@ -194,8 +194,11 @@ def main() -> None:
     if user_data:
         st.sidebar.markdown(f"""
         <div class="glass-card profile-card">
+            <div class="badge-label">Avatar</div>
             <div class="profile-avatar">{user_data.get('user', 'U')[0].upper()}</div>
+            <div class="badge-label">Rango Actual</div>
             <div class="level-badge">{user_data.get('level', 'L0')}</div>
+            <div class="badge-label">Usuario Corresponsal</div>
             <h3 style="margin:0;">{user_data.get('user', 'User')}</h3>
             <p style="color:#94a3b8; font-size:12px;">{user_data.get('xp_total', 0)} XP Acumulados</p>
         </div>

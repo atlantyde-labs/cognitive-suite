@@ -1,23 +1,26 @@
 /*
  * frontend/style.css
- * Precision Glassmorphism for Atlantyqa Dashboard
+ * Theme-aware Glassmorphism for Atlantyqa Dashboard
  */
 
-.stApp {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: #e2e8f0;
-}
+/* Let Streamlit handle the main app background/colors */
+/* .stApp { background: ...; color: ...; } -> Removed to respect system/user theme */
 
-/* Glass Card Base */
+/* Glass Card Base - Neutral color to work with both light/dark */
 .glass-card {
-    background: rgba(30, 41, 59, 0.7);
+    background: rgba(128, 128, 128, 0.1);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(128, 128, 128, 0.2);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 20px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Ensure text inside glass cards is readable based on base theme */
+.glass-card h3,
+.glass-card p {
+    margin: 4px 0;
 }
 
 /* Profile Card */
@@ -28,67 +31,72 @@
 }
 
 .profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    margin: 0 auto 12px;
+    margin: 0 auto 10px;
     background: linear-gradient(45deg, #10b981, #3b82f6);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 24px;
     font-weight: bold;
     color: white;
 }
 
 .level-badge {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: #10b981;
+    color: white;
     font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 8px;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.badge-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 2px;
 }
 
 /* Mission Card */
 .mission-card {
-    transition: transform 0.2s ease;
-    border-top: 2px solid rgba(59, 130, 246, 0.5);
+    transition: all 0.2s ease;
+    border-top: 3px solid #3b82f6;
 }
 
 .mission-card:hover {
     transform: translateY(-4px);
-    border-top: 2px solid #3b82f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .xp-label {
     color: #f59e0b;
     /* Amber/Gold */
-    font-weight: bold;
+    font-weight: 800;
 }
 
-/* Status Indicators */
-.status-pill {
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    text-transform: uppercase;
-    font-weight: bold;
+/* Fix Streamlit Button Contrast */
+.stButton>button {
+    width: 100%;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    background-color: #10b981 !important;
+    color: white !important;
+    border: none !important;
+    transition: filter 0.2s !important;
 }
 
-.status-success {
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
+.stButton>button:hover {
+    filter: brightness(1.1);
+    color: white !important;
 }
 
-.status-pending {
-    background: rgba(245, 158, 11, 0.2);
-    color: #f59e0b;
-}
-
-.status-failure {
-    background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
+/* Sidebar Specifics */
+section[data-testid="stSidebar"] .glass-card {
+    padding: 15px;
+    background: rgba(128, 128, 128, 0.05);
 }
