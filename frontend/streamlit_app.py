@@ -221,6 +221,26 @@ def main() -> None:
         </div>
         """, unsafe_allow_html=True)
 
+        # --- SECCIÓN DE MEDALLAS (BADGES) ---
+        st.sidebar.subheader("🏅 Medallas Ganadas")
+        badges = user_data.get("badges", {})
+        if badges:
+            for badge_id in badges:
+                badge_info = engine.get_badge_info(badge_id)
+                if badge_info:
+                    asset_path = badge_info.get("asset")
+                    if asset_path:
+                        # Streamlit can display images from local paths
+                        full_img_path = Path(asset_path)
+                        if full_img_path.exists():
+                            st.sidebar.image(str(full_img_path), width=100, caption=badge_info.get("label"))
+                        else:
+                            st.sidebar.write(f"🔹 {badge_info.get('label')}")
+                    else:
+                        st.sidebar.write(f"🔹 {badge_info.get('label')}")
+        else:
+            st.sidebar.write("Aún no tienes medallas.")
+
     st.sidebar.markdown(f"**Rol:** {role}")
     if auth_required and st.sidebar.button("Sign out"):
         write_audit_event(

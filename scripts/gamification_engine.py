@@ -145,7 +145,7 @@ def main():
         if args.json:
             print(json.dumps({"success": success, "message": msg}))
         else:
-            status = "✅ SUCCESS" if success else "❌ FAILURE"
+            status = "✅ ÉXITO" if success else "❌ FALLO"
             print(f"{status}: {msg}")
         if not success:
             sys.exit(1)
