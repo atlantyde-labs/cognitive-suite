@@ -244,10 +244,11 @@ def main() -> None:
         with st.sidebar.expander("📖 Guía de Rangos"):
             st.markdown("""
             **Subir de nivel requiere XP:**
-            - **Aspirante**: (L0) 0 XP
-            - **Explorador**: (L1) 250 XP
-            - **Constructor**: (L2) 600 XP
-            - **Ingeniero**: (L3) 1200 XP
+            - **Aspirante**: (L0) 0 XP (Sin medalla)
+            - **Explorador**: (L1) 100 XP
+            - **Constructor**: (L2) 300 XP
+            - **Ingeniero**: (L3) 600 XP
+            - **Maestro**: (L4) 1200 XP (Cognitive Steward)
 
             *Gana XP completando misiones y validando tus laboratorios.*
             """)

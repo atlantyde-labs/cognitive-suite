@@ -6,10 +6,10 @@
   "level": "L0",
   "last_seen": "2026-02-06T18:40:00Z",
   "badges": {
-    "owner_badge": {
-      "earned_at": "2026-02-06T18:40:00Z",
-      "xp_awarded": 180,
-      "source_pr": 42
+    "lab_1_badge": {
+      "earned_at": "2026-02-09T22:00:00Z",
+      "xp_awarded": 150,
+      "source_lab": "lab_01"
     }
   },
   "history": [
