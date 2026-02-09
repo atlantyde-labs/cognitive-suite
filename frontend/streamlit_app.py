@@ -246,16 +246,22 @@ def main() -> None:
 
         st.sidebar.markdown("---")
 
-        # --- SECCIÓN DE MEDALLAS (COMPACTA) ---
+        # --- SECCIÓN DE MEDALLAS (CENTRADO Y GRANDE) ---
         badges = user_data.get("badges", {})
         if badges:
-            st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:10px; font-size:13px;">🏅 MIS MEDALLAS</p>', unsafe_allow_html=True)
+            st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:15px; font-size:14px; text-align: center; border-top: 1px solid rgba(128,128,128,0.2); paddingTop: 15px;">🏅 MIS MEDALLAS</p>', unsafe_allow_html=True)
             for badge_id in badges:
                 badge_info = engine.get_badge_info(badge_id)
                 if badge_info:
                     asset_path = badge_info.get("asset")
                     if asset_path and Path(asset_path).exists():
-                        st.sidebar.image(str(Path(asset_path)), width=80, caption=badge_info.get("label"))
+                        # Centered Layout: [Spacer, Image, Spacer]
+                        c1, c2, c3 = st.sidebar.columns([1, 4, 1])
+                        with c2:
+                            st.image(str(Path(asset_path)), use_column_width=True)
+
+                        # Caption
+                        st.sidebar.markdown(f"<div style='text-align: center; font-size: 11px; margin-bottom: 15px; color: #94a3b8;'>{badge_info.get('label')}</div>", unsafe_allow_html=True)
                     else:
                         st.sidebar.write(f"🔹 {badge_info.get('label')}")
 
