@@ -217,30 +217,21 @@ def main() -> None:
         level_id = engine.get_level_for_xp(xp) if engine else user_data.get('level', 'L0')
         level_label = engine.get_level_label(level_id) if engine else level_id
 
+        # GitHub Avatar or Fallback
+        avatar_url = f"https://github.com/{display_name}.png" if display_name != "Usuario" else ""
+        avatar_html = f'<img src="{avatar_url}" class="profile-avatar-img">' if avatar_url else f'<div class="profile-avatar">{display_name[0].upper()}</div>'
+
         st.sidebar.markdown(f"""
-        <div class="glass-card profile-card" style="margin-bottom: 10px;">
-            <div class="profile-avatar">{display_name[0].upper()}</div>
+        <div class="glass-card profile-card" style="margin-bottom: 15px;">
+            {avatar_html}
             <div class="level-badge">{level_label}</div>
-            <h3 style="margin:0;">{display_name}</h3>
-            <p style="color:#94a3b8; font-size:12px;">{user_data.get('xp_total', 0)} XP Acumulados</p>
-            <div class="role-pill">{role}</div>
+            <h3 style="margin:5px 0 0 0;">{display_name}</h3>
+            <p style="color:#94a3b8; font-size:12px; margin:0;">{user_data.get('xp_total', 0)} XP Acumulados</p>
+            <div class="role-pill" style="margin-top:5px;">{role}</div>
         </div>
         """, unsafe_allow_html=True)
 
-        # --- SECCIÓN DE MEDALLAS (FULL WIDTH) ---
-        badges = user_data.get("badges", {})
-        if badges:
-            st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:5px; font-size:14px;">🏅 MIS MEDALLAS</p>', unsafe_allow_html=True)
-            for badge_id in badges:
-                badge_info = engine.get_badge_info(badge_id)
-                if badge_info:
-                    asset_path = badge_info.get("asset")
-                    if asset_path and Path(asset_path).exists():
-                        st.sidebar.image(str(Path(asset_path)), use_column_width=True, caption=badge_info.get("label"))
-                    else:
-                        st.sidebar.write(f"🔹 {badge_info.get('label')}")
-
-        # --- GUÍA DE RANGOS ---
+        # --- GUÍA DE RANGOS (MOVIDO ARRIBA) ---
         with st.sidebar.expander("📖 Guía de Rangos"):
             st.markdown("""
             **Subir de nivel requiere XP:**
@@ -254,6 +245,20 @@ def main() -> None:
             """)
 
         st.sidebar.markdown("---")
+
+        # --- SECCIÓN DE MEDALLAS (COMPACTA) ---
+        badges = user_data.get("badges", {})
+        if badges:
+            st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:10px; font-size:13px;">🏅 MIS MEDALLAS</p>', unsafe_allow_html=True)
+            for badge_id in badges:
+                badge_info = engine.get_badge_info(badge_id)
+                if badge_info:
+                    asset_path = badge_info.get("asset")
+                    if asset_path and Path(asset_path).exists():
+                        st.sidebar.image(str(Path(asset_path)), width=80, caption=badge_info.get("label"))
+                    else:
+                        st.sidebar.write(f"🔹 {badge_info.get('label')}")
+
     if auth_required and st.sidebar.button("Sign out"):
         write_audit_event(
             {
