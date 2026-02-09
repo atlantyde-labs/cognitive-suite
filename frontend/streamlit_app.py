@@ -212,7 +212,9 @@ def main() -> None:
     # --- SIDEBAR: Profile Card ---
     if user_data:
         display_name = user_data.get('user', 'Usuario')
-        level_id = user_data.get('level', 'L0')
+        # Calculate level dynamically based on current rules
+        xp = user_data.get('xp_total', 0)
+        level_id = engine.get_level_for_xp(xp) if engine else user_data.get('level', 'L0')
         level_label = engine.get_level_label(level_id) if engine else level_id
 
         st.sidebar.markdown(f"""
