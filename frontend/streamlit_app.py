@@ -24,6 +24,7 @@ import hashlib
 import json
 import os
 import subprocess
+import base64
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -177,6 +178,15 @@ def get_git_username() -> str:
         return "Guardian"
 
 
+def get_image_base64(image_path: str) -> str:
+    """Convierte una imagen local a base64 para embeber en HTML."""
+    try:
+        with open(image_path, "rb") as IMG:
+            return base64.b64encode(IMG.read()).decode()
+    except Exception:
+        return ""
+
+
 def main() -> None:
     st.set_page_config(page_title="Cognitive Suite Analysis", layout="wide")
     st.title("📊 Cognitive Suite – Resultados del Análisis")
@@ -246,18 +256,32 @@ def main() -> None:
 
         st.sidebar.markdown("---")
 
-        # --- SECCIÓN DE MEDALLAS (COMPACTA) ---
+        # --- SECCIÓN DE MEDALLAS (PREMIUM GALLERY) ---
         badges = user_data.get("badges", {})
         if badges:
             st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:10px; font-size:13px;">🏅 MIS MEDALLAS</p>', unsafe_allow_html=True)
+            gallery_html = '<div class="medal-gallery">'
+
             for badge_id in badges:
                 badge_info = engine.get_badge_info(badge_id)
                 if badge_info:
                     asset_path = badge_info.get("asset")
+                    label = badge_info.get("label", "Medalla")
+
                     if asset_path and Path(asset_path).exists():
-                        st.sidebar.image(str(Path(asset_path)), width=80, caption=badge_info.get("label"))
+                        b64_img = get_image_base64(str(Path(asset_path)))
+                        if b64_img:
+                            gallery_html += f'''
+                            <div class="medal-item" title="{label}">
+                                <img src="data:image/png;base64,{b64_img}" alt="{label}">
+                            </div>
+                            '''
                     else:
-                        st.sidebar.write(f"🔹 {badge_info.get('label')}")
+                        # Fallback simple si no hay imagen
+                        gallery_html += f'<div class="medal-item" title="{label}">🔹</div>'
+
+            gallery_html += '</div>'
+            st.sidebar.markdown(gallery_html, unsafe_allow_html=True)
 
     if auth_required and st.sidebar.button("Sign out"):
         write_audit_event(
