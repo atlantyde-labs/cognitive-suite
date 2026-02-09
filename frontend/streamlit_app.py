@@ -216,10 +216,10 @@ def main() -> None:
         xp = user_data.get('xp_total', 0)
         level_id = engine.get_level_for_xp(xp) if engine else user_data.get('level', 'L0')
         level_label = engine.get_level_label(level_id) if engine else level_id
-
         # GitHub Avatar or Fallback
         avatar_url = f"https://github.com/{display_name}.png" if display_name != "Usuario" else ""
-        avatar_html = f'<img src="{avatar_url}" class="profile-avatar-img">' if avatar_url else f'<div class="profile-avatar">{display_name[0].upper()}</div>'
+        # Use CSS class for styling, remove inline styles
+        avatar_html = f'<div style="text-align:center"><img src="{avatar_url}" class="profile-avatar-img"></div>' if avatar_url else f'<div class="profile-avatar">{display_name[0].upper()}</div>'
 
         st.sidebar.markdown(f"""
         <div class="glass-card profile-card" style="margin-bottom: 15px;">
@@ -371,10 +371,12 @@ def main() -> None:
         if engine:
             col1, col2, col3 = st.columns(3)
             labs = [
-                {"id": "lab_01", "name": "Lab 01: Deep Dive", "xp": "10 XP", "icon": "🤿"},
-                {"id": "lab_02", "name": "Lab 02: GitOps", "xp": "100 XP", "icon": "🔐"},
-                {"id": "lab_03", "name": "Lab 03: Dashboard", "xp": "75 XP", "icon": "🎨"},
+                {"id": "lab_01", "name": "Lab 01: Deep Dive", "xp": "150 XP", "icon": "🤿", "badge_key": "lab_1_badge"},
+                {"id": "lab_02", "name": "Lab 02: GitOps", "xp": "250 XP", "icon": "🔐", "badge_key": "lab_2_badge"},
+                {"id": "lab_03", "name": "Lab 03: Dashboard", "xp": "200 XP", "icon": "🎨", "badge_key": "lab_3_badge"},
             ]
+
+            user_badges = user_data.get("badges", {}) if user_data else {}
 
             for i, lab in enumerate(labs):
                 with [col1, col2, col3][i]:
@@ -386,14 +388,19 @@ def main() -> None:
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button(f"Verificar {lab['id'].upper()}", key=f"btn_{lab['id']}"):
-                        with st.spinner(f"El Oráculo está verificando {lab['id']}..."):
-                            success, msg = engine.verify_lab(lab['id'])
-                            if success:
-                                st.success(msg)
-                                st.balloons()
-                            else:
-                                st.error(msg)
+                    if lab['badge_key'] in user_badges:
+                        st.success("✅ Completado")
+                    else:
+                        if st.button(f"Verificar {lab['id'].upper()}", key=f"btn_{lab['id']}"):
+                            with st.spinner(f"El Oráculo está verificando {lab['id']}..."):
+                                success, msg = engine.verify_lab(lab['id'])
+                                if success:
+                                    st.success(msg)
+                                    st.balloons()
+                                    # Force reload to update badge state
+                                    st.experimental_rerun()
+                                else:
+                                    st.error(msg)
         else:
             st.error("Error: Gamification Engine no disponible.")
 
