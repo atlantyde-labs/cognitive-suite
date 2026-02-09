@@ -1,9 +1,9 @@
 {
   "user": "octocat",
-  "xp_total": 320,
-  "xp_effective": 220,
-  "xp_regulatory": 100,
-  "level": "L1",
+  "xp_total": 180,
+  "xp_effective": 180,
+  "xp_regulatory": 0,
+  "level": "L0",
   "last_seen": "2026-02-06T18:40:00Z",
   "badges": {
     "owner_badge": {
