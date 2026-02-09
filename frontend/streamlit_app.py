@@ -29,6 +29,17 @@ from typing import List, Dict, Any, Optional
 
 import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
+import sys
+
+# Asegurar que los scripts del motor son importables
+root_dir = Path(__file__).resolve().parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
+
+try:
+    from scripts.gamification_engine import GamificationEngine
+except ImportError:
+    GamificationEngine = None
 
 ROLE_PERMS = {
     "viewer": {"view_details": False, "view_entities": False, "view_file": False},
@@ -166,6 +177,30 @@ def main() -> None:
     perms = ROLE_PERMS[role]
     actor = st.session_state.get("auth_user", "unknown")
 
+    # Inyectar CSS Dinámico (Glassmorphism)
+    style_path = Path(__file__).resolve().parent / "style.css"
+    if style_path.exists():
+        st.markdown(f"<style>{style_path.read_text(encoding='utf-8')}</style>", unsafe_allow_name=True)
+
+    # Motor de Gamificación
+    engine = GamificationEngine() if GamificationEngine else None
+    user_data = None
+    if engine:
+        # Por ahora cargamos octocat como demo/admin
+        user_name = "octocat"
+        user_data = engine.get_user_ledger(user_name)
+
+    # --- SIDEBAR: Profile Card ---
+    if user_data:
+        st.sidebar.markdown(f"""
+        <div class="glass-card profile-card">
+            <div class="profile-avatar">{user_data.get('user', 'U')[0].upper()}</div>
+            <div class="level-badge">{user_data.get('level', 'L0')}</div>
+            <h3 style="margin:0;">{user_data.get('user', 'User')}</h3>
+            <p style="color:#94a3b8; font-size:12px;">{user_data.get('xp_total', 0)} XP Acumulados</p>
+        </div>
+        """, unsafe_allow_name=True)
+
     st.sidebar.markdown(f"**Role:** {role}")
     if auth_required and st.sidebar.button("Sign out"):
         write_audit_event(
@@ -205,7 +240,12 @@ def main() -> None:
             audit_path,
         )
         st.session_state["access_logged"] = True
-    # Convertir a DataFrame para representación tabular
+
+    # --- TABS PRINCIPALES ---
+    tab_analysis, tab_labs = st.tabs(["📝 Análisis Semántico", "🛡️ Gamification Hub"])
+
+    with tab_analysis:
+        # Convertir a DataFrame para representación tabular
     df = pd.DataFrame([
         {
             "uuid": rec.get("uuid"),
@@ -267,6 +307,38 @@ def main() -> None:
                 st.write(f"**Firma de autor:** {rec.get('author_signature')}")
             st.write(f"**Puntuación de relevancia:** {rec.get('relevance_score')}")
 
+    with tab_labs:
+        st.header("🎯 Misiones y Oráculos")
+        st.markdown("Bienvenido al **Command Center** de Atlantyqa. Aquí puedes validar tus pruebas de trabajo.")
+
+        if engine:
+            col1, col2, col3 = st.columns(3)
+            labs = [
+                {"id": "lab_01", "name": "Lab 01: Deep Dive", "xp": "10 XP", "icon": "🤿"},
+                {"id": "lab_02", "name": "Lab 02: GitOps", "xp": "100 XP", "icon": "🔐"},
+                {"id": "lab_03", "name": "Lab 03: Dashboard", "xp": "75 XP", "icon": "🎨"},
+            ]
+
+            for i, lab in enumerate(labs):
+                with [col1, col2, col3][i]:
+                    st.markdown(f"""
+                    <div class="glass-card mission-card">
+                        <h3>{lab['icon']} {lab['id'].upper()}</h3>
+                        <p>{lab['name']}</p>
+                        <p class="xp-label">Reward: {lab['xp']}</p>
+                    </div>
+                    """, unsafe_allow_name=True)
+
+                    if st.button(f"Verificar {lab['id'].upper()}", key=f"btn_{lab['id']}"):
+                        with st.spinner(f"El Oráculo está verificando {lab['id']}..."):
+                            success, msg = engine.verify_lab(lab['id'])
+                            if success:
+                                st.success(msg)
+                                st.balloons()
+                            else:
+                                st.error(msg)
+        else:
+            st.error("Error: Gamification Engine no disponible.")
 
 if __name__ == "__main__":
     main()

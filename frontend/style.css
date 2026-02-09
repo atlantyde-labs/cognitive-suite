@@ -1,0 +1,94 @@
+/*
+ * frontend/style.css
+ * Precision Glassmorphism for Atlantyqa Dashboard
+ */
+
+.stApp {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #e2e8f0;
+}
+
+/* Glass Card Base */
+.glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Profile Card */
+.profile-card {
+    text-align: center;
+    border-left: 4px solid #10b981;
+    /* Atlantyqa Green */
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    background: linear-gradient(45deg, #10b981, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+/* Mission Card */
+.mission-card {
+    transition: transform 0.2s ease;
+    border-top: 2px solid rgba(59, 130, 246, 0.5);
+}
+
+.mission-card:hover {
+    transform: translateY(-4px);
+    border-top: 2px solid #3b82f6;
+}
+
+.xp-label {
+    color: #f59e0b;
+    /* Amber/Gold */
+    font-weight: bold;
+}
+
+/* Status Indicators */
+.status-pill {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.status-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status-pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.status-failure {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
