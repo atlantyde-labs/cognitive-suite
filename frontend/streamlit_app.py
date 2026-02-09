@@ -246,66 +246,66 @@ def main() -> None:
 
     with tab_analysis:
         # Convertir a DataFrame para representación tabular
-    df = pd.DataFrame([
-        {
-            "uuid": rec.get("uuid"),
-            "archivo": Path(rec.get("file", "")).name if perms["view_file"] else f"file_{hash_identifier(str(rec.get('uuid', '')), hash_salt)}",
-            "tipo": rec.get("content_type"),
-            "palabras": rec.get("word_count"),
-            "etiquetas": ", ".join(rec.get("intent_tags", [])),
-            "sentimiento": rec.get("sentiment", {}).get("label"),
-            "relevancia": rec.get("relevance_score"),
-        }
-        for rec in data
-    ])
-    # Filtro por etiquetas
-    all_tags = sorted({tag for rec in data for tag in rec.get("intent_tags", [])})
-    selected_tags = st.multiselect("Filtra por etiquetas cognitivas", options=all_tags, default=all_tags)
-    if selected_tags and len(selected_tags) < len(all_tags):
-        mask = df["etiquetas"].apply(lambda x: any(tag in x for tag in selected_tags))
-        df_display = df[mask]
-    else:
-        df_display = df
-    st.dataframe(df_display, use_container_width=True)
-    if not perms["view_details"]:
-        st.info("Your role does not allow access to record details.")
-        return
-    # Seleccionar un registro para detalles
-    st.subheader("Detalles del registro")
-    selected_uuid = st.selectbox(
-        "Seleccione un UUID para ver detalles", options=["(Seleccione)"] + list(df_display["uuid"])
-    )
-    if selected_uuid and selected_uuid != "(Seleccione)":
-        rec = next((r for r in data if r.get("uuid") == selected_uuid), None)
-        if rec:
-            write_audit_event(
-                {
-                    "event": "ui_record_view",
-                    "timestamp": now_iso(),
-                    "env": env,
-                    "role": role,
-                    "actor": actor,
-                    "record_id": hash_identifier(str(rec.get("uuid", "")), hash_salt),
-                    "redacted": bool(rec.get("redacted")),
-                },
-                audit_path,
+        df = pd.DataFrame([
+            {
+                "uuid": rec.get("uuid"),
+                "archivo": Path(rec.get("file", "")).name if perms["view_file"] else f"file_{hash_identifier(str(rec.get('uuid', '')), hash_salt)}",
+                "tipo": rec.get("content_type"),
+                "palabras": rec.get("word_count"),
+                "etiquetas": ", ".join(rec.get("intent_tags", [])),
+                "sentimiento": rec.get("sentiment", {}).get("label"),
+                "relevancia": rec.get("relevance_score"),
+            }
+            for rec in data
+        ])
+        # Filtro por etiquetas
+        all_tags = sorted({tag for rec in data for tag in rec.get("intent_tags", [])})
+        selected_tags = st.multiselect("Filtra por etiquetas cognitivas", options=all_tags, default=all_tags)
+        if selected_tags and len(selected_tags) < len(all_tags):
+            mask = df["etiquetas"].apply(lambda x: any(tag in x for tag in selected_tags))
+            df_display = df[mask]
+        else:
+            df_display = df
+        st.dataframe(df_display, use_container_width=True)
+        if not perms["view_details"]:
+            st.info("Your role does not allow access to record details.")
+        else:
+            # Seleccionar un registro para detalles
+            st.subheader("Detalles del registro")
+            selected_uuid = st.selectbox(
+                "Seleccione un UUID para ver detalles", options=["(Seleccione)"] + list(df_display["uuid"])
             )
-            st.write(f"### {rec.get('title')}")
-            if perms["view_file"]:
-                st.write(f"**Archivo:** {rec.get('file')}")
-            else:
-                st.write("**Archivo:** restricted")
-            st.write(f"**Tipo de contenido:** {rec.get('content_type')}")
-            st.write(f"**Etiquetas:** {', '.join(rec.get('intent_tags', []))}")
-            st.write(f"**Sentimiento:** {rec.get('sentiment', {}).get('label')} (score: {rec.get('sentiment', {}).get('score')})")
-            st.write(f"**Resumen:** {rec.get('summary')}")
-            if perms["view_entities"] and rec.get('entities'):
-                st.write("**Entidades:**")
-                ent_df = pd.DataFrame(rec['entities'], columns=["Tipo", "Texto"])
-                st.table(ent_df)
-            if perms["view_entities"] and rec.get('author_signature'):
-                st.write(f"**Firma de autor:** {rec.get('author_signature')}")
-            st.write(f"**Puntuación de relevancia:** {rec.get('relevance_score')}")
+            if selected_uuid and selected_uuid != "(Seleccione)":
+                rec = next((r for r in data if r.get("uuid") == selected_uuid), None)
+                if rec:
+                    write_audit_event(
+                        {
+                            "event": "ui_record_view",
+                            "timestamp": now_iso(),
+                            "env": env,
+                            "role": role,
+                            "actor": actor,
+                            "record_id": hash_identifier(str(rec.get("uuid", "")), hash_salt),
+                            "redacted": bool(rec.get("redacted")),
+                        },
+                        audit_path,
+                    )
+                    st.write(f"### {rec.get('title')}")
+                    if perms["view_file"]:
+                        st.write(f"**Archivo:** {rec.get('file')}")
+                    else:
+                        st.write("**Archivo:** restricted")
+                    st.write(f"**Tipo de contenido:** {rec.get('content_type')}")
+                    st.write(f"**Etiquetas:** {', '.join(rec.get('intent_tags', []))}")
+                    st.write(f"**Sentimiento:** {rec.get('sentiment', {}).get('label')} (score: {rec.get('sentiment', {}).get('score')})")
+                    st.write(f"**Resumen:** {rec.get('summary')}")
+                    if perms["view_entities"] and rec.get('entities'):
+                        st.write("**Entidades:**")
+                        ent_df = pd.DataFrame(rec['entities'], columns=["Tipo", "Texto"])
+                        st.table(ent_df)
+                    if perms["view_entities"] and rec.get('author_signature'):
+                        st.write(f"**Firma de autor:** {rec.get('author_signature')}")
+                    st.write(f"**Puntuación de relevancia:** {rec.get('relevance_score')}")
 
     with tab_labs:
         st.header("🎯 Misiones y Oráculos")
