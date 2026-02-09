@@ -104,6 +104,18 @@ class GamificationEngine:
         except Exception as e:
             return False, f"Execution error: {str(e)}"
 
+    def get_user_ledger(self, user_name):
+        """Loads a user ledger file from metrics/users/."""
+        ledger_path = Path("metrics/users") / f"{user_name}.json"
+        if not ledger_path.exists():
+            return None
+        try:
+            with open(ledger_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading ledger for {user_name}: {e}", file=sys.stderr)
+            return None
+
 def main():
     parser = argparse.ArgumentParser(description="Atlantyqa Gamification Engine CLI")
     parser.add_argument("--level-info", help="Get XP and label for a level (e.g. level_1, l2, 3)")
