@@ -41,6 +41,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install PyYAML
+
       - name: "Guard: require PROJECT_TOKEN"
         run: |
           if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then

@@ -16,12 +16,22 @@ permissions:
 jobs:
   add-to-project:
     runs-on: ubuntu-latest
+    env:
+      SEC_PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install PyYAML
+
       - name: Add Issue/PR to Org Project (by labels)
-        if: secrets.PROJECT_TOKEN != ''
+        if: env.SEC_PROJECT_TOKEN != ''
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || 'https://github.com/orgs/atlantyde-labs/projects/2' }}
@@ -31,7 +41,7 @@ jobs:
 
       - name: Calculate Gamification Rewards
         id: gamification
-        if: secrets.PROJECT_TOKEN != ''
+        if: env.SEC_PROJECT_TOKEN != ''
         run: |
           # Get labels from payload
           LABELS=$(jq -r '.issue.labels[].name // .pull_request.labels[].name' $GITHUB_EVENT_PATH | tr '\n' ',' | sed 's/,$//')
@@ -56,7 +66,7 @@ jobs:
           fi
 
       - name: Set Project fields (Level/XP) in Org Project v2 (GraphQL)
-        if: secrets.PROJECT_TOKEN != '' && steps.gamification.outputs.mapped == 'true'
+        if: env.SEC_PROJECT_TOKEN != '' && steps.gamification.outputs.mapped == 'true'
         uses: actions/github-script@v7
         env:
           PROJECT_URL: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || 'https://github.com/orgs/atlantyde-labs/projects/2' }}
