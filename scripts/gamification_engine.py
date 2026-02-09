@@ -7,6 +7,7 @@ Centralizes XP and badge logic from metrics/xp-rules.yml.
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 import yaml
@@ -61,12 +62,54 @@ class GamificationEngine:
 
         return current_level
 
+    def validate_ledger_data(self, ledger_data):
+        """
+        Validates the consistency of a user ledger.
+        Returns (is_valid, error_message).
+        """
+        # 1. Total XP vs History
+        history = ledger_data.get("history", [])
+        calculated_xp = sum(entry.get("xp", 0) for entry in history)
+
+        # Note: xp_regulatory might be a subset, but xp_total should match history
+        if calculated_xp != ledger_data.get("xp_total", 0):
+            return False, f"XP mismatch: total={ledger_data.get('xp_total')}, history_sum={calculated_xp}"
+
+        # 2. Level Consistency
+        expected_level = self.get_level_for_xp(calculated_xp)
+        if expected_level != ledger_data.get("level"):
+            return False, f"Level mismatch: expected={expected_level}, found={ledger_data.get('level')}"
+
+        return True, "Valid"
+
+    def verify_lab(self, lab_id):
+        """
+        Executes the specialized validator for a lab.
+        Returns (success, message).
+        """
+        validator_path = Path(f"scripts/verify/verify_{lab_id}.py")
+        if not validator_path.exists():
+            return False, f"Validator not implemented for {lab_id}"
+
+        try:
+            result = subprocess.run(
+                [sys.executable, str(validator_path)],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            success = result.returncode == 0
+            message = result.stdout.strip() or result.stderr.strip()
+            return success, message
+        except Exception as e:
+            return False, f"Execution error: {str(e)}"
+
 def main():
     parser = argparse.ArgumentParser(description="Atlantyqa Gamification Engine CLI")
     parser.add_argument("--level-info", help="Get XP and label for a level (e.g. level_1, l2, 3)")
     parser.add_argument("--calculate-level", type=int, help="Calculate final level from total XP")
-    parser.add_argument("--json", action="store_true", help="Output in JSON format")
-
+    parser.add_argument("--json", action="store_true", help="Output result in JSON format")
+    parser.add_argument("--verify-lab", help="Run validation for a specific lab (e.g. lab_01)")
     args = parser.parse_args()
     engine = GamificationEngine()
 
@@ -83,7 +126,18 @@ def main():
         if args.json:
             print(json.dumps({"level": level}))
         else:
-            print(level)
+            print(f"Level for {args.calculate_level} XP: {level}")
+
+    elif args.verify_lab:
+        success, msg = engine.verify_lab(args.verify_lab)
+        if args.json:
+            print(json.dumps({"success": success, "message": msg}))
+        else:
+            status = "✅ SUCCESS" if success else "❌ FAILURE"
+            print(f"{status}: {msg}")
+        if not success:
+            sys.exit(1)
+
     else:
         # Default behavior: show version/status
         print(f"Atlantyqa Gamification Engine v{engine.config.get('version', '1')}")
