@@ -180,7 +180,7 @@ def main() -> None:
     # Inyectar CSS Dinámico (Glassmorphism)
     style_path = Path(__file__).resolve().parent / "style.css"
     if style_path.exists():
-        st.markdown(f"<style>{style_path.read_text(encoding='utf-8')}</style>", unsafe_allow_name=True)
+        st.markdown(f"<style>{style_path.read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
 
     # Motor de Gamificación
     engine = GamificationEngine() if GamificationEngine else None
@@ -199,7 +199,7 @@ def main() -> None:
             <h3 style="margin:0;">{user_data.get('user', 'User')}</h3>
             <p style="color:#94a3b8; font-size:12px;">{user_data.get('xp_total', 0)} XP Acumulados</p>
         </div>
-        """, unsafe_allow_name=True)
+        """, unsafe_allow_html=True)
 
     st.sidebar.markdown(f"**Role:** {role}")
     if auth_required and st.sidebar.button("Sign out"):
@@ -327,7 +327,7 @@ def main() -> None:
                         <p>{lab['name']}</p>
                         <p class="xp-label">Reward: {lab['xp']}</p>
                     </div>
-                    """, unsafe_allow_name=True)
+                    """, unsafe_allow_html=True)
 
                     if st.button(f"Verificar {lab['id'].upper()}", key=f"btn_{lab['id']}"):
                         with st.spinner(f"El Oráculo está verificando {lab['id']}..."):
