@@ -97,6 +97,37 @@
 
 /* Sidebar Specifics */
 section[data-testid="stSidebar"] .glass-card {
-    padding: 15px;
+    padding: 20px;
     background: rgba(128, 128, 128, 0.05);
+    border: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.role-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-top: 10px;
+}
+
+.medal-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.medal-item {
+    width: 60px;
+    text-align: center;
+}
+
+.medal-item img {
+    width: 100%;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
 }

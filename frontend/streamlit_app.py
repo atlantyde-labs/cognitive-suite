@@ -212,36 +212,37 @@ def main() -> None:
     # --- SIDEBAR: Profile Card ---
     if user_data:
         display_name = user_data.get('user', 'Usuario')
+        level_id = user_data.get('level', 'L0')
+        level_label = engine.get_level_label(level_id) if engine else level_id
+
         st.sidebar.markdown(f"""
-        <div class="glass-card profile-card">
+        <div class="glass-card profile-card" style="margin-bottom: 10px;">
             <div class="profile-avatar">{display_name[0].upper()}</div>
-            <div class="level-badge">{user_data.get('level', 'L0')}</div>
+            <div class="level-badge">{level_label}</div>
             <h3 style="margin:0;">{display_name}</h3>
             <p style="color:#94a3b8; font-size:12px;">{user_data.get('xp_total', 0)} XP Acumulados</p>
+            <div class="role-pill">{role}</div>
         </div>
         """, unsafe_allow_html=True)
 
-        # --- SECCIÓN DE MEDALLAS (BADGES) ---
-        st.sidebar.subheader("🏅 Medallas Ganadas")
+        # --- SECCIÓN DE MEDALLAS (GALLERY) ---
         badges = user_data.get("badges", {})
         if badges:
-            for badge_id in badges:
+            st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:5px; font-size:14px;">🏅 MEDALLAS</p>', unsafe_allow_html=True)
+            cols = st.sidebar.columns(3)
+            for i, badge_id in enumerate(badges):
                 badge_info = engine.get_badge_info(badge_id)
                 if badge_info:
                     asset_path = badge_info.get("asset")
-                    if asset_path:
-                        # Streamlit can display images from local paths
-                        full_img_path = Path(asset_path)
-                        if full_img_path.exists():
-                            st.sidebar.image(str(full_img_path), width=100, caption=badge_info.get("label"))
+                    with cols[i % 3]:
+                        if asset_path and Path(asset_path).exists():
+                            st.image(str(Path(asset_path)), use_container_width=True)
+                            # Tooltip-like caption
+                            st.caption(f"<div style='font-size:8px; line-height:1; text-align:center;'>{badge_info.get('label')}</div>", unsafe_allow_html=True)
                         else:
-                            st.sidebar.write(f"🔹 {badge_info.get('label')}")
-                    else:
-                        st.sidebar.write(f"🔹 {badge_info.get('label')}")
-        else:
-            st.sidebar.write("Aún no tienes medallas.")
+                            st.write(f"🔹")
 
-    st.sidebar.markdown(f"**Rol:** {role}")
+        st.sidebar.markdown("---")
     if auth_required and st.sidebar.button("Sign out"):
         write_audit_event(
             {

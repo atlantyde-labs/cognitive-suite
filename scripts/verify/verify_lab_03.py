@@ -8,6 +8,11 @@ Checks if the user has customized the strealit app with their own widgets.
 import sys
 from pathlib import Path
 
+# Fix for Windows terminal encoding issues with emojis
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 def verify():
     dashboard_file = Path("frontend/streamlit_app.py")
     insights_file = Path("outputs/insights/analysis.json")

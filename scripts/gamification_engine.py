@@ -62,6 +62,10 @@ class GamificationEngine:
 
         return current_level
 
+    def get_level_label(self, level_id):
+        """Returns the human-readable label for a level ID."""
+        return self.config.get("levels", {}).get(level_id, {}).get("label", level_id)
+
     def validate_ledger_data(self, ledger_data):
         """
         Validates the consistency of a user ledger.

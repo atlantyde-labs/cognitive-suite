@@ -9,6 +9,11 @@ import json
 import sys
 from pathlib import Path
 
+# Fix for Windows terminal encoding issues
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 def verify():
     insights_file = Path("outputs/insights/analysis.json")
     analysis_file = Path("outputs/insights/analysis.json")

@@ -55,9 +55,13 @@ task_rewards:
 levels:
   L0:
     min_xp: 0
+    label: "Aspirante"
   L1:
     min_xp: 250
+    label: "Explorador"
   L2:
     min_xp: 600
+    label: "Constructor"
   L3:
     min_xp: 1200
+    label: "Ingeniero"

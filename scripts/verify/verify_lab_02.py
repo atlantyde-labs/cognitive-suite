@@ -6,6 +6,7 @@ Checks if the pipeline was executed in 'prod' mode with hashing and salt.
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
