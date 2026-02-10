@@ -3,7 +3,7 @@ version: 1
 badges:
   owner_badge:
     base_xp: 150
-    label: "Owner Badge"
+    label: "Cognitive Steward"
     multiplier:
       early_adopter: 1.2
     max_xp: 200
@@ -14,7 +14,7 @@ badges:
     doc: docs/portal/metrics.md
   early_adopter:
     base_xp: 50
-    label: "Early Adopter"
+    label: "Cognitive Early Adopter"
     multiplier:
       early_adopter: 1.0
     max_xp: 120
@@ -23,27 +23,48 @@ badges:
     asset: docs/assets/badge-owner.png
     doc: docs/portal/metrics.md
   lab_1_badge:
-    base_xp: 80
-    label: "Lab 1 Explorer"
+    base_xp: 150
+    label: "Cognitive Explorer (Lab 1)"
     asset: docs/assets/badge-cognitive-explore-level1.png
     doc: docs/portal/lab-01-deep-dive.md
   lab_2_badge:
-    base_xp: 120
-    label: "Lab 2 Navigator"
+    base_xp: 250
+    label: "Cognitive Builder (Lab 2)"
     asset: docs/assets/badge-cognitive-explore-level2.png
     doc: docs/portal/lab-02-gitops-steward.md
   lab_3_badge:
-    base_xp: 160
-    label: "Lab 3 Orchestrator"
+    base_xp: 200
+    label: "Cognitive Engineer (Lab 3)"
     asset: docs/assets/badge-cognitive-explore-level3.png
     doc: docs/portal/lab-03-bootstrap-dashboard.md
+
+task_rewards:
+  level_1:
+    xp: 10
+    label: "L1: Explorer"
+  level_2:
+    xp: 25
+    label: "L2: Builder"
+  level_3:
+    xp: 50
+    label: "L3: Engineer"
+  level_4:
+    xp: 100
+    label: "L4: Steward"
 
 levels:
   L0:
     min_xp: 0
+    label: "Aspirante"
   L1:
-    min_xp: 250
+    min_xp: 100
+    label: "Explorador"
   L2:
-    min_xp: 600
+    min_xp: 300
+    label: "Constructor"
   L3:
+    min_xp: 600
+    label: "Ingeniero"
+  L4:
     min_xp: 1200
+    label: "Maestro"

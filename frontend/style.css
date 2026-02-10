@@ -1,0 +1,145 @@
+/*
+ * frontend/style.css
+ * Theme-aware Glassmorphism for Atlantyqa Dashboard
+ */
+
+/* Let Streamlit handle the main app background/colors */
+/* .stApp { background: ...; color: ...; } -> Removed to respect system/user theme */
+
+/* Glass Card Base - Neutral color to work with both light/dark */
+.glass-card {
+    background: rgba(128, 128, 128, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+/* Ensure text inside glass cards is readable based on base theme */
+.glass-card h3,
+.glass-card p {
+    margin: 4px 0;
+}
+
+/* Profile Card */
+.profile-card {
+    text-align: center;
+    border-left: 4px solid #10b981;
+    /* Atlantyqa Green */
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    background: linear-gradient(45deg, #10b981, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+.profile-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 10px;
+    display: block;
+    border: 2px solid rgba(16, 185, 129, 0.5);
+    /* Green border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: #10b981;
+    color: white;
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.badge-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 2px;
+}
+
+/* Mission Card */
+.mission-card {
+    transition: all 0.2s ease;
+    border-top: 3px solid #3b82f6;
+}
+
+.mission-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.xp-label {
+    color: #f59e0b;
+    /* Amber/Gold */
+    font-weight: 800;
+}
+
+/* Fix Streamlit Button Contrast */
+.stButton>button {
+    width: 100%;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    background-color: #10b981 !important;
+    color: white !important;
+    border: none !important;
+    transition: filter 0.2s !important;
+}
+
+.stButton>button:hover {
+    filter: brightness(1.1);
+    color: white !important;
+}
+
+/* Sidebar Specifics */
+section[data-testid="stSidebar"] .glass-card {
+    padding: 20px;
+    background: rgba(128, 128, 128, 0.05);
+    border: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.role-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-top: 10px;
+}
+
+.medal-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.medal-item {
+    width: 60px;
+    text-align: center;
+}
+
+.medal-item img {
+    width: 100%;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}

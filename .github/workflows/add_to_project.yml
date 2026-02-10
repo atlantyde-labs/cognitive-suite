@@ -16,9 +16,22 @@ permissions:
 jobs:
   add-to-project:
     runs-on: ubuntu-latest
+    env:
+      SEC_PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install PyYAML
+
       - name: Add Issue/PR to Org Project (by labels)
-        if: ${{ secrets.PROJECT_TOKEN != '' }}
+        if: env.SEC_PROJECT_TOKEN != ''
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || 'https://github.com/orgs/atlantyde-labs/projects/2' }}
@@ -26,32 +39,53 @@ jobs:
           labeled: good-first-issue, learning-task, ci-gitops, automation, ci-boott
           label-operator: OR
 
+      - name: Calculate Gamification Rewards
+        id: gamification
+        if: env.SEC_PROJECT_TOKEN != ''
+        run: |
+          # Get labels from payload
+          LABELS=$(jq -r '.issue.labels[].name // .pull_request.labels[].name' $GITHUB_EVENT_PATH | tr '\n' ',' | sed 's/,$//')
+          echo "Labels: $LABELS"
+
+          # Determine level based on specific labels
+          if echo "$LABELS" | grep -i -q "good first issue"; then LEVEL="level_1";
+          elif echo "$LABELS" | grep -i -q "learning-task"; then LEVEL="level_2";
+          elif echo "$LABELS" | grep -i -q "ci-gitops\|automation"; then LEVEL="level_3";
+          elif echo "$LABELS" | grep -i -q "ci-boott"; then LEVEL="level_2";
+          else LEVEL="none"; fi
+
+          if [ "$LEVEL" != "none" ]; then
+            REWARDS=$(python scripts/gamification_engine.py --level-info "$LEVEL" --json)
+            # Standardize level name for single-select (e.g. "1")
+            LEVEL_NUM=$(echo $REWARDS | jq -r .label | cut -d':' -f1 | sed 's/L//' | tr -d ' ')
+            echo "level_num=$LEVEL_NUM" >> $GITHUB_OUTPUT
+            echo "xp=$(echo $REWARDS | jq -r .xp)" >> $GITHUB_OUTPUT
+            echo "mapped=true" >> $GITHUB_OUTPUT
+          else
+            echo "mapped=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set Project fields (Level/XP) in Org Project v2 (GraphQL)
-        if: ${{ secrets.PROJECT_TOKEN != '' }}
+        if: env.SEC_PROJECT_TOKEN != '' && steps.gamification.outputs.mapped == 'true'
         uses: actions/github-script@v7
         env:
           PROJECT_URL: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || 'https://github.com/orgs/atlantyde-labs/projects/2' }}
+          CALC_LEVEL: ${{ steps.gamification.outputs.level_num }}
+          CALC_XP: ${{ steps.gamification.outputs.xp }}
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            // NOTE: In actions/github-script@v7, `core`, `github`, and `context` are already available.
-            // Do NOT require('@actions/core') — it can trigger "Identifier 'core' has already been declared".
-
-            function parseProjectUrl(url) {
-              // https://github.com/orgs/<org>/projects/<number>
+            const { org, number } = (function(url) {
               const m = url.match(/github\.com\/orgs\/([^/]+)\/projects\/(\d+)/i);
               if (!m) throw new Error(`PROJECT_URL not recognized: ${url}`);
               return { org: m[1], number: parseInt(m[2], 10) };
-            }
+            })(process.env.PROJECT_URL);
 
-            async function gql(query, variables) {
-              return await github.graphql(query, variables);
-            }
+            async function gql(query, variables) { return await github.graphql(query, variables); }
 
             async function findProjectItemId(projectId, contentId) {
-              // paginate items to find the item with content.id === contentId
               let cursor = null;
-              for (let i = 0; i < 20; i++) { // safety cap
+              for (let i = 0; i < 20; i++) {
                 const res = await gql(`
                   query($projectId: ID!, $cursor: String) {
                     node(id: $projectId) {
@@ -60,22 +94,15 @@ jobs:
                           pageInfo { hasNextPage endCursor }
                           nodes {
                             id
-                            content {
-                              ... on Issue { id }
-                              ... on PullRequest { id }
-                            }
+                            content { ... on Issue { id } ... on PullRequest { id } }
                           }
                         }
                       }
                     }
                   }
                 `, { projectId, cursor });
-
                 const items = res.node.items.nodes || [];
-                for (const it of items) {
-                  if (it.content?.id === contentId) return it.id;
-                }
-
+                for (const it of items) { if (it.content?.id === contentId) return it.id; }
                 const pi = res.node.items.pageInfo;
                 if (!pi.hasNextPage) return null;
                 cursor = pi.endCursor;
@@ -84,41 +111,14 @@ jobs:
             }
 
             try {
-              const { org, number } = parseProjectUrl(process.env.PROJECT_URL);
-
               const payload = context.payload;
-              const isIssue = !!payload.issue;
-              const item = isIssue ? payload.issue : payload.pull_request;
-              if (!item) {
-                core.info("No issue/pull_request in payload; skipping.");
-                return;
-              }
+              const item = payload.issue || payload.pull_request;
+              if (!item) return;
 
-              const labels = (item.labels || []).map(l => (typeof l === 'string' ? l : l.name)).filter(Boolean);
-
-              const level =
-                labels.includes('good first issue') ? '1' :
-                labels.includes('learning-task') ? '2' :
-                labels.includes('ci-gitops') ? '3' :
-                labels.includes('automation') ? '3' :
-                labels.includes('ci-boott') ? '2' : '';
-
-              const xp = level === '1' ? 10 : level === '2' ? 25 : level === '3' ? 50 : level === '4' ? 100 : 0;
-
-              core.info(`Project URL: ${process.env.PROJECT_URL}`);
-              core.info(`Detected labels: ${labels.join(', ')}`);
-              core.info(`Computed Level=${level || '(none)'}, XP=${xp}`);
-
-              if (!level || xp === 0) {
-                core.info("No Level/XP mapping for these labels. Skipping field updates.");
-                return;
-              }
-
-              // GraphQL contentId: use the issue/PR node_id from webhook payload
+              const level = process.env.CALC_LEVEL;
+              const xp = parseInt(process.env.CALC_XP, 10);
               const contentId = item.node_id;
-              if (!contentId) throw new Error("Missing node_id in issue/PR payload; cannot update project fields.");
 
-              // 1) Get project id + fields (Level/XP)
               const projData = await gql(`
                 query($org: String!, $number: Int!) {
                   organization(login: $org) {
@@ -127,16 +127,8 @@ jobs:
                       fields(first: 50) {
                         nodes {
                           __typename
-                          ... on ProjectV2Field {
-                            id
-                            name
-                            dataType
-                          }
-                          ... on ProjectV2SingleSelectField {
-                            id
-                            name
-                            options { id name }
-                          }
+                          ... on ProjectV2Field { id name dataType }
+                          ... on ProjectV2SingleSelectField { id name options { id name } }
                         }
                       }
                     }
@@ -148,56 +140,45 @@ jobs:
               const projectId = project.id;
               const fields = project.fields.nodes;
 
-              const levelField = fields.find(f => f.__typename === "ProjectV2SingleSelectField" && f.name === "Level");
-              const xpField = fields.find(f => (f.__typename === "ProjectV2Field") && f.name === "XP");
+              const levelField = fields.find(f => f.name === "Level");
+              const xpField = fields.find(f => f.name === "XP");
 
-              if (!levelField) throw new Error(`Field "Level" (single select) not found in project.`);
-              if (!xpField) throw new Error(`Field "XP" (number) not found in project.`);
+              if (!levelField || !xpField) throw new Error("Missing Level or XP field in project");
 
               const levelOption = (levelField.options || []).find(o => o.name === level);
-              if (!levelOption) throw new Error(`Option "${level}" not found in field "Level".`);
+              if (!levelOption) throw new Error(`Option "${level}" not found in Level field`);
 
-              // 2) Ensure item is in project (find or add)
               let projectItemId = await findProjectItemId(projectId, contentId);
-
               if (!projectItemId) {
-                core.info("Item not found in project; adding...");
                 const addRes = await gql(`
                   mutation($projectId: ID!, $contentId: ID!) {
-                    addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
-                      item { id }
-                    }
+                    addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) { item { id } }
                   }
                 `, { projectId, contentId });
                 projectItemId = addRes.addProjectV2ItemById.item.id;
               }
 
-              // 3) Update Level
+              // Update Level
               await gql(`
                 mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
                   updateProjectV2ItemFieldValue(input: {
-                    projectId: $projectId,
-                    itemId: $itemId,
-                    fieldId: $fieldId,
+                    projectId: $projectId, itemId: $itemId, fieldId: $fieldId,
                     value: { singleSelectOptionId: $optionId }
                   }) { projectV2Item { id } }
                 }
               `, { projectId, itemId: projectItemId, fieldId: levelField.id, optionId: levelOption.id });
 
-              // 4) Update XP
+              // Update XP
               await gql(`
                 mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $number: Float!) {
                   updateProjectV2ItemFieldValue(input: {
-                    projectId: $projectId,
-                    itemId: $itemId,
-                    fieldId: $fieldId,
+                    projectId: $projectId, itemId: $itemId, fieldId: $fieldId,
                     value: { number: $number }
                   }) { projectV2Item { id } }
                 }
               `, { projectId, itemId: projectItemId, fieldId: xpField.id, number: xp });
 
-              core.info(`✅ Updated Project v2 fields: Level=${level}, XP=${xp}`);
-
+              core.info(`✅ Updated Project: Level=${level}, XP=${xp}`);
             } catch (e) {
-              core.warning(`Gamification field update skipped: ${e.message}`);
+              core.warning(`Update skipped: ${e.message}`);
             }

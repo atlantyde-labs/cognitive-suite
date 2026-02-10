@@ -43,7 +43,7 @@ jobs:
           done
 
       - name: Push images to GHCR
-        if: ${{ inputs.push_to_ghcr == 'true' }}
+        if: inputs.push_to_ghcr == 'true'
         run: |
           for img in ingestor pipeline frontend gitops; do
             docker push ghcr.io/${{ github.repository }}/cognitive-$img:${{ github.sha }}

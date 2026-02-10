@@ -38,6 +38,17 @@ jobs:
   project_fields:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install PyYAML
+
       - name: "Guard: require PROJECT_TOKEN"
         run: |
           if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then
@@ -376,17 +387,19 @@ jobs:
           if has_label "role-ux-local"; then Role="UX Local"; fi
 
           GAME_LEVEL=""
-          if has_label "good first issue"; then GAME_LEVEL="1"; fi
-          if has_label "learning-task"; then GAME_LEVEL="2"; fi
-          if has_label "ci-gitops"; then GAME_LEVEL="3"; fi
-          if has_label "automation"; then GAME_LEVEL="3"; fi
-          if has_label "ci-boott"; then GAME_LEVEL="2"; fi
+          if has_label "good first issue"; then GAME_LEVEL="level_1"; fi
+          if has_label "learning-task"; then GAME_LEVEL="level_2"; fi
+          if has_label "ci-gitops"; then GAME_LEVEL="level_3"; fi
+          if has_label "automation"; then GAME_LEVEL="level_3"; fi
+          if has_label "ci-boott"; then GAME_LEVEL="level_2"; fi
 
           XP="0"
-          if [ "$GAME_LEVEL" = "1" ]; then XP="10"; fi
-          if [ "$GAME_LEVEL" = "2" ]; then XP="25"; fi
-          if [ "$GAME_LEVEL" = "3" ]; then XP="50"; fi
-          if [ "$GAME_LEVEL" = "4" ]; then XP="100"; fi
+          if [ "$GAME_LEVEL" != "" ]; then
+            REWARDS=$(python scripts/gamification_engine.py --level-info "$GAME_LEVEL" --json)
+            XP=$(echo "$REWARDS" | jq -r .xp)
+            # Standardize for project field
+            GAME_LEVEL=$(echo "$REWARDS" | jq -r .label | cut -d':' -f1 | sed 's/L//' | tr -d ' ')
+          fi
 
           echo "Computed: Area=$Area Skill=$Skill Compute=$Compute Level=$Level Role=$Role | GameLevel=$GAME_LEVEL XP=$XP"
 

@@ -23,12 +23,25 @@ Al ejecutar dentro del contenedor Docker de ``frontend`` se utiliza
 import hashlib
 import json
 import os
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
+import sys
+import logging
+
+# Asegurar que los scripts del motor son importables
+root_dir = Path(__file__).resolve().parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
+
+try:
+    from scripts.gamification_engine import GamificationEngine
+except ImportError:
+    GamificationEngine = None
 
 ROLE_PERMS = {
     "viewer": {"view_details": False, "view_entities": False, "view_file": False},
@@ -150,6 +163,22 @@ def ensure_auth(
     return ""  # Satisfy type hint although st.stop() halts execution
 
 
+def get_git_username() -> str:
+    """Intenta obtener el nombre de usuario de Git o el del sistema."""
+    try:
+        res = subprocess.run(["git", "config", "user.name"], capture_output=True, text=True, check=False)
+        if res.returncode == 0 and res.stdout.strip():
+            return res.stdout.strip()
+    except Exception as exc:
+        logging.debug("No se pudo obtener el usuario de Git: %s", exc)
+
+    try:
+        return os.getlogin()
+    except Exception as exc:
+        logging.debug("No se pudo obtener os.getlogin(): %s", exc)
+        return "Guardian"
+
+
 def main() -> None:
     st.set_page_config(page_title="Cognitive Suite Analysis", layout="wide")
     st.title("📊 Cognitive Suite – Resultados del Análisis")
@@ -166,7 +195,78 @@ def main() -> None:
     perms = ROLE_PERMS[role]
     actor = st.session_state.get("auth_user", "unknown")
 
-    st.sidebar.markdown(f"**Role:** {role}")
+    # Inyectar CSS Dinámico (Glassmorphism)
+    style_path = Path(__file__).resolve().parent / "style.css"
+    if style_path.exists():
+        st.markdown(f"<style>{style_path.read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
+
+    # Motor de Gamificación
+    engine = GamificationEngine() if GamificationEngine else None
+    user_data = None
+    if engine:
+        # Descubrimiento automático del usuario
+        user_name = get_git_username()
+        user_data = engine.get_user_ledger(user_name)
+        if not user_data:
+            # Fallback a L0kyLuke si el real no tiene ledger aún
+            user_data = engine.get_user_ledger("L0kyLuke")
+
+    # --- SIDEBAR: Profile Card ---
+    if user_data:
+        display_name = user_data.get('user', 'Usuario')
+        # Calculate level dynamically based on current rules
+        xp = user_data.get('xp_total', 0)
+        level_id = engine.get_level_for_xp(xp) if engine else user_data.get('level', 'L0')
+        level_label = engine.get_level_label(level_id) if engine else level_id
+        # GitHub Avatar or Fallback
+        avatar_url = f"https://github.com/{display_name}.png" if display_name != "Usuario" else ""
+        # Use CSS class for styling, remove inline styles
+        avatar_html = f'<div style="text-align:center"><img src="{avatar_url}" class="profile-avatar-img"></div>' if avatar_url else f'<div class="profile-avatar">{display_name[0].upper()}</div>'
+
+        st.sidebar.markdown(f"""
+        <div class="glass-card profile-card" style="margin-bottom: 15px;">
+            {avatar_html}
+            <div class="level-badge">{level_label}</div>
+            <h3 style="margin:5px 0 0 0;">{display_name}</h3>
+            <p style="color:#94a3b8; font-size:12px; margin:0;">{user_data.get('xp_total', 0)} XP Acumulados</p>
+            <div class="role-pill" style="margin-top:5px;">{role}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # --- GUÍA DE RANGOS (MOVIDO ARRIBA) ---
+        with st.sidebar.expander("📖 Guía de Rangos"):
+            st.markdown("""
+            **Subir de nivel requiere XP:**
+            - **Aspirante**: 0 XP (Sin medalla)
+            - **Explorador**: 100 XP
+            - **Constructor**: 300 XP
+            - **Ingeniero**: 600 XP (Tu nivel actual)
+            - **Maestro**: 1200 XP (Ultimate Goal)
+
+            *Gana XP completando misiones y validando tus laboratorios.*
+            """)
+
+        st.sidebar.markdown("---")
+
+        # --- SECCIÓN DE MEDALLAS (CENTRADO Y GRANDE) ---
+        badges = user_data.get("badges", {})
+        if badges:
+            st.sidebar.markdown('<p style="font-weight:bold; margin-bottom:15px; font-size:14px; text-align: center; border-top: 1px solid rgba(128,128,128,0.2); paddingTop: 15px;">🏅 MIS MEDALLAS</p>', unsafe_allow_html=True)
+            for badge_id in badges:
+                badge_info = engine.get_badge_info(badge_id)
+                if badge_info:
+                    asset_path = badge_info.get("asset")
+                    if asset_path and Path(asset_path).exists():
+                        # Centered Layout: [Spacer, Image, Spacer]
+                        c1, c2, c3 = st.sidebar.columns([1, 4, 1])
+                        with c2:
+                            st.image(str(Path(asset_path)), use_column_width=True)
+
+                        # Caption
+                        st.sidebar.markdown(f"<div style='text-align: center; font-size: 11px; margin-bottom: 15px; color: #94a3b8;'>{badge_info.get('label')}</div>", unsafe_allow_html=True)
+                    else:
+                        st.sidebar.write(f"🔹 {badge_info.get('label')}")
+
     if auth_required and st.sidebar.button("Sign out"):
         write_audit_event(
             {
@@ -205,68 +305,112 @@ def main() -> None:
             audit_path,
         )
         st.session_state["access_logged"] = True
-    # Convertir a DataFrame para representación tabular
-    df = pd.DataFrame([
-        {
-            "uuid": rec.get("uuid"),
-            "archivo": Path(rec.get("file", "")).name if perms["view_file"] else f"file_{hash_identifier(str(rec.get('uuid', '')), hash_salt)}",
-            "tipo": rec.get("content_type"),
-            "palabras": rec.get("word_count"),
-            "etiquetas": ", ".join(rec.get("intent_tags", [])),
-            "sentimiento": rec.get("sentiment", {}).get("label"),
-            "relevancia": rec.get("relevance_score"),
-        }
-        for rec in data
-    ])
-    # Filtro por etiquetas
-    all_tags = sorted({tag for rec in data for tag in rec.get("intent_tags", [])})
-    selected_tags = st.multiselect("Filtra por etiquetas cognitivas", options=all_tags, default=all_tags)
-    if selected_tags and len(selected_tags) < len(all_tags):
-        mask = df["etiquetas"].apply(lambda x: any(tag in x for tag in selected_tags))
-        df_display = df[mask]
-    else:
-        df_display = df
-    st.dataframe(df_display, use_container_width=True)
-    if not perms["view_details"]:
-        st.info("Your role does not allow access to record details.")
-        return
-    # Seleccionar un registro para detalles
-    st.subheader("Detalles del registro")
-    selected_uuid = st.selectbox(
-        "Seleccione un UUID para ver detalles", options=["(Seleccione)"] + list(df_display["uuid"])
-    )
-    if selected_uuid and selected_uuid != "(Seleccione)":
-        rec = next((r for r in data if r.get("uuid") == selected_uuid), None)
-        if rec:
-            write_audit_event(
-                {
-                    "event": "ui_record_view",
-                    "timestamp": now_iso(),
-                    "env": env,
-                    "role": role,
-                    "actor": actor,
-                    "record_id": hash_identifier(str(rec.get("uuid", "")), hash_salt),
-                    "redacted": bool(rec.get("redacted")),
-                },
-                audit_path,
-            )
-            st.write(f"### {rec.get('title')}")
-            if perms["view_file"]:
-                st.write(f"**Archivo:** {rec.get('file')}")
-            else:
-                st.write("**Archivo:** restricted")
-            st.write(f"**Tipo de contenido:** {rec.get('content_type')}")
-            st.write(f"**Etiquetas:** {', '.join(rec.get('intent_tags', []))}")
-            st.write(f"**Sentimiento:** {rec.get('sentiment', {}).get('label')} (score: {rec.get('sentiment', {}).get('score')})")
-            st.write(f"**Resumen:** {rec.get('summary')}")
-            if perms["view_entities"] and rec.get('entities'):
-                st.write("**Entidades:**")
-                ent_df = pd.DataFrame(rec['entities'], columns=["Tipo", "Texto"])
-                st.table(ent_df)
-            if perms["view_entities"] and rec.get('author_signature'):
-                st.write(f"**Firma de autor:** {rec.get('author_signature')}")
-            st.write(f"**Puntuación de relevancia:** {rec.get('relevance_score')}")
 
+    # --- TABS PRINCIPALES ---
+    tab_analysis, tab_labs = st.tabs(["📝 Análisis Semántico", "🛡️ Gamification Hub"])
+
+    with tab_analysis:
+        # Convertir a DataFrame para representación tabular
+        df = pd.DataFrame([
+            {
+                "uuid": rec.get("uuid"),
+                "archivo": Path(rec.get("file", "")).name if perms["view_file"] else f"file_{hash_identifier(str(rec.get('uuid', '')), hash_salt)}",
+                "tipo": rec.get("content_type"),
+                "palabras": rec.get("word_count"),
+                "etiquetas": ", ".join(rec.get("intent_tags", [])),
+                "sentimiento": rec.get("sentiment", {}).get("label"),
+                "relevancia": rec.get("relevance_score"),
+            }
+            for rec in data
+        ])
+        # Filtro por etiquetas
+        all_tags = sorted({tag for rec in data for tag in rec.get("intent_tags", [])})
+        selected_tags = st.multiselect("Filtra por etiquetas cognitivas", options=all_tags, default=all_tags)
+        if selected_tags and len(selected_tags) < len(all_tags):
+            mask = df["etiquetas"].apply(lambda x: any(tag in x for tag in selected_tags))
+            df_display = df[mask]
+        else:
+            df_display = df
+        st.dataframe(df_display, use_container_width=True)
+        if not perms["view_details"]:
+            st.info("Your role does not allow access to record details.")
+        else:
+            # Seleccionar un registro para detalles
+            st.subheader("Detalles del registro")
+            selected_uuid = st.selectbox(
+                "Seleccione un UUID para ver detalles", options=["(Seleccione)"] + list(df_display["uuid"])
+            )
+            if selected_uuid and selected_uuid != "(Seleccione)":
+                rec = next((r for r in data if r.get("uuid") == selected_uuid), None)
+                if rec:
+                    write_audit_event(
+                        {
+                            "event": "ui_record_view",
+                            "timestamp": now_iso(),
+                            "env": env,
+                            "role": role,
+                            "actor": actor,
+                            "record_id": hash_identifier(str(rec.get("uuid", "")), hash_salt),
+                            "redacted": bool(rec.get("redacted")),
+                        },
+                        audit_path,
+                    )
+                    st.write(f"### {rec.get('title')}")
+                    if perms["view_file"]:
+                        st.write(f"**Archivo:** {rec.get('file')}")
+                    else:
+                        st.write("**Archivo:** restricted")
+                    st.write(f"**Tipo de contenido:** {rec.get('content_type')}")
+                    st.write(f"**Etiquetas:** {', '.join(rec.get('intent_tags', []))}")
+                    st.write(f"**Sentimiento:** {rec.get('sentiment', {}).get('label')} (score: {rec.get('sentiment', {}).get('score')})")
+                    st.write(f"**Resumen:** {rec.get('summary')}")
+                    if perms["view_entities"] and rec.get('entities'):
+                        st.write("**Entidades:**")
+                        ent_df = pd.DataFrame(rec['entities'], columns=["Tipo", "Texto"])
+                        st.table(ent_df)
+                    if perms["view_entities"] and rec.get('author_signature'):
+                        st.write(f"**Firma de autor:** {rec.get('author_signature')}")
+                    st.write(f"**Puntuación de relevancia:** {rec.get('relevance_score')}")
+
+    with tab_labs:
+        st.header("🎯 Misiones y Oráculos")
+        st.markdown("Bienvenido al **Command Center** de Atlantyqa. Aquí puedes validar tus pruebas de trabajo.")
+
+        if engine:
+            col1, col2, col3 = st.columns(3)
+            labs = [
+                {"id": "lab_01", "name": "Lab 01: Deep Dive", "xp": "150 XP", "icon": "🤿", "badge_key": "lab_1_badge"},
+                {"id": "lab_02", "name": "Lab 02: GitOps", "xp": "250 XP", "icon": "🔐", "badge_key": "lab_2_badge"},
+                {"id": "lab_03", "name": "Lab 03: Dashboard", "xp": "200 XP", "icon": "🎨", "badge_key": "lab_3_badge"},
+            ]
+
+            user_badges = user_data.get("badges", {}) if user_data else {}
+
+            for i, lab in enumerate(labs):
+                with [col1, col2, col3][i]:
+                    st.markdown(f"""
+                    <div class="glass-card mission-card">
+                        <h3>{lab['icon']} {lab['id'].upper()}</h3>
+                        <p>{lab['name']}</p>
+                        <p class="xp-label">Recompensa: {lab['xp']}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    if lab['badge_key'] in user_badges:
+                        st.success("✅ Completado")
+                    else:
+                        if st.button(f"Verificar {lab['id'].upper()}", key=f"btn_{lab['id']}"):
+                            with st.spinner(f"El Oráculo está verificando {lab['id']}..."):
+                                success, msg = engine.verify_lab(lab['id'])
+                                if success:
+                                    st.success(msg)
+                                    st.balloons()
+                                    # Force reload to update badge state
+                                    st.experimental_rerun()
+                                else:
+                                    st.error(msg)
+        else:
+            st.error("Error: Gamification Engine no disponible.")
 
 if __name__ == "__main__":
     main()

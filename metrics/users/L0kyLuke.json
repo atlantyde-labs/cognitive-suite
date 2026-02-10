@@ -1,0 +1,52 @@
+{
+  "user": "L0kyLuke",
+  "xp_total": 600,
+  "xp_effective": 600,
+  "xp_regulatory": 0,
+  "level": "L3",
+  "last_seen": "2026-02-09T23:25:00Z",
+  "badges": {
+    "lab_1_badge": {
+      "earned_at": "2026-02-09T22:00:00Z",
+      "xp_awarded": 150,
+      "source_lab": "lab_01"
+    },
+    "lab_2_badge": {
+      "earned_at": "2026-02-09T23:25:00Z",
+      "xp_awarded": 250,
+      "source_lab": "lab_02"
+    },
+    "lab_3_badge": {
+      "earned_at": "2026-02-09T23:25:00Z",
+      "xp_awarded": 200,
+      "source_lab": "lab_03"
+    }
+  },
+  "history": [
+    {
+      "type": "badge",
+      "badge": "owner_badge",
+      "xp": 180,
+      "pr": 42,
+      "timestamp": "2026-02-06T18:40:00Z",
+      "non_decay": false
+    }
+  ],
+  "feedback": [],
+  "domains": [],
+  "labs_unlocked": [
+    "LAB-000",
+    "LAB-010"
+  ],
+  "labs_locked": [
+    "LAB-020",
+    "LAB-SEC-030"
+  ],
+  "lab_credits": [
+    {
+      "lab": "LAB-010",
+      "credits": 2,
+      "eu_ects_equivalent": 0.5
+    }
+  ]
+}
