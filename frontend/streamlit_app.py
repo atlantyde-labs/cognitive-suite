@@ -31,6 +31,7 @@ from typing import List, Dict, Any, Optional
 import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
 import sys
+import logging
 
 # Asegurar que los scripts del motor son importables
 root_dir = Path(__file__).resolve().parent.parent
@@ -168,12 +169,13 @@ def get_git_username() -> str:
         res = subprocess.run(["git", "config", "user.name"], capture_output=True, text=True, check=False)
         if res.returncode == 0 and res.stdout.strip():
             return res.stdout.strip()
-    except Exception:
-        pass
+    except Exception as exc:
+        logging.debug("No se pudo obtener el usuario de Git: %s", exc)
 
     try:
         return os.getlogin()
-    except Exception:
+    except Exception as exc:
+        logging.debug("No se pudo obtener os.getlogin(): %s", exc)
         return "Guardian"
 
 

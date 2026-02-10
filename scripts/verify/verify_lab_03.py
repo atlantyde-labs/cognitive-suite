@@ -26,27 +26,15 @@ def verify():
     # Check for customization (Paso 4)
     content = dashboard_file.read_text(encoding="utf-8")
 
-    # Anchors for customization from Lab 03 instructions
+    # Markers that indicate the user followed Lab 03 instructions
     custom_markers = [
         "st.metric(",
-        "st.subheader(",
         "Mi Métrica Custom",
         "🎯"
     ]
 
-    # We want to find at least one marker that indicates changes in Paso 4
-    # but specifically ones that might have been added.
-    # Let's be more specific: the lab suggests:
-    # st.subheader("🎯 Mi Métrica Custom")
-    # st.metric("Total Entidades", ...)
-
-    if "🎯" in content or "Mi Métrica Custom" in content:
+    if any(marker in content for marker in custom_markers):
         return True, "Éxito: Personalización del Dashboard detectada. ¡Misión Lab 03 completada! 🎉"
-
-    # Fallback: check if the file was modified recently? No, better check for content.
-    # Let's count metrics. If they added a NEW metric.
-    if content.count("st.metric") > 0: # The baseline might not have any. Let's check.
-         return True, "Éxito: Se han detectado métricas personalizadas en el Dashboard."
 
     return False, "Fallo técnico: No se encontraron personalizaciones en el Dashboard. ¿Has completado el Paso 4 de la misión?"
 

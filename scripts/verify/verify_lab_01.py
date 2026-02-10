@@ -15,7 +15,6 @@ if sys.platform == "win32":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 def verify():
-    insights_file = Path("outputs/insights/analysis.json")
     analysis_file = Path("outputs/insights/analysis.json")
     audit_file = Path("outputs/audit/analysis.jsonl")
 
