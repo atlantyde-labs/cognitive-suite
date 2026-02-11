@@ -94,7 +94,7 @@ openai-whisper==20250625
 packaging==25.0
 pandas==2.3.3
     #   -r requirements.in
-pillow==12.1.0
+pillow==12.1.1
 platformdirs==4.5.1
 preshed==3.0.12
 protobuf==6.33.5

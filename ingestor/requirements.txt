@@ -41,7 +41,7 @@ numpy==2.2.6
     #   torchvision
 openai-whisper==20250625
     # via -r ingestor/requirements.in
-pillow==12.1.0
+pillow==12.1.1
     # via torchvision
 pymupdf==1.26.7
     # via -r ingestor/requirements.in
