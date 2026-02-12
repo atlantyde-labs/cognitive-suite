@@ -1,0 +1,118 @@
+name: UAT Knowledge Contracts
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      run_knowledge_uat:
+        description: "Run knowledge validation and contract checks"
+        type: boolean
+        default: true
+      run_docs_uat:
+        description: "Run MkDocs strict build as UAT docs gate"
+        type: boolean
+        default: true
+      upload_evidence:
+        description: "Upload UAT evidence artifacts"
+        type: boolean
+        default: true
+
+concurrency:
+  group: uat-knowledge-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  knowledge-uat:
+    name: Knowledge UAT (contracts + ontology)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' || inputs.run_knowledge_uat == true }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements-ci.txt
+
+      - name: Install CI deps
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements-ci.txt
+
+      - name: Validate knowledge schemas and datasets
+        run: |
+          python3 scripts/validate-knowledge.py
+
+      - name: Validate UAT view contracts and ontology model
+        run: |
+          python3 scripts/validate-knowledge-uat.py \
+            --output outputs/ci-evidence/knowledge-uat-report.json
+
+      - name: Publish UAT summary
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report_path = Path("outputs/ci-evidence/knowledge-uat-report.json")
+          report = json.loads(report_path.read_text(encoding="utf-8"))
+          summary = report.get("summary", {})
+          lines = [
+              "## Knowledge UAT Summary",
+              f"- Views total: {summary.get('views_total', 0)}",
+              f"- Views valid: {summary.get('views_valid', 0)}",
+              f"- Errors total: {summary.get('errors_total', 0)}",
+              f"- Report: `{report_path}`",
+          ]
+          step_summary = os.environ["GITHUB_STEP_SUMMARY"]
+          with open(step_summary, "a", encoding="utf-8") as f:
+              f.write("\n".join(lines) + "\n")
+          PY
+
+      - name: Upload knowledge UAT evidence
+        if: ${{ always() && (github.event_name == 'pull_request' || inputs.upload_evidence == true) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-uat-evidence
+          path: outputs/ci-evidence
+          if-no-files-found: error
+
+  docs-uat:
+    name: Docs UAT (MkDocs strict)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' || inputs.run_docs_uat == true }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+
+      - name: Install docs deps
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements-docs.txt
+
+      - name: Build docs strict
+        run: |
+          mkdocs build --strict
+
+      - name: Upload docs UAT artifact
+        if: ${{ always() && (github.event_name == 'pull_request' || inputs.upload_evidence == true) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-uat-site
+          path: site
+          if-no-files-found: error

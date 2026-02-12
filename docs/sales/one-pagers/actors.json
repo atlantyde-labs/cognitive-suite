@@ -1,0 +1,97 @@
+[
+  {
+    "id": "eu",
+    "actor_name": "Comisión Europea · One-Pager ATLANTYQA",
+    "elevator_pitch": "Europa tiene regulación, pero no siempre capacidad material para ejecutarla. Las empresas y administraciones quieren IA, automatización y eficiencia, pero sin perder el control de sus datos ni asumir riesgos regulatorios inasumibles. ATLANTYQA construye infraestructura cognitiva soberana: IA local, automatización auditada y cumplimiento como código. Reducimos dependencia externa, bajamos riesgo regulatorio y convertimos el cumplimiento en un activo productivo.",
+    "sovereign_stack_description": "Sovereign Cognitive Stack: IA local, agentes autónomos y evidencias continuas desplegadas en entornos air-gapped y microCPDs. La pila se coordina con squads TaaS y se apoya en workflows que generan SBOMs, bitácoras y métricas de impacto.",
+    "deliverables": [
+      "Kit 'AI Sovereignty-in-a-Box': microCPD + IA local + portal de evidencias listo para replicar en DGs y agencias europeas.",
+      "Compliance Evidence Factory: pipelines reproducibles, outputs/ci-evidence y dashboards de métricas + Gitea evidence repo.",
+      "Governed agents + kill-switch: agentes documentales/operativos con logs auditables y protocolos de mitigación respaldados por bot-review y metrics."
+    ],
+    "metrics": [
+      "Porcentaje de decisiones apoyadas en agentes locales vs cloud externo.",
+      "Evidencias almacenadas en outputs/ci-evidence y outputs/bot-evidence.",
+      "Badge + XP scoreboard reproducido en docs/portal/metrics.md y metrics/users/."
+    ],
+    "actor_anchor": "1-union-europea",
+    "team_onboarding": "squads ATLANTYQA + DGs",
+    "pilot_idea": "piloto AI Sovereignty-in-a-Box"
+  },
+  {
+    "id": "state",
+    "actor_name": "Estado español / Comunidades Autónomas · One-Pager ATLANTYQA",
+    "elevator_pitch": "El Estado y las CCAA necesitan digitalizar sin perder la soberanía de datos ni financiar infraestructuras externas. ATLANTYQA despliega nodos soberanos locales, automatización auditada y squads de talento que ejecutan políticas públicas con trazabilidad y control total.",
+    "sovereign_stack_description": "Municipal Sovereignty Starter: microCPD + IA local + portal ciudadano + evidence stack replicable con run-local-workflow.sh, docker-compose y playbooks de docs/ops/local-runner.md.",
+    "deliverables": [
+      "Kit 'Micro-CPD municipal' con despliegue guiado (docs + scripts).",
+      "Programa de squads ATLANTYQA Academy/TaaS que forma talento y opera nodos locales.",
+      "Panel de soberanía (dashboards en docs/portal/metrics.md, actualizaciones metrics/users) con evidencia de impacto para contralores."
+    ],
+    "metrics": [
+      "Número de nodos desplegados y replicados en provincias/regiones.",
+      "Evidencias registradas en outputs/bot-evidence y metrics/users.",
+      "Mejora de tiempos de servicio, reducción de coste y creación de empleo tecnológico local."
+    ],
+    "actor_anchor": "2-estado-espanol",
+    "team_onboarding": "área de innovación + squads ATLANTYQA Academy",
+    "pilot_idea": "piloto microCPD + portal ciudadano"
+  },
+  {
+    "id": "corp",
+    "actor_name": "Grandes corporaciones reguladas · One-Pager ATLANTYQA",
+    "elevator_pitch": "Los bancos, aseguradoras, utilities y hospitales necesitan automatizar con IA sin perder control ni abrir frentes regulatorios. ATLANTYQA ofrece agentes soberanos, compliance evidence pipelines y squads que operan con auditoría y conocimiento legal incorporado.",
+    "sovereign_stack_description": "Agentic Ops Pack: agentes documentales y de atención que corren on-premise o en microCPD seguro, acompañados de compliance-as-code y reporting en tiempo real. Todo auditado con bot-review y artefactos versionados.",
+    "deliverables": [
+      "Agentes documentales/operativos con guardarraíles configurables (perfiles predefinidos).",
+      "Compliance Evidence Factory (pipelines automáticos + outputs/ci-evidence + métricas).",
+      "Programas de reskilling (Academy + XP ledger) que documentan talento y asignan badges."
+    ],
+    "metrics": [
+      "Tiempo de ciclo reducido para aprobaciones y auditorías (medido en outputs/bot-evidence).",
+      "Reducción de incidentes relacionados con datos sensibles.",
+      "Dashboards de XP/badges activados para squads y reviewers (metrics/xp-rules)."
+    ],
+    "actor_anchor": "3-corporates",
+    "team_onboarding": "risk committees y squads legales",
+    "pilot_idea": "prueba piloto Agentic Ops Pack en un dominio regulado"
+  },
+  {
+    "id": "integrator",
+    "actor_name": "Integradores tecnológicos / partners · One-Pager ATLANTYQA",
+    "elevator_pitch": "Tus clientes exigen automatización soberana y compliance. ATLANTYQA te da un framework repetible (pipelines, evidence stack, squads) que puedes revender como servicio gestionado.",
+    "sovereign_stack_description": "Compliance Evidence Pack + Sovereign Agents replicable en partners, con workflows que generan artefactos reproducibles (release-*, add_to_project) y dashboards de métricas (docs/portal/metrics.md).",
+    "deliverables": [
+      "Marco 'Compliance-as-Code' listo para integrarse en propuestas (JSONL, badges, evidencias).",
+      "Kit de agentes soberanos + guardarraíles (scripts bot-review).",
+      "Formación/operación con squads ATLANTYQA Academy + TaaS (talento + XP ledger)."
+    ],
+    "metrics": [
+      "Número de deployments replicados por partner.",
+      "Evidencia generada por cliente final (outputs/ci-evidence, dashboards).",
+      "Revenue recurrente por mantenimiento/compliance + squads."
+    ],
+    "actor_anchor": "4-integradores",
+    "team_onboarding": "equipos comerciales + technical partners",
+    "pilot_idea": "taller conjunto y cliente piloto"
+  },
+  {
+    "id": "municipal",
+    "actor_name": "Municipios / administraciones locales · One-Pager ATLANTYQA",
+    "elevator_pitch": "Los municipios necesitan IA y automatización, pero con soberanía, seguridad y empleo local. ATLANTYQA despliega microCPDs, edge IA y talento operativo para resolver servicios ciudadanos con control total.",
+    "sovereign_stack_description": "Municipal Sovereignty Starter + Edge BlueTech (microCPD + sensórica + IA local + portal) apoyado en dashboard/app.py, vectorstore y workflows replicables.",
+    "deliverables": [
+      "Blueprint de microCPD municipal + portal ciudadano + Edge BlueTech.",
+      "Programa de squads ATLANTYQA Academy / TaaS para operar nodos.",
+      "Panel de gobierno (dashboards, evidencia, compliance) y manual de deployment replicable."
+    ],
+    "metrics": [
+      "Nodos desplegados (microCPDs + edge IA).",
+      "Ahorros energéticos y mejora de servicios.",
+      "Nuevos empleos tecnológicos locales y reskilling documentado en metrics/users."
+    ],
+    "actor_anchor": "5-municipios",
+    "team_onboarding": "equipos de smart city + procurement",
+    "pilot_idea": "demo con microCPD y portal"
+  }
+]

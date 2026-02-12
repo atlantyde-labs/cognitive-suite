@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cognitive-suite:knowledge:view-contract",
+  "title": "View Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "views"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "views": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "locale",
+          "path",
+          "audience",
+          "required_sections",
+          "required_links",
+          "taxonomy_bindings"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "es",
+              "en"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "audience": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_sections": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_links": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "taxonomy_bindings": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "domain",
+              "sector"
+            ],
+            "properties": {
+              "domain": {
+                "type": "string"
+              },
+              "sector": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
