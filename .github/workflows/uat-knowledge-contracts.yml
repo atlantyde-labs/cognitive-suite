@@ -50,6 +50,10 @@ jobs:
         run: |
           python3 scripts/validate-knowledge.py
 
+      - name: Validate stakeholder intake coherence
+        run: |
+          python3 scripts/validate-stakeholder-intake.py
+
       - name: Validate UAT view contracts and ontology model
         run: |
           python3 scripts/validate-knowledge-uat.py \

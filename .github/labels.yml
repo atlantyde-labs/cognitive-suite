@@ -174,3 +174,66 @@
 - name: codeowner-approved
   color: "0c4a6e"
   description: "Marca automática que indica que CODEOWNERS aprobó el PR early-adopter"
+
+# -------------------------
+# Intake stakeholders / SLA (respuesta rapida)
+# -------------------------
+- name: intake-stakeholder
+  color: "0052cc"
+  description: "Solicitud inicial de stakeholder para triage rapido"
+
+- name: sla-24h
+  color: "b60205"
+  description: "Respuesta inicial comprometida en menos de 24h"
+
+- name: sla-72h
+  color: "d93f0b"
+  description: "Respuesta inicial comprometida en menos de 72h"
+
+- name: sla-120h
+  color: "fbca04"
+  description: "Respuesta inicial comprometida en 5 dias habiles"
+
+- name: audience-pyme
+  color: "0e8a16"
+  description: "Stakeholder: pyme multisector"
+
+- name: audience-universidad
+  color: "5319e7"
+  description: "Stakeholder: universidad e investigacion"
+
+- name: audience-municipio
+  color: "0052cc"
+  description: "Stakeholder: ayuntamiento o territorio ITI"
+
+- name: audience-banca
+  color: "b07219"
+  description: "Stakeholder: banca y finanzas reguladas"
+
+- name: audience-salud
+  color: "d93f0b"
+  description: "Stakeholder: salud y hospitales"
+
+- name: audience-autonomo
+  color: "1d76db"
+  description: "Stakeholder: autonomo o microequipo"
+
+- name: audience-asesoria
+  color: "5319e7"
+  description: "Stakeholder: asesoria legal/fiscal/contable"
+
+- name: audience-administracion
+  color: "0052cc"
+  description: "Stakeholder: administracion publica o ente instrumental"
+
+- name: audience-cooperativa
+  color: "0e8a16"
+  description: "Stakeholder: cooperativa o economia social"
+
+- name: audience-utilities
+  color: "0c4a6e"
+  description: "Stakeholder: utilities, energia o transporte"
+
+- name: audience-otro
+  color: "cfd3d7"
+  description: "Stakeholder: segmento no clasificado"

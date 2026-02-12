@@ -1,0 +1,131 @@
+name: Stakeholder Intake Triage
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number to triage manually"
+        required: true
+        type: string
+
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  group: stakeholder-triage-${{ github.event.issue.number || github.event.inputs.issue_number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve issue number
+        id: ctx
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          INPUT_ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "issues" ]; then
+            echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! echo "${INPUT_ISSUE_NUMBER:-}" | grep -Eq '^[0-9]+$'; then
+            echo "::error::workflow_dispatch requires numeric issue_number"
+            exit 1
+          fi
+          echo "issue_number=$INPUT_ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Apply labels and quick response comment
+        uses: actions/github-script@v7
+        env:
+          ISSUE_NUMBER: ${{ steps.ctx.outputs.issue_number }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = Number(process.env.ISSUE_NUMBER);
+
+            const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number });
+            const body = issue.body || "";
+            const existing = new Set((issue.labels || []).map((l) => (typeof l === "string" ? l : l.name)));
+
+            function section(name) {
+              const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const re = new RegExp(`###\\s*${escaped}\\s*\\n([\\s\\S]*?)(?:\\n###\\s|$)`, "i");
+              const m = body.match(re);
+              return m ? m[1].trim() : "";
+            }
+
+            const title = issue.title || "";
+            const isStakeholder = title.startsWith("[Stakeholder]") || existing.has("intake-stakeholder") || body.includes("Tipo de stakeholder");
+            if (!isStakeholder) {
+              core.info("Issue is not a stakeholder intake. Skipping.");
+              return;
+            }
+
+            const stakeholder = section("Tipo de stakeholder");
+            const urgency = section("Urgencia de respuesta inicial");
+            const need = section("Necesidad principal");
+            const outcome = section("Resultado esperado en 30-90 dias");
+
+            const labels = new Set(["intake-stakeholder", "contrib-review", "level-beta"]);
+
+            const stakeholderMap = {
+              "Universidad / investigacion": ["audience-universidad", "domain-docs", "skill-data-ai", "compute-medium"],
+              "Ayuntamiento / territorio ITI": ["audience-municipio", "domain-ops", "skill-devsecops", "compute-medium"],
+              "Banca / finanzas reguladas": ["audience-banca", "domain-core", "skill-devsecops", "compute-medium"],
+              "Salud / hospital": ["audience-salud", "domain-core", "skill-devsecops", "compute-medium"],
+              "PYME (cualquier sector)": ["audience-pyme", "domain-core", "compute-low"],
+              "Autonomo / microequipo": ["audience-autonomo", "domain-core", "compute-low"],
+              "Asesoria legal/fiscal/contable": ["audience-asesoria", "domain-ops", "skill-docs", "compute-low"],
+              "Administracion publica / ente instrumental": ["audience-administracion", "domain-ops", "skill-devsecops", "compute-medium"],
+              "Cooperativa / economia social": ["audience-cooperativa", "domain-ops", "compute-low"],
+              "Utilities / energia / transporte": ["audience-utilities", "domain-ops", "skill-devsecops", "compute-medium"],
+              "Otro": ["audience-otro", "domain-ops", "compute-low"],
+            };
+
+            const urgencyMap = {
+              "Critica (respuesta inicial <24h)": "sla-24h",
+              "Alta (respuesta inicial <72h)": "sla-72h",
+              "Normal (respuesta inicial <=5 dias habiles)": "sla-120h",
+            };
+
+            (stakeholderMap[stakeholder] || ["audience-otro"]).forEach((l) => labels.add(l));
+            labels.add(urgencyMap[urgency] || "sla-120h");
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number,
+              labels: Array.from(labels),
+            });
+
+            const comment = [
+              "## ATLANTYQA Rapid Response",
+              "",
+              "Solicitud recibida y clasificada para triage tecnico inicial.",
+              "",
+              `- Stakeholder: ${stakeholder || "No especificado"}`,
+              `- Urgencia: ${urgency || "No especificada"}`,
+              `- Necesidad principal: ${need || "No especificada"}`,
+              `- Resultado esperado: ${outcome || "No especificado"}`,
+              "",
+              "### Siguiente paso del equipo tecnico",
+              "- [ ] Validar alcance y restricciones en primera revision",
+              "- [ ] Proponer respuesta inicial y plan 30-90 dias",
+              "- [ ] Asociar artefactos (trust pack / one-pager / piloto) y responsables",
+              "",
+              "Si necesitas acelerar la coordinacion, abre ademas un issue con plantilla **Rapid response task (equipo tecnico)**.",
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: comment,
+            });

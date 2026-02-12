@@ -31,3 +31,19 @@ labels:
     - ci-gitops
     - automation
     - ci-boott
+  stakeholders:
+    - intake-stakeholder
+    - sla-24h
+    - sla-72h
+    - sla-120h
+    - audience-universidad
+    - audience-municipio
+    - audience-banca
+    - audience-salud
+    - audience-pyme
+    - audience-autonomo
+    - audience-asesoria
+    - audience-administracion
+    - audience-cooperativa
+    - audience-utilities
+    - audience-otro

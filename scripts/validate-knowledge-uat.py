@@ -74,6 +74,7 @@ def _check_view_contracts(contracts: dict, ontology: dict, taxonomy: dict):
             "exists": view_path.exists(),
             "sections_ok": True,
             "links_ok": True,
+            "narrative_ok": True,
             "taxonomy_ok": True,
         }
 
@@ -81,6 +82,7 @@ def _check_view_contracts(contracts: dict, ontology: dict, taxonomy: dict):
             errors.append(f"view '{view_id}': file not found: {view['path']}")
             view_result["sections_ok"] = False
             view_result["links_ok"] = False
+            view_result["narrative_ok"] = False
             view_result["taxonomy_ok"] = False
             checks.append(view_result)
             continue
@@ -99,6 +101,18 @@ def _check_view_contracts(contracts: dict, ontology: dict, taxonomy: dict):
             if required_link not in content:
                 errors.append(f"view '{view_id}': required link not found: '{required_link}' in {view['path']}")
                 view_result["links_ok"] = False
+
+        narrative_contract = view.get("narrative_contract")
+        if isinstance(narrative_contract, dict):
+            min_occurrences = int(narrative_contract.get("min_occurrences", 1))
+            for marker in narrative_contract.get("markers", []):
+                occurrences = normalized_content.count(_norm(marker))
+                if occurrences < min_occurrences:
+                    errors.append(
+                        f"view '{view_id}': narrative marker '{marker}' appears {occurrences} times; "
+                        f"expected at least {min_occurrences}"
+                    )
+                    view_result["narrative_ok"] = False
 
         domain = view["taxonomy_bindings"]["domain"]
         sector = view["taxonomy_bindings"]["sector"]
@@ -211,7 +225,9 @@ def main():
     report["summary"] = {
         "views_total": len(view_contracts["views"]),
         "views_valid": sum(
-            1 for item in view_checks if item["exists"] and item["sections_ok"] and item["links_ok"] and item["taxonomy_ok"]
+            1
+            for item in view_checks
+            if item["exists"] and item["sections_ok"] and item["links_ok"] and item["narrative_ok"] and item["taxonomy_ok"]
         ),
         "errors_total": len(report["errors"]),
     }

@@ -30,6 +30,12 @@ entities:
     - municipalities
     - regulated_finance
     - healthcare
+    - smb_multisector
+    - freelancers
+    - advisory_firms
+    - public_administration
+    - cooperatives
+    - utilities_transport
     - regulated_industry
   labels:
     - domain-docs
@@ -44,6 +50,21 @@ entities:
     - level-beta
     - level-stable
     - level-critical
+    - intake-stakeholder
+    - sla-24h
+    - sla-72h
+    - sla-120h
+    - audience-universidad
+    - audience-municipio
+    - audience-banca
+    - audience-salud
+    - audience-pyme
+    - audience-autonomo
+    - audience-asesoria
+    - audience-administracion
+    - audience-cooperativa
+    - audience-utilities
+    - audience-otro
   fields:
     - Status
     - Area
@@ -71,6 +92,36 @@ relations:
     target: cognitive_suite
   - source_type: sector
     source: healthcare
+    relation_type: governed_by
+    target_type: domain
+    target: cognitive_suite
+  - source_type: sector
+    source: smb_multisector
+    relation_type: governed_by
+    target_type: domain
+    target: atlantyqa
+  - source_type: sector
+    source: freelancers
+    relation_type: governed_by
+    target_type: domain
+    target: atlantyqa
+  - source_type: sector
+    source: advisory_firms
+    relation_type: governed_by
+    target_type: domain
+    target: cognitive_suite
+  - source_type: sector
+    source: public_administration
+    relation_type: governed_by
+    target_type: domain
+    target: atlantyqa
+  - source_type: sector
+    source: cooperatives
+    relation_type: governed_by
+    target_type: domain
+    target: coop_model
+  - source_type: sector
+    source: utilities_transport
     relation_type: governed_by
     target_type: domain
     target: cognitive_suite

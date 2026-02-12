@@ -21,3 +21,4 @@ Este directorio estandariza **colecciones/diccionarios** para auditar y explotar
 Validacion recomendada:
 - `python3 scripts/validate-knowledge.py`
 - `python3 scripts/validate-knowledge-uat.py`
+- `python3 scripts/validate-stakeholder-intake.py`

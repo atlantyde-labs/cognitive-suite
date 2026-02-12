@@ -9,6 +9,16 @@ views:
       - compliance_risk
     required_sections:
       - "Infraestructura cognitiva soberana para decisiones reguladas"
+      - "Universidades e investigacion"
+      - "Ayuntamientos y territorios ITI"
+      - "Banca y finanzas reguladas"
+      - "Salud y hospitales"
+      - "PYMES multisector (ticket basico)"
+      - "Autonomos y microequipos"
+      - "Asesorias legales, fiscales y contables"
+      - "Administraciones publicas y entes instrumentales"
+      - "Cooperativas y economia social"
+      - "Otros sectores regulados"
       - "Trust Pack + recursos"
       - "CTA unico"
     required_links:
@@ -24,9 +34,16 @@ views:
     required_labels:
       - domain-docs
       - level-stable
+    narrative_contract:
+      markers:
+        - "**Audiencia**"
+        - "**Narrativa**"
+        - "**Oferta inicial**"
+        - "**Valor**"
+      min_occurrences: 10
     taxonomy_bindings:
       domain: atlantyqa
-      sector: municipalities
+      sector: smb_multisector
 
   - id: sector_hub_en
     locale: en
@@ -37,6 +54,16 @@ views:
       - compliance_risk
     required_sections:
       - "Sovereign cognitive infrastructure for regulated decision-making"
+      - "Universities & Research"
+      - "Municipalities & ITI territories"
+      - "Banking & Regulated Finance"
+      - "Healthcare & Hospitals"
+      - "SMBs across sectors (basic tier)"
+      - "Freelancers and micro-teams"
+      - "Legal, tax, and accounting firms"
+      - "Public administrations and public agencies"
+      - "Cooperatives and social economy organizations"
+      - "Other regulated sectors"
       - "Trust Pack + resources"
       - "Unified CTA"
     required_links:
@@ -52,9 +79,16 @@ views:
     required_labels:
       - domain-docs
       - level-stable
+    narrative_contract:
+      markers:
+        - "**Audience**"
+        - "**Narrative**"
+        - "**Starter offer**"
+        - "**Value**"
+      min_occurrences: 10
     taxonomy_bindings:
       domain: atlantyqa
-      sector: universities
+      sector: smb_multisector
 
   - id: trust_overview_es
     locale: es

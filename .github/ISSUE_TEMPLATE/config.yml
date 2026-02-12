@@ -3,3 +3,6 @@ contact_links:
   - name: "📚 Documentación"
     url: "https://github.com/atlantyde-labs/cognitive-suite"
     about: "Lee el README y la ruta de aprendizaje antes de abrir un issue."
+  - name: "🧭 Hub sectorial ATLANTYQA"
+    url: "https://atlantyde-labs.github.io/cognitive-suite/sectors/sector-hub/"
+    about: "Consulta la narrativa por sector antes de enviar una solicitud."

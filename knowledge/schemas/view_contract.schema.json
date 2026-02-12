@@ -70,6 +70,28 @@
               "type": "string"
             }
           },
+          "narrative_contract": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "markers",
+              "min_occurrences"
+            ],
+            "properties": {
+              "markers": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "min_occurrences": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
           "taxonomy_bindings": {
             "type": "object",
             "additionalProperties": false,
