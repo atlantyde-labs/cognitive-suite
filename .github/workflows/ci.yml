@@ -35,6 +35,13 @@ jobs:
               - 'docs/**'
               - 'mkdocs.yml'
               - 'requirements-docs.txt'
+              - 'requirements-ci.txt'
+              - 'knowledge/contracts/**'
+              - 'knowledge/datasets/**'
+              - 'knowledge/schemas/**'
+              - 'scripts/validate-knowledge.py'
+              - 'scripts/validate-stakeholder-intake.py'
+              - 'scripts/validate-knowledge-uat.py'
               - 'PATCH_MKDOCS_NAV_APPEND.md'
 
             fe:

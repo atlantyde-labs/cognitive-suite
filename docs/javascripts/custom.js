@@ -1,6 +1,17 @@
 // Custom JavaScript for Atlantyqa website
 // Set search placeholder to Spanish
 document.addEventListener('DOMContentLoaded', function () {
+  // Add a specific class for homepage routes to keep home-only style rules in global CSS
+  const path = window.location.pathname.replace(/\/+$/, '');
+  if (
+    path === '/cognitive-suite' ||
+    path === '/cognitive-suite/en' ||
+    path === '' ||
+    path === '/'
+  ) {
+    document.body.classList.add('home-page');
+  }
+
   // Search placeholder bilingual support
   const checkSearchInput = setInterval(function () {
     const searchInput = document.querySelector('.md-search__input');

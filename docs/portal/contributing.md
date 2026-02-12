@@ -5,8 +5,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Ciclo de Vida del PR</h3>
+<div class="tactical-container tactical-container--compact">
+  <h3 class="tactical-title">Ciclo de Vida del PR</h3>
   
 ```mermaid
 graph TD

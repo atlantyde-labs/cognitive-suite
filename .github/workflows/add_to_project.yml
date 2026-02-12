@@ -36,7 +36,7 @@ jobs:
         with:
           project-url: ${{ secrets.PROJECT_URL != '' && secrets.PROJECT_URL || 'https://github.com/orgs/atlantyde-labs/projects/2' }}
           github-token: ${{ secrets.PROJECT_TOKEN }}
-          labeled: good-first-issue, learning-task, ci-gitops, automation, ci-boott
+          labeled: good first issue, learning-task, ci-gitops, automation, ci-boott, intake-stakeholder, sla-24h, sla-72h, sla-120h, audience-universidad, audience-municipio, audience-banca, audience-salud, audience-pyme, audience-autonomo, audience-asesoria, audience-administracion, audience-cooperativa, audience-utilities, audience-otro
           label-operator: OR
 
       - name: Calculate Gamification Rewards

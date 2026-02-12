@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cognitive-suite:knowledge:taxonomy-ontology",
+  "title": "Taxonomy Ontology",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "metadata",
+    "classes",
+    "entities",
+    "relations"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner",
+        "updated_on"
+      ],
+      "properties": {
+        "owner": {
+          "type": "string"
+        },
+        "updated_on": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "entities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domains",
+        "sectors",
+        "labels",
+        "fields"
+      ],
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sectors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_type",
+          "source",
+          "relation_type",
+          "target_type",
+          "target"
+        ],
+        "properties": {
+          "source_type": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "relation_type": {
+            "type": "string"
+          },
+          "target_type": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,8 +5,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Cognitive Value Cycle</h3>
+<div class="tactical-container tactical-container--compact">
+  <h3 class="tactical-title">Cognitive Value Cycle</h3>
 
 ```mermaid
 graph TD
@@ -56,15 +56,15 @@ We reward real impact, not time in the chair.
 To ensure sustainable deliveries and prevent burnout.
 
 <div class="features-grid">
-    <div class="feature-card" style="border-left: 4px solid var(--atlantyqa-green);">
+    <div class="feature-card feature-card--accent-left-thin-green">
         <h3>Cycle Time</h3>
         <p>Time from <code>In Progress</code> to <code>Done</code>. Goal: Reduce blocks and external waits.</p>
     </div>
-    <div class="feature-card" style="border-left: 4px solid #182232;">
+    <div class="feature-card feature-card--accent-left-thin-navy">
         <h3>CI Reliability</h3>
         <p>Percentage of green builds ('Success'). A broken pipeline blocks learning.</p>
     </div>
-    <div class="feature-card" style="border-left: 4px solid #e7ae4c;">
+    <div class="feature-card feature-card--accent-left-thin-gold">
         <h3>Sovereign Adoption</h3>
         <p>% of PRs that respect the <strong>Local-First</strong> principle. No hidden cloud dependencies.</p>
     </div>

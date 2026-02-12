@@ -5,8 +5,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">PR Lifecycle</h3>
+<div class="tactical-container tactical-container--compact">
+  <h3 class="tactical-title">PR Lifecycle</h3>
 
 ```mermaid
 graph TD

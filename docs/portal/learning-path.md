@@ -5,8 +5,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 3rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy); margin-bottom: 2rem;">🗺️ Mapa de Capacidades</h3>
+<div class="tactical-container tactical-container--spacious">
+  <h3 class="tactical-title tactical-title--spaced">🗺️ Mapa de Capacidades</h3>
   
 ```mermaid
 graph TD
@@ -24,7 +24,7 @@ graph TD
 ## Niveles de Maestría
 
 === "🟢 Nivel 1: Explorador"
-    <div class="feature-card" style="border-left: 5px solid #e7ae4c;">
+    <div class="feature-card feature-card--accent-left-gold">
         <h3>Explorador Cognitivo</h3>
         <p><strong>Enfoque:</strong> Entender el terreno y las herramientas básicas.</p>
         <ul>
@@ -36,7 +36,7 @@ graph TD
     </div>
 
 === "🔵 Nivel 2: Constructor"
-    <div class="feature-card" style="border-left: 5px solid #37a880;">
+    <div class="feature-card feature-card--accent-left-green">
         <h3>Constructor de Sentido</h3>
         <p><strong>Enfoque:</strong> Mejorar la ingesta y visualización.</p>
         <ul>
@@ -47,7 +47,7 @@ graph TD
     </div>
 
 === "🟣 Nivel 3: Ingeniero"
-    <div class="feature-card" style="border-left: 5px solid #182232;">
+    <div class="feature-card feature-card--accent-left-navy">
         <h3>Ingeniero Cognitivo</h3>
         <p><strong>Enfoque:</strong> Automatización y Orquestación (GitOps).</p>
         <ul>
@@ -58,7 +58,7 @@ graph TD
     </div>
 
 === "⚫ Nivel 4: Estratega"
-    <div class="feature-card" style="border-left: 5px solid #000;">
+    <div class="feature-card feature-card--accent-left-black">
         <h3>Cooperador Estratégico</h3>
         <p><strong>Enfoque:</strong> Arquitectura y Gobernanza.</p>
         <ul>
@@ -85,7 +85,7 @@ El aprendizaje es activo. No hay exámenes, solo misiones reales.
 
 ---
 
-<div class="hero-cta" style="justify-content: center; margin-top: 4rem;">
+<div class="hero-cta hero-cta--center hero-cta--mt-4">
   <a href="../talent-challenge-labs/" class="btn-primary">Ver Labs de Desafío →</a>
   <a href="https://github.com/atlantyde-labs/cognitive-suite/issues/new/choose" class="btn-secondary" target="_blank">Abrir Nuevo Issue</a>
 </div>

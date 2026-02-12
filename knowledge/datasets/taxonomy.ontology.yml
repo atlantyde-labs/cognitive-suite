@@ -1,0 +1,172 @@
+version: "1.0"
+metadata:
+  owner: "Atlantyqa Knowledge Office"
+  updated_on: "2026-02-12"
+
+classes:
+  - id: domain
+    label: Domain
+    description: Functional knowledge domain in the Atlantyqa knowledge graph.
+  - id: sector
+    label: Sector
+    description: Target sector where value propositions and contracts are applied.
+  - id: view
+    label: View Contract
+    description: Public or internal documentation view with explicit quality requirements.
+  - id: label
+    label: Label
+    description: Git/project taxonomy labels.
+  - id: field
+    label: Project Field
+    description: Git project board fields mapped to governance reporting.
+
+entities:
+  domains:
+    - atlantyqa
+    - cognitive_suite
+    - coop_model
+  sectors:
+    - universities
+    - municipalities
+    - regulated_finance
+    - healthcare
+    - smb_multisector
+    - freelancers
+    - advisory_firms
+    - public_administration
+    - cooperatives
+    - utilities_transport
+    - regulated_industry
+  labels:
+    - domain-docs
+    - domain-core
+    - domain-ops
+    - skill-docs
+    - skill-data-ai
+    - skill-devsecops
+    - compute-low
+    - compute-medium
+    - compute-heavy
+    - level-beta
+    - level-stable
+    - level-critical
+    - intake-stakeholder
+    - sla-24h
+    - sla-72h
+    - sla-120h
+    - audience-universidad
+    - audience-municipio
+    - audience-banca
+    - audience-salud
+    - audience-pyme
+    - audience-autonomo
+    - audience-asesoria
+    - audience-administracion
+    - audience-cooperativa
+    - audience-utilities
+    - audience-otro
+  fields:
+    - Status
+    - Area
+    - Skill
+    - Compute
+    - Level
+    - Role
+    - XP
+
+relations:
+  - source_type: sector
+    source: universities
+    relation_type: governed_by
+    target_type: domain
+    target: atlantyqa
+  - source_type: sector
+    source: municipalities
+    relation_type: governed_by
+    target_type: domain
+    target: atlantyqa
+  - source_type: sector
+    source: regulated_finance
+    relation_type: governed_by
+    target_type: domain
+    target: cognitive_suite
+  - source_type: sector
+    source: healthcare
+    relation_type: governed_by
+    target_type: domain
+    target: cognitive_suite
+  - source_type: sector
+    source: smb_multisector
+    relation_type: governed_by
+    target_type: domain
+    target: atlantyqa
+  - source_type: sector
+    source: freelancers
+    relation_type: governed_by
+    target_type: domain
+    target: atlantyqa
+  - source_type: sector
+    source: advisory_firms
+    relation_type: governed_by
+    target_type: domain
+    target: cognitive_suite
+  - source_type: sector
+    source: public_administration
+    relation_type: governed_by
+    target_type: domain
+    target: atlantyqa
+  - source_type: sector
+    source: cooperatives
+    relation_type: governed_by
+    target_type: domain
+    target: coop_model
+  - source_type: sector
+    source: utilities_transport
+    relation_type: governed_by
+    target_type: domain
+    target: cognitive_suite
+  - source_type: sector
+    source: regulated_industry
+    relation_type: governed_by
+    target_type: domain
+    target: coop_model
+  - source_type: view
+    source: sector_hub_es
+    relation_type: uses_label
+    target_type: label
+    target: domain-docs
+  - source_type: view
+    source: sector_hub_en
+    relation_type: uses_label
+    target_type: label
+    target: domain-docs
+  - source_type: view
+    source: sector_hub_es
+    relation_type: tracked_by_field
+    target_type: field
+    target: Status
+  - source_type: view
+    source: sector_hub_en
+    relation_type: tracked_by_field
+    target_type: field
+    target: Status
+  - source_type: view
+    source: trust_overview_es
+    relation_type: uses_label
+    target_type: label
+    target: domain-docs
+  - source_type: view
+    source: trust_overview_en
+    relation_type: uses_label
+    target_type: label
+    target: domain-docs
+  - source_type: view
+    source: legal_privacy_es
+    relation_type: uses_label
+    target_type: label
+    target: domain-docs
+  - source_type: view
+    source: legal_privacy_en
+    relation_type: uses_label
+    target_type: label
+    target: domain-docs

@@ -1,0 +1,165 @@
+version: "1.0"
+views:
+  - id: sector_hub_es
+    locale: es
+    path: docs/sectors/sector-hub.md
+    audience:
+      - public_sector
+      - regulated_private
+      - compliance_risk
+    required_sections:
+      - "Infraestructura cognitiva soberana para decisiones reguladas"
+      - "Universidades e investigacion"
+      - "Ayuntamientos y territorios ITI"
+      - "Banca y finanzas reguladas"
+      - "Salud y hospitales"
+      - "PYMES multisector (ticket basico)"
+      - "Autonomos y microequipos"
+      - "Asesorias legales, fiscales y contables"
+      - "Administraciones publicas y entes instrumentales"
+      - "Cooperativas y economia social"
+      - "Otros sectores regulados"
+      - "Trust Pack + recursos"
+      - "CTA unico"
+    required_links:
+      - "../sales/trust-pack.md"
+      - "../trust/overview.md"
+      - "../trust/security-compliance.md"
+      - "../trust/deployment-models.md"
+      - "../sales/generated/eu.md"
+      - "../sales/generated/state.md"
+      - "../sales/generated/corp.md"
+      - "../sales/generated/municipal.md"
+      - "../sales/generated/integrator.md"
+    required_labels:
+      - domain-docs
+      - level-stable
+    narrative_contract:
+      markers:
+        - "**Audiencia**"
+        - "**Narrativa**"
+        - "**Oferta inicial**"
+        - "**Valor**"
+      min_occurrences: 10
+    taxonomy_bindings:
+      domain: atlantyqa
+      sector: smb_multisector
+
+  - id: sector_hub_en
+    locale: en
+    path: docs/sectors/sector-hub.en.md
+    audience:
+      - public_sector
+      - regulated_private
+      - compliance_risk
+    required_sections:
+      - "Sovereign cognitive infrastructure for regulated decision-making"
+      - "Universities & Research"
+      - "Municipalities & ITI territories"
+      - "Banking & Regulated Finance"
+      - "Healthcare & Hospitals"
+      - "SMBs across sectors (basic tier)"
+      - "Freelancers and micro-teams"
+      - "Legal, tax, and accounting firms"
+      - "Public administrations and public agencies"
+      - "Cooperatives and social economy organizations"
+      - "Other regulated sectors"
+      - "Trust Pack + resources"
+      - "Unified CTA"
+    required_links:
+      - "../sales/trust-pack.md"
+      - "../trust/overview.en.md"
+      - "../trust/security-compliance.en.md"
+      - "../trust/deployment-models.en.md"
+      - "../sales/generated/eu.md"
+      - "../sales/generated/state.md"
+      - "../sales/generated/corp.md"
+      - "../sales/generated/municipal.md"
+      - "../sales/generated/integrator.md"
+    required_labels:
+      - domain-docs
+      - level-stable
+    narrative_contract:
+      markers:
+        - "**Audience**"
+        - "**Narrative**"
+        - "**Starter offer**"
+        - "**Value**"
+      min_occurrences: 10
+    taxonomy_bindings:
+      domain: atlantyqa
+      sector: smb_multisector
+
+  - id: trust_overview_es
+    locale: es
+    path: docs/trust/overview.md
+    audience:
+      - compliance_risk
+      - procurement
+      - platform_ops
+    required_sections:
+      - "Trust & Governance"
+      - "Contenido del Trust Pack"
+    required_links:
+      - "One-pagers"
+      - "Security & Compliance"
+      - "RFPs"
+    required_labels:
+      - domain-docs
+    taxonomy_bindings:
+      domain: coop_model
+      sector: regulated_industry
+
+  - id: trust_overview_en
+    locale: en
+    path: docs/trust/overview.en.md
+    audience:
+      - compliance_risk
+      - procurement
+      - platform_ops
+    required_sections:
+      - "Trust & Governance"
+      - "Trust Pack Contents"
+    required_links:
+      - "one-pagers"
+      - "Security & Compliance"
+      - "RFPs"
+    required_labels:
+      - domain-docs
+    taxonomy_bindings:
+      domain: coop_model
+      sector: regulated_industry
+
+  - id: legal_privacy_es
+    locale: es
+    path: docs/legal/privacy.md
+    audience:
+      - legal
+      - compliance_risk
+    required_sections:
+      - "Politica de Privacidad"
+      - "Compromiso con la Privacidad"
+    required_links:
+      - "privacy@atlantyqa.com"
+    required_labels:
+      - domain-docs
+    taxonomy_bindings:
+      domain: coop_model
+      sector: regulated_industry
+
+  - id: legal_privacy_en
+    locale: en
+    path: docs/legal/privacy.en.md
+    audience:
+      - legal
+      - compliance_risk
+    required_sections:
+      - "Privacy Policy"
+      - "Privacy Commitment"
+    required_links:
+      - "privacy@atlantyqa.com"
+    required_labels:
+      - domain-docs
+    taxonomy_bindings:
+      domain: coop_model
+      sector: regulated_industry

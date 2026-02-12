@@ -1,0 +1,99 @@
+name: "Stakeholder intake (ATLANTYQA)"
+description: "Recoge peticiones iniciales de stakeholders para respuesta rapida del equipo tecnico."
+title: "[Stakeholder] "
+labels: ["intake-stakeholder", "contrib-review", "level-beta"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Este formulario activa el circuito de respuesta rapida ATLANTYQA.
+        Rellena los campos minimos para que el equipo tecnico pueda priorizar en la primera revision.
+
+  - type: dropdown
+    id: stakeholder_type
+    attributes:
+      label: "Tipo de stakeholder"
+      options:
+        - "Universidad / investigacion"
+        - "Ayuntamiento / territorio ITI"
+        - "Banca / finanzas reguladas"
+        - "Salud / hospital"
+        - "PYME (cualquier sector)"
+        - "Autonomo / microequipo"
+        - "Asesoria legal/fiscal/contable"
+        - "Administracion publica / ente instrumental"
+        - "Cooperativa / economia social"
+        - "Utilities / energia / transporte"
+        - "Otro"
+    validations:
+      required: true
+
+  - type: input
+    id: organization
+    attributes:
+      label: "Organizacion o proyecto"
+      placeholder: "Nombre de empresa, entidad o iniciativa"
+    validations:
+      required: true
+
+  - type: input
+    id: contact_role
+    attributes:
+      label: "Rol del solicitante"
+      placeholder: "CEO, responsable IT, asesor fiscal, secretaria general, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: need
+    attributes:
+      label: "Necesidad principal"
+      description: "Que problema quieres resolver ahora."
+      placeholder: "Describe el dolor operativo/regulatorio actual."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_outcome
+    attributes:
+      label: "Resultado esperado en 30-90 dias"
+      placeholder: "Que resultado tangible consideras exito."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: "Urgencia de respuesta inicial"
+      options:
+        - "Critica (respuesta inicial <24h)"
+        - "Alta (respuesta inicial <72h)"
+        - "Normal (respuesta inicial <=5 dias habiles)"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: compliance_scope
+    attributes:
+      label: "Contexto regulatorio (si aplica)"
+      options:
+        - label: "GDPR / privacidad de datos"
+        - label: "AI Act / gobernanza IA"
+        - label: "NIS2 / ciberseguridad"
+        - label: "CRA / cumplimiento tecnologico"
+        - label: "Ninguno / no aplica"
+
+  - type: input
+    id: preferred_channel
+    attributes:
+      label: "Canal de contacto preferido"
+      placeholder: "Email, reunion, telefono, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: "Referencias o adjuntos"
+      description: "Comparte enlaces, documentos o contexto adicional."
+      placeholder: "URLs, normativa, procesos internos, ejemplos."

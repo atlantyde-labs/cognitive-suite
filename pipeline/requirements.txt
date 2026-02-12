@@ -87,7 +87,7 @@ packaging==25.0
     #   thinc
     #   transformers
     #   weasel
-pillow==12.1.0
+pillow==12.1.1
     # via torchvision
 preshed==3.0.12
     # via

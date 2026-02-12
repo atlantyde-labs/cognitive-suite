@@ -80,8 +80,8 @@ extra:
 copyright: |
   <span class="atlantyqa-copyright-wrapper">
     &copy; 2026 Atlantyqa Labs. |
-    <a href="privacy-policy/">Política de Privacidad</a> ·
-    <a href="terms-of-service/">Términos de Servicio</a>
+    <a href="legal/privacy/">Política de Privacidad</a> ·
+    <a href="legal/terms/">Términos de Servicio</a>
   </span>
 
 plugins:
@@ -94,6 +94,19 @@ plugins:
           name: Español
           nav:
             - index.md
+            - Soluciones por sector:
+                - Hub sectorial: sectors/sector-hub.md
+                - Universidades: sectors/universities.md
+                - Municipios ITI: sectors/municipalities-iti.md
+                - Banca regulada: sectors/regulated-banking.md
+                - Salud y hospitales: sectors/healthcare.md
+            - Confianza y gobernanza:
+                - Visión general: trust/overview.md
+                - Seguridad y compliance: trust/security-compliance.md
+                - Modelos de despliegue: trust/deployment-models.md
+            - Legal:
+                - Política de Privacidad: legal/privacy.md
+                - Términos de Servicio: legal/terms.md
             - Comienza aquí:
                 - Inicio rápido: portal/quickstart.md
                 - Ruta de aprendizaje: portal/learning-path.md
@@ -144,6 +157,19 @@ plugins:
           name: English
           nav:
             - index.en.md
+            - Sector Solutions:
+                - Sector Hub: sectors/sector-hub.en.md
+                - Universities: sectors/universities.en.md
+                - ITI Municipalities: sectors/municipalities-iti.en.md
+                - Regulated Banking: sectors/regulated-banking.en.md
+                - Healthcare & Hospitals: sectors/healthcare.en.md
+            - Trust & Governance:
+                - Overview: trust/overview.en.md
+                - Security & Compliance: trust/security-compliance.en.md
+                - Deployment Models: trust/deployment-models.en.md
+            - Legal:
+                - Privacy Policy: legal/privacy.en.md
+                - Terms of Service: legal/terms.en.md
             - Start Here:
                 - Quickstart: portal/quickstart.en.md
                 - Learning Path: portal/learning-path.en.md

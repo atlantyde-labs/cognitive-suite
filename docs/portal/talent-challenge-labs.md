@@ -5,8 +5,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">El Ecosistema de Evaluación</h3>
+<div class="tactical-container tactical-container--compact">
+  <h3 class="tactical-title">El Ecosistema de Evaluación</h3>
 
 ```mermaid
 graph TD
@@ -26,23 +26,23 @@ graph TD
 Elige tu nivel de dificultad. Cada misión completada forja tu reputación en la comunidad.
 
 <div class="features-grid">
-    <div class="feature-card" style="border-top: 5px solid #e7ae4c;">
+    <div class="feature-card feature-card--accent-top-gold">
         <h3>🟢 Lab 01: Inmersión Profunda</h3>
         <p><strong>Objetivo:</strong> Configurar el <em>Pipeline Seguro</em>. Establecer una línea base y ejecutar el análisis local con redacción activa.</p>
         <p><strong>Recompensa:</strong> <code>50 XP</code> + Insignia 🛡️</p>
-        <a href="../lab-01-deep-dive/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Iniciar Misión</a>
+        <a href="../lab-01-deep-dive/" class="btn-secondary btn-block">Iniciar Misión</a>
     </div>
-    <div class="feature-card" style="border-top: 5px solid #37a880;">
+    <div class="feature-card feature-card--accent-top-green">
         <h3>🔵 Lab 02: GitOps Steward</h3>
         <p><strong>Objetivo:</strong> Sincronizar resultados a la nube sin filtrar ni un solo byte sensible. Dominar el flujo GitOps seguro.</p>
         <p><strong>Recompensa:</strong> <code>100 XP</code> + Insignia ☁️</p>
-        <a href="../lab-02-gitops-steward/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Iniciar Misión</a>
+        <a href="../lab-02-gitops-steward/" class="btn-secondary btn-block">Iniciar Misión</a>
     </div>
-    <div class="feature-card" style="border-top: 5px solid #182232;">
+    <div class="feature-card feature-card--accent-top-navy">
         <h3>🟣 Lab 03: Bootstrap Dashboard</h3>
         <p><strong>Objetivo:</strong> Crear un centro de comando visual con Streamlit. Visualizar insights sin tocar código.</p>
         <p><strong>Recompensa:</strong> <code>75 XP</code> + Insignia 📊</p>
-        <a href="../lab-03-bootstrap-dashboard/" class="btn-secondary" style="width:100%; text-align:center; margin-top:1rem;">Iniciar Misión</a>
+        <a href="../lab-03-bootstrap-dashboard/" class="btn-secondary btn-block">Iniciar Misión</a>
     </div>
 </div>
 

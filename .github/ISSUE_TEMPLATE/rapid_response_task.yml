@@ -1,0 +1,65 @@
+name: "Rapid response task (equipo tecnico)"
+description: "Plantilla operativa para responder rapidamente a una solicitud de stakeholder."
+title: "[Rapid-Response] "
+labels: ["contrib-review", "contrib-automation", "domain-ops", "level-beta"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Usa esta plantilla para convertir una solicitud de stakeholder en una respuesta tecnica accionable.
+
+  - type: input
+    id: intake_issue
+    attributes:
+      label: "Issue de intake origen"
+      placeholder: "#123"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: squad
+    attributes:
+      label: "Squad responsable"
+      options:
+        - "Docs/Enablement"
+        - "Platform/GitOps"
+        - "Data/AI"
+        - "Compliance/Trust"
+        - "Cross-functional"
+    validations:
+      required: true
+
+  - type: textarea
+    id: triage_summary
+    attributes:
+      label: "Resumen tecnico de triage"
+      placeholder: "Contexto, restricciones y propuesta de respuesta inicial."
+    validations:
+      required: true
+
+  - type: textarea
+    id: quick_actions
+    attributes:
+      label: "Acciones 24-72h"
+      placeholder: "- [ ] validar alcance\n- [ ] preparar respuesta\n- [ ] coordinar siguiente hito"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "Criterios de cierre"
+      placeholder: "- [ ] respuesta enviada\n- [ ] plan acordado\n- [ ] artefactos compartidos"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: sla
+    attributes:
+      label: "SLA comprometido"
+      options:
+        - "sla-24h"
+        - "sla-72h"
+        - "sla-120h"
+    validations:
+      required: true

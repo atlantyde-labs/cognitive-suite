@@ -3,10 +3,6 @@ hide:
   - title
 ---
 
-<style>
-  .md-content h1 { display: none !important; }
-</style>
-
 <div class="hero-sov" markdown="1">
 
 <span class="sovereignty-badge">Enclave Local · Soberanía Digital</span>
@@ -118,9 +114,9 @@ python cogctl.py analyze
 
 </div>
 
-<div style="text-align: center; margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, rgba(55, 168, 128, 0.05) 0%, rgba(231, 174, 76, 0.05) 100%); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
-<p style="font-size: 1.1rem; font-weight: 600; color: var(--atlantyqa-navy); margin-bottom: 1.5rem;">
+<div class="cta-panel">
+<p class="cta-panel__text">
 ¿Preparado para asegurar tu soberanía digital?
 </p>
-<a href="portal/quickstart/" class="btn-primary" style="display: inline-block;">Iniciar Learning Path →</a>
+<a href="portal/quickstart/" class="btn-primary btn-primary--inline">Iniciar Learning Path →</a>
 </div>
