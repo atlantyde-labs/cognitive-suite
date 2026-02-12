@@ -73,7 +73,7 @@ views:
     required_labels:
       - domain-docs
     taxonomy_bindings:
-      domain: cognitive_suite
+      domain: coop_model
       sector: regulated_industry
 
   - id: trust_overview_en
@@ -93,7 +93,7 @@ views:
     required_labels:
       - domain-docs
     taxonomy_bindings:
-      domain: cognitive_suite
+      domain: coop_model
       sector: regulated_industry
 
   - id: legal_privacy_es
@@ -110,7 +110,7 @@ views:
     required_labels:
       - domain-docs
     taxonomy_bindings:
-      domain: atlantyqa
+      domain: coop_model
       sector: regulated_industry
 
   - id: legal_privacy_en
@@ -127,5 +127,5 @@ views:
     required_labels:
       - domain-docs
     taxonomy_bindings:
-      domain: atlantyqa
+      domain: coop_model
       sector: regulated_industry

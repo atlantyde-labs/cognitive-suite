@@ -53,6 +53,17 @@ def _check_view_contracts(contracts: dict, ontology: dict, taxonomy: dict):
     ontology_sectors = set(ontology["entities"]["sectors"])
     taxonomy_domains = set(taxonomy["domains"])
     taxonomy_labels = set(taxonomy["labels"])
+    sector_domain_map = {}
+    for relation in ontology.get("relations", []):
+        if (
+            relation.get("source_type") == "sector"
+            and relation.get("relation_type") == "governed_by"
+            and relation.get("target_type") == "domain"
+        ):
+            sector = relation.get("source")
+            domain = relation.get("target")
+            if isinstance(sector, str) and isinstance(domain, str):
+                sector_domain_map.setdefault(sector, set()).add(domain)
 
     for view in contracts["views"]:
         view_id = view["id"]
@@ -99,6 +110,18 @@ def _check_view_contracts(contracts: dict, ontology: dict, taxonomy: dict):
             view_result["taxonomy_ok"] = False
         if sector not in ontology_sectors:
             errors.append(f"view '{view_id}': taxonomy sector '{sector}' not present in ontology")
+            view_result["taxonomy_ok"] = False
+        allowed_domains = sorted(sector_domain_map.get(sector, set()))
+        if not allowed_domains:
+            errors.append(
+                f"view '{view_id}': sector '{sector}' has no governed_by relation in ontology; cannot validate domain binding"
+            )
+            view_result["taxonomy_ok"] = False
+        elif domain not in allowed_domains:
+            errors.append(
+                f"view '{view_id}': invalid taxonomy binding domain='{domain}' for sector='{sector}' "
+                f"(allowed: {', '.join(allowed_domains)})"
+            )
             view_result["taxonomy_ok"] = False
 
         for label in view.get("required_labels", []):
