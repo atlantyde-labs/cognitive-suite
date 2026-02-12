@@ -5,8 +5,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Organic Architecture</h3>
+<div class="tactical-container tactical-container--compact">
+  <h3 class="tactical-title">Organic Architecture</h3>
 
 ```mermaid
 graph TD
@@ -29,7 +29,7 @@ graph TD
 
 This is not just a code repository; it's the digital manifestation of a collective will.
 
-<div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+<div class="features-grid features-grid--compact">
     <div class="feature-card">
         <h3>🧠 The Visionary (Kbza)</h3>
         <p><strong>Roles:</strong> CEO · CIO · DevSecOps · Ethical Designer</p>
@@ -76,7 +76,7 @@ A phased cognitive conquest plan.
 
 This repository is the meeting point to materialize this vision.
 
-<div class="hero-cta" style="justify-content: start;">
+<div class="hero-cta hero-cta--start">
   <a href="../../adoption-plan/" class="btn-primary">View Adoption Plan</a>
   <a href="../../internal/execution-plan/" class="btn-secondary">Technical Execution Plan</a>
   <a href="../metrics/" class="btn-secondary">Impact Metrics</a>

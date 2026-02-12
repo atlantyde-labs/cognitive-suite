@@ -154,7 +154,7 @@ Screenshots adjuntos en /evidence folder.
 
 Has creado tu centro de comando visual. ¡Felicidades!
 
-<div class="hero-cta" style="justify-content: start; margin-top: 3rem;">
+<div class="hero-cta hero-cta--start hero-cta--mt-3">
   <a href="../contributing/" class="btn-primary">Contribuir al Proyecto →</a>
   <a href="../talent-challenge-labs/" class="btn-secondary">Volver a Labs</a>
 </div>

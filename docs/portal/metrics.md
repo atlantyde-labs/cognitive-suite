@@ -5,8 +5,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Ciclo de Valor Cognitivo</h3>
+<div class="tactical-container tactical-container--compact">
+  <h3 class="tactical-title">Ciclo de Valor Cognitivo</h3>
 
 ```mermaid
 graph TD
@@ -173,15 +173,15 @@ Usa `exports/run_exports.py` para ejecutar todo el pipeline a la vez y mantener 
 Para garantizar entregas sostenibles y prevenir el *burnout*.
 
 <div class="features-grid">
-    <div class="feature-card" style="border-left: 4px solid var(--atlantyqa-green);">
+    <div class="feature-card feature-card--accent-left-thin-green">
         <h3>Cycle Time</h3>
         <p>Tiempo de <code>In Progress</code> a <code>Done</code>. Objetivo: Reducir bloqueos y esperas externas.</p>
     </div>
-    <div class="feature-card" style="border-left: 4px solid #182232;">
+    <div class="feature-card feature-card--accent-left-thin-navy">
         <h3>CI Reliability</h3>
         <p>Porcentaje de builds verdes ('Success'). Un pipeline roto bloquea el aprendizaje.</p>
     </div>
-    <div class="feature-card" style="border-left: 4px solid #e7ae4c;">
+    <div class="feature-card feature-card--accent-left-thin-gold">
         <h3>Sovereign Adoption</h3>
         <p>% de PRs que respetan el principio <strong>Local-First</strong>. Sin dependencias ocultas de la nube.</p>
     </div>

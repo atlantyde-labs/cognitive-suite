@@ -5,8 +5,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 3rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy); margin-bottom: 2rem;">🗺️ Capabilities Map</h3>
+<div class="tactical-container tactical-container--spacious">
+  <h3 class="tactical-title tactical-title--spaced">🗺️ Capabilities Map</h3>
 
 ```mermaid
 graph TD
@@ -24,7 +24,7 @@ graph TD
 ## Mastery Levels
 
 === "🟢 Level 1: Explorer"
-    <div class="feature-card" style="border-left: 5px solid #e7ae4c;">
+    <div class="feature-card feature-card--accent-left-gold">
         <h3>Cognitive Explorer</h3>
         <p><strong>Focus:</strong> Understand the terrain and basic tools.</p>
         <ul>
@@ -36,7 +36,7 @@ graph TD
     </div>
 
 === "🔵 Level 2: Builder"
-    <div class="feature-card" style="border-left: 5px solid #37a880;">
+    <div class="feature-card feature-card--accent-left-green">
         <h3>Sense Builder</h3>
         <p><strong>Focus:</strong> Improve ingestion and visualization.</p>
         <ul>
@@ -47,7 +47,7 @@ graph TD
     </div>
 
 === "🟣 Level 3: Engineer"
-    <div class="feature-card" style="border-left: 5px solid #182232;">
+    <div class="feature-card feature-card--accent-left-navy">
         <h3>Cognitive Engineer</h3>
         <p><strong>Focus:</strong> Automation and Orchestration (GitOps).</p>
         <ul>
@@ -58,7 +58,7 @@ graph TD
     </div>
 
 === "⚫ Level 4: Strategist"
-    <div class="feature-card" style="border-left: 5px solid #000;">
+    <div class="feature-card feature-card--accent-left-black">
         <h3>Strategic Cooperator</h3>
         <p><strong>Focus:</strong> Architecture and Governance.</p>
         <ul>
@@ -85,7 +85,7 @@ Learning is active. No exams, only real missions.
 
 ---
 
-<div class="hero-cta" style="justify-content: center; margin-top: 4rem;">
+<div class="hero-cta hero-cta--center hero-cta--mt-4">
   <a href="../talent-challenge-labs/" class="btn-primary">View Challenge Labs →</a>
   <a href="https://github.com/atlantyde-labs/cognitive-suite/issues/new/choose" class="btn-secondary" target="_blank">Open New Issue</a>
 </div>

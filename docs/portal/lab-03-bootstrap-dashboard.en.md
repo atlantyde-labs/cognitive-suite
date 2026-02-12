@@ -154,7 +154,7 @@ Want to stand out? Implement these improvements:
 
 You've created your visual command center. Congratulations!
 
-<div class="hero-cta" style="justify-content: start; margin-top: 3rem;">
+<div class="hero-cta hero-cta--start hero-cta--mt-3">
   <a href="../contributing/" class="btn-primary">Contribute to Project →</a>
   <a href="../talent-challenge-labs/" class="btn-secondary">Back to Labs</a>
 </div>

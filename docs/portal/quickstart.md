@@ -7,8 +7,8 @@
 
 ---
 
-<div class="tactical-container" style="margin: 4rem 0; padding: 2rem;">
-  <h3 style="margin-top: 0; text-align: center; color: var(--atlantyqa-navy);">Flujo de Activación</h3>
+<div class="tactical-container tactical-container--compact">
+  <h3 class="tactical-title">Flujo de Activación</h3>
 
 ```mermaid
 graph LR
@@ -116,6 +116,6 @@ El archivo `analysis.json` es el "cerebro" extraído de tu documento. Aquí te e
 
 ### Siguiente Nivel
 
-<div class="hero-cta" style="justify-content: start; margin-top: 3rem;">
+<div class="hero-cta hero-cta--start hero-cta--mt-3">
   <a href="../learning-path/" class="btn-primary">Explorar Ruta de Aprendizaje →</a>
 </div>

@@ -159,6 +159,10 @@ plugins:
             - index.en.md
             - Sector Solutions:
                 - Sector Hub: sectors/sector-hub.en.md
+                - Universities: sectors/universities.en.md
+                - ITI Municipalities: sectors/municipalities-iti.en.md
+                - Regulated Banking: sectors/regulated-banking.en.md
+                - Healthcare & Hospitals: sectors/healthcare.en.md
             - Trust & Governance:
                 - Overview: trust/overview.en.md
                 - Security & Compliance: trust/security-compliance.en.md

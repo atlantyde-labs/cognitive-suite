@@ -138,7 +138,7 @@ Antes de hacer push, ejecuta esta validación automática para asegurar la sober
 
 Has dominado la sincronización segura. Ahora aprende a visualizar estos datos.
 
-<div class="hero-cta" style="justify-content: start; margin-top: 3rem;">
+<div class="hero-cta hero-cta--start hero-cta--mt-3">
   <a href="../lab-03-bootstrap-dashboard/" class="btn-primary">Ir a Lab 03: Dashboard →</a>
   <a href="../talent-challenge-labs/" class="btn-secondary">Volver a Labs</a>
 </div>

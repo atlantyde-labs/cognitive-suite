@@ -138,7 +138,7 @@ Before pushing, run this automated validation to ensure data sovereignty:
 
 You've mastered secure synchronization. Now learn to visualize this data.
 
-<div class="hero-cta" style="justify-content: start; margin-top: 3rem;">
+<div class="hero-cta hero-cta--start hero-cta--mt-3">
   <a href="../lab-03-bootstrap-dashboard/" class="btn-primary">Go to Lab 03: Dashboard →</a>
   <a href="../talent-challenge-labs/" class="btn-secondary">Back to Labs</a>
 </div>
