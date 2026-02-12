@@ -214,16 +214,30 @@ def main():
         "errors": [],
     }
 
-    report["errors"].extend(_validate_schema(view_contracts, _load_json(VIEW_CONTRACT_SCHEMA), "view_contracts"))
-    report["errors"].extend(_validate_schema(ontology, _load_json(ONTOLOGY_SCHEMA), "taxonomy_ontology"))
+    view_schema_errors = _validate_schema(view_contracts, _load_json(VIEW_CONTRACT_SCHEMA), "view_contracts")
+    ontology_schema_errors = _validate_schema(ontology, _load_json(ONTOLOGY_SCHEMA), "taxonomy_ontology")
+    report["errors"].extend(view_schema_errors)
+    report["errors"].extend(ontology_schema_errors)
 
-    view_errors, view_checks = _check_view_contracts(view_contracts, ontology, taxonomy)
-    report["errors"].extend(view_errors)
-    report["checks"].extend(view_checks)
+    view_checks = []
+    if view_schema_errors or ontology_schema_errors:
+        if view_schema_errors:
+            report["errors"].append(
+                "[knowledge-uat] semantic checks skipped: view contracts schema validation failed"
+            )
+        if ontology_schema_errors:
+            report["errors"].append(
+                "[knowledge-uat] semantic checks skipped: ontology schema validation failed"
+            )
+    else:
+        view_errors, view_checks = _check_view_contracts(view_contracts, ontology, taxonomy)
+        report["errors"].extend(view_errors)
+        report["checks"].extend(view_checks)
+        report["errors"].extend(_check_ontology_alignment(ontology, taxonomy))
 
-    report["errors"].extend(_check_ontology_alignment(ontology, taxonomy))
+    views = view_contracts.get("views", []) if isinstance(view_contracts, dict) else []
     report["summary"] = {
-        "views_total": len(view_contracts["views"]),
+        "views_total": len(views) if isinstance(views, list) else 0,
         "views_valid": sum(
             1
             for item in view_checks
