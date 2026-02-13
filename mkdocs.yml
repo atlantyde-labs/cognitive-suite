@@ -100,6 +100,12 @@ plugins:
                 - Municipios ITI: sectors/municipalities-iti.md
                 - Banca regulada: sectors/regulated-banking.md
                 - Salud y hospitales: sectors/healthcare.md
+                - PYMES multisector: sectors/smbs.md
+                - Autonomos y microequipos: sectors/freelancers.md
+                - Asesorias legales, fiscales y contables: sectors/advisory-firms.md
+                - Administraciones publicas y entes: sectors/public-administration.md
+                - Cooperativas y economia social: sectors/cooperatives.md
+                - Otros sectores regulados: sectors/other-regulated.md
             - Confianza y gobernanza:
                 - Visión general: trust/overview.md
                 - Seguridad y compliance: trust/security-compliance.md
@@ -163,6 +169,12 @@ plugins:
                 - ITI Municipalities: sectors/municipalities-iti.en.md
                 - Regulated Banking: sectors/regulated-banking.en.md
                 - Healthcare & Hospitals: sectors/healthcare.en.md
+                - SMBs Across Sectors: sectors/smbs.en.md
+                - Freelancers & Micro-teams: sectors/freelancers.en.md
+                - Legal, Tax & Accounting Firms: sectors/advisory-firms.en.md
+                - Public Administrations & Agencies: sectors/public-administration.en.md
+                - Cooperatives & Social Economy: sectors/cooperatives.en.md
+                - Other Regulated Sectors: sectors/other-regulated.en.md
             - Trust & Governance:
                 - Overview: trust/overview.en.md
                 - Security & Compliance: trust/security-compliance.en.md

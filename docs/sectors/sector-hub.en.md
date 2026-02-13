@@ -2,79 +2,222 @@
 
 ## Sovereign cognitive infrastructure for regulated decision-making
 
-ATLANTYQA combines local-first integration, governance, and compliance so every institution can adopt AI without losing control or trust. This page acts as the single hub for public and regulated sectors; each subsection summarizes what already exists in the one-pagers and landing drafts, focusing on what each committee needs to see.
+
+Infrastructure that deploys AI with control, compliance, and measurable outcomes, ready for your sector.
+This hub guides decision-makers through use cases, expected impact, and deployment models across universities, municipalities, regulated finance, healthcare, SMBs, advisory firms, and cooperatives.
+Displayed KPIs are pilot reference ranges and are calibrated by sector and baseline maturity.
+
 
 ---
 
 ## Universities & Research
 
-- **Audience**: rectorates, CIO offices, research leads, and postgraduate program directors.  
-- **Narrative**: scientific data sovereignty to reduce hyperscaler dependency and protect sensitive EU-funded research.  
-- **Starter offer**: reproducible research/teaching stack + GDPR/DPIA compliance layer + applied Academy squads.  
-- **Value**: institutional control of knowledge assets, faster ethics approvals, and verifiable operational talent.
+[View detailed page](./universities.en.md)
+
+### The challenge
+Sensitive data handling, long ethics/GDPR approval cycles, and external cloud dependency in research operations.
+
+### What you gain
+Institutional control of research data, stronger reproducibility, and governance-ready academic operations.
+
+### How we deploy
+4-6 week pilot with local/hybrid stack, DPIA-ready evidence, and reproducible environments for teaching and research.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Ethics/GDPR approval cycle time | -30% to -40% |
+| Operational reproducibility across projects | +25% to +35% |
+| External cloud dependency | -20% to -30% |
 
 ## Municipalities & ITI territories
 
-- **Audience**: mayor offices, city secretariat, internal control, procurement, and digital transformation units.  
-- **Narrative**: public digital infrastructure that stays in territory and avoids lock-in for critical services.  
-- **Starter offer**: municipal/ITI sovereign node + administrative use-case catalog + procurement-ready rollout model.  
-- **Value**: operational continuity, auditable traceability, and improved medium-term total cost.
+[View detailed page](./municipalities-iti.en.md)
+
+### The challenge
+Slow administrative cycles, limited traceability for oversight, and lock-in risk in critical service platforms.
+
+### What you gain
+Governed municipal AI services with full case traceability and digital capacity that remains in territory.
+
+### How we deploy
+6-8 week pilot with a sovereign municipal node, two prioritized administrative processes, and oversight evidence.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Administrative cycle time | -20% to -35% |
+| Traceability in critical case flows | +40% to +60% |
+| Single-vendor operational dependency | -15% to -25% |
 
 ## Banking & Regulated Finance
 
-- **Audience**: risk committees, compliance, operations leadership, CIO/CISO, and internal audit.  
-- **Narrative**: governed automation with continuous evidence so AI can scale without regulatory exposure.  
-- **Starter offer**: auditable agents for backoffice/legal/reporting + evidence factory (AI Act, GDPR, NIS2, DORA, CRA).  
-- **Value**: lower sanction risk, faster audits, and measurable operational efficiency.
+[View detailed page](./regulated-banking.en.md)
+
+### The challenge
+Need to accelerate AI automation without increasing regulatory exposure or audit complexity.
+
+### What you gain
+AI that passes audits with continuous evidence, lower supervisory friction, and measurable process efficiency.
+
+### How we deploy
+6-week pilot in backoffice/legal/reporting with auditable agents, full logs, and approval controls.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Audit preparation time | -25% to -40% |
+| Operational compliance incidents | -15% to -30% |
+| Document process productivity | +20% to +35% |
 
 ## Healthcare & Hospitals
 
-- **Audience**: medical leadership, hospital IT, DPO teams, and care quality offices.  
-- **Narrative**: assistant AI (not autonomous AI) with full clinical traceability and strict health-data control.  
-- **Starter offer**: modular pilot for clinical/admin workflows + DPIA-ready architecture and on-prem residency.  
-- **Value**: reduced legal/ethical risk, safer adoption, and better administrative cycle times.
+[View detailed page](./healthcare.en.md)
+
+### The challenge
+High clinical admin burden, sensitive data risk, and low trust in non-traceable AI support.
+
+### What you gain
+Safe assistant AI for critical environments with on-prem data control and mandatory human oversight.
+
+### How we deploy
+6-8 week pilot for clinical documentation and administrative workflows with DPIA-ready architecture.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Admin workload per case | -15% to -30% |
+| Clinical documentation turnaround time | -20% to -35% |
+| Traceable assisted decisions coverage | +40% to +60% |
 
 ## SMBs across sectors (basic tier)
 
-- **Audience**: management, operations, and admin teams with limited resources and clear ROI pressure.  
-- **Narrative**: practical automation from week one without adding technical complexity or compliance exposure.  
-- **Starter offer**: "basic tier" package with document agent, compliance evidence, and an operations dashboard.  
-- **Value**: lower admin workload, stronger data control, and predictable monthly cost.
+[View detailed page](./smbs.en.md)
+
+### The challenge
+Small teams with heavy admin load and limited capacity to adopt complex technology stacks.
+
+### What you gain
+Practical automation from week one with document control and predictable operating cost.
+
+### How we deploy
+2-4 week basic-tier rollout with document agent, operational templates, and baseline dashboard.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Time spent on administration | -20% to -35% |
+| Repetitive tasks automated | +30% to +50% |
+| Process error incidents | -10% to -25% |
 
 ## Freelancers and micro-teams
 
-- **Audience**: independent professionals who need productivity without infrastructure overhead.  
-- **Narrative**: local/hybrid AI for repetitive tasks (proposals, billing, follow-up) with controlled documentation.  
-- **Starter offer**: operational playbook + assistant workflows + evidence and backup templates.  
-- **Value**: more billable time, less operational drag, and better traceability for clients.
+[View detailed page](./freelancers.en.md)
+
+### The challenge
+Too much non-billable operational work and low standardization in recurring client workflows.
+
+### What you gain
+More billable output with lower admin drag and stronger delivery traceability for clients.
+
+### How we deploy
+2-3 week playbook rollout for proposals, billing, follow-up, and evidence-ready records.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Recovered billable hours | +15% to +30% |
+| Proposal preparation time | -20% to -35% |
+| Reuse of operational templates | +40% to +60% |
 
 ## Legal, tax, and accounting firms
 
-- **Audience**: partners, quality leads, and delivery teams in advisory practices.  
-- **Narrative**: governed automation for cases and compliance workflows without compromising professional secrecy.  
-- **Starter offer**: document agents, compliance checklists, and per-client evidence repository.  
-- **Value**: lower error risk, faster turnaround, and standardized service quality.
+[View detailed page](./advisory-firms.en.md)
+
+### The challenge
+Complex multi-client cases, strict deadlines, and error risk in compliance-heavy workflows.
+
+### What you gain
+More predictable advisory operations with protected professional secrecy and per-client evidence.
+
+### How we deploy
+4-6 week pilot with document agents, compliance checklists, and auditable client repositories.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Case handling cycle time | -20% to -35% |
+| Rework caused by document errors | -15% to -30% |
+| Evidence-ready case coverage | +40% to +60% |
 
 ## Public administrations and public agencies
 
-- **Audience**: secretariat, internal control, procurement, CIO offices, and transformation units.  
-- **Narrative**: institutional digital capacity with traceability, compliance, and budget control by design.  
-- **Starter offer**: sovereign node + administrative use-case catalog + public procurement deployment framework.  
-- **Value**: operational continuity, reduced lock-in, and auditable evidence for oversight bodies.
+[View detailed page](./public-administration.en.md)
+
+### The challenge
+Fragmented modernization initiatives and weak visibility of impact for oversight and budget control.
+
+### What you gain
+In-house institutional digital capacity with traceability, compliance, and controllable delivery cost.
+
+### How we deploy
+6-8 week pilot with sovereign node, two administrative use cases, and evidence-based execution dashboard.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Response time to oversight requests | -20% to -35% |
+| Processes with full traceability | +35% to +55% |
+| Critical-process single-vendor dependency | -15% to -30% |
 
 ## Cooperatives and social economy organizations
 
-- **Audience**: boards, cooperative management, and shared-services teams.  
-- **Narrative**: technology aligned with participatory governance and collective control of strategic data.  
-- **Starter offer**: local-first collaborative stack, process automation, and community KPI dashboard.  
-- **Value**: better efficiency without losing organizational identity or shared knowledge sovereignty.
+[View detailed page](./cooperatives.en.md)
+
+### The challenge
+Distributed internal processes, weak shared data governance, and limited operational impact visibility.
+
+### What you gain
+Higher efficiency with collective data control and governance aligned to cooperative identity.
+
+### How we deploy
+4-6 week pilot with local-first collaborative stack, internal automations, and community KPI dashboard.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Internal coordination workload | -15% to -30% |
+| Visibility of community performance indicators | +40% to +60% |
+| Documentation governance maturity | +25% to +45% |
 
 ## Other regulated sectors
 
-- **Audience**: utilities, energy, transport, regulated industry, and central public bodies.  
-- **Narrative**: operational control and continuous compliance for critical processes under strict regulation.  
-- **Starter offer**: governed automation + legal-technical evidence + domain-specific TaaS squads.  
-- **Value**: stronger resilience, lower systemic risk, and standardized data governance execution.
+[View detailed page](./other-regulated.en.md)
+
+### The challenge
+Critical regulated operations with legacy constraints and high cost of non-compliance.
+
+### What you gain
+Continuous operational control with regulatory evidence and lower systemic risk in critical workflows.
+
+### How we deploy
+6-week pilot on one critical flow with governed automation, legacy integration, and evidence reporting.
+
+### Expected impact (90 days)
+| KPI | Expected |
+| --- | --- |
+| Audit/supervision preparation time | -25% to -40% |
+| High-impact operational incidents | -10% to -20% |
+| Critical processes with continuous evidence | +30% to +50% |
+
+---
+
+## Validation and traction signals
+
+- One operating model across public sector, regulated organizations, and SMBs: lower adoption friction across non-technical and technical teams.
+- Evidence from day one: view contracts, ontology taxonomy bindings, and traceable decision records in each pilot.
+- Procurement-ready artifacts: one-pagers, trust pack, modular pricing, and deployment roadmap.
+- RFP-ready packaging: sector scope, expected KPIs, validation milestones, and auditable deliverables.
 
 ---
 
@@ -85,12 +228,15 @@ ATLANTYQA combines local-first integration, governance, and compliance so every 
 - Pricing and contracting model: [commercial one-pagers](../sales/one-pagers.md).  
 - Leadership narrative and objection playbook: [leadership narrative](../sales/leadership-narrative.md), [objection playbook](../sales/objection-playbook.md).
 
-📩 **Request the Trust Pack and book an institutional pilot / RFP kickoff.**
+📩 **Request the Trust Pack and start a 90-day strategic pilot.**
 
 ---
 
 ## Unified CTA
 
-1. Kick off a 90-day institutional pilot with evidence from day one.  
-2. Align compliance, procurement, and legal via the modular pricing plan.  
-3. Scale based on proven value and convert it into lasting capacity.
+Book your 90-day strategic pilot: build evidence, prove impact, and reduce risk from day one.
+
+<div class="hero-cta" markdown="1">
+  <a href="../trust/overview.en.md" class="btn-primary">I want an executive demo</a>
+  <a href="../sales/one-pagers.md" class="btn-secondary">I want sector pricing</a>
+</div>

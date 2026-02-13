@@ -36,10 +36,10 @@ views:
       - level-stable
     narrative_contract:
       markers:
-        - "**Audiencia**"
-        - "**Narrativa**"
-        - "**Oferta inicial**"
-        - "**Valor**"
+        - "### Problema a resolver"
+        - "### Resultado esperado"
+        - "### Despliegue inicial"
+        - "### Impacto esperado (90 dias)"
       min_occurrences: 10
     taxonomy_bindings:
       domain: atlantyqa
@@ -81,10 +81,10 @@ views:
       - level-stable
     narrative_contract:
       markers:
-        - "**Audience**"
-        - "**Narrative**"
-        - "**Starter offer**"
-        - "**Value**"
+        - "### The challenge"
+        - "### What you gain"
+        - "### How we deploy"
+        - "### Expected impact (90 days)"
       min_occurrences: 10
     taxonomy_bindings:
       domain: atlantyqa

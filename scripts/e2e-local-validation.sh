@@ -93,16 +93,36 @@ run_step() {
 # 1. Install tooling
 # ============================================
 run_step "Install tooling" "
-  sudo apt-get update -qq
-  sudo apt-get install -y -qq shellcheck ripgrep jq python3-pip 2>&1 | grep -v '^Reading\|^Building\|^Selecting'
+  if command -v shellcheck >/dev/null 2>&1 \
+    && command -v rg >/dev/null 2>&1 \
+    && command -v jq >/dev/null 2>&1 \
+    && command -v python3 >/dev/null 2>&1; then
+    echo 'Tooling already available; skipping apt install.'
+  elif command -v apt-get >/dev/null 2>&1; then
+    if [[ \$(id -u) -eq 0 ]]; then
+      apt-get update -qq
+      apt-get install -y -qq shellcheck ripgrep jq python3-pip 2>&1 | grep -v '^Reading\|^Building\|^Selecting'
+    elif command -v sudo >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1; then
+      sudo apt-get update -qq
+      sudo apt-get install -y -qq shellcheck ripgrep jq python3-pip 2>&1 | grep -v '^Reading\|^Building\|^Selecting'
+    else
+      echo 'Skipping apt install: no non-interactive sudo available in this environment.'
+    fi
+  else
+    echo 'Skipping apt install: apt-get not available.'
+  fi
 "
 
 # ============================================
 # 2. Install Python dependencies
 # ============================================
 run_step "Install Python dependencies" "
-  python3 -m pip install --upgrade pip --quiet
-  python3 -m pip install jsonschema --quiet
+  python3 -m pip install --upgrade pip --quiet || echo 'WARN: pip upgrade skipped (offline/restricted env).'
+  if python3 -c 'import jsonschema' >/dev/null 2>&1; then
+    echo 'jsonschema already installed.'
+  else
+    python3 -m pip install jsonschema --quiet
+  fi
 "
 
 # ============================================

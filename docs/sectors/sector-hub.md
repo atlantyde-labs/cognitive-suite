@@ -2,79 +2,220 @@
 
 ## Infraestructura cognitiva soberana para decisiones reguladas
 
-ATLANTYQA une integración local-first, gobernanza y compliance para que cada institución pueda adoptar IA sin perder control ni confianza. Esta página funciona como **hub único** para todos los sectores públicos y regulados: cada subsección resume lo que ya hay en los one-pagers y landings previos, con foco en lo que cada comité necesita ver.
+Infraestructura cognitiva que despliega IA con control, cumplimiento y resultados medibles, lista para tu sector.
+Este hub te guía por casos de uso, beneficios y modelos de despliegue para cada audiencia: desde universidades y municipios hasta banca regulada, salud, pymes, asesorias y cooperativas.
+Los KPI mostrados son rangos de referencia para fase piloto y se calibran por sector y madurez inicial.
 
 ---
 
 ## Universidades e investigación
 
-- **Audiencia**: rectorados, vicerrectorados, direcciones TI, grupos de investigación y escuelas de posgrado.  
-- **Narrativa**: soberanía del dato científico para reducir dependencia externa y proteger proyectos europeos sensibles.  
-- **Oferta inicial**: infraestructura reproducible para investigación/docencia + compliance GDPR/DPIA + programa Academy aplicado.  
-- **Valor**: control institucional del conocimiento, aprobación más rápida en comités éticos y talento operativo verificable.
+[Ver detalle del sector](./universities.md)
+
+### Problema a resolver
+Datos sensibles, ciclos lentos de validación ética/GDPR y dependencia de cloud externo para investigación aplicada.
+
+### Resultado esperado
+Control institucional del dato científico, mayor reproducibilidad y operación académica con gobernanza verificable.
+
+### Despliegue inicial
+Piloto de 4-6 semanas con stack local/híbrido, evidencias DPIA y entorno reproducible para docencia e investigación.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Reducción de ciclo ético/GDPR | 30-40% |
+| Reproducibilidad operativa de proyectos | +25-35% |
+| Dependencia de cloud externo | -20-30% |
 
 ## Ayuntamientos y territorios ITI
 
-- **Audiencia**: alcaldías, secretarías generales, intervención, contratación y oficinas de modernización.  
-- **Narrativa**: infraestructura pública digital que permanece en territorio y evita lock-in en servicios críticos.  
-- **Oferta inicial**: nodo municipal/ITI + catálogo de casos de uso administrativos + marco de compra pública replicable.  
-- **Valor**: continuidad operativa, trazabilidad para control interno/externo y mejora de coste total a medio plazo.
+[Ver detalle del sector](./municipalities-iti.md)
+
+### Problema a resolver
+Tramitación lenta, baja trazabilidad para control interno y riesgo de lock-in en plataformas críticas.
+
+### Resultado esperado
+Servicios municipales con IA gobernada, trazabilidad de expediente y capacidad digital que permanece en territorio.
+
+### Despliegue inicial
+Piloto de 6-8 semanas con nodo soberano, dos procesos administrativos priorizados y evidencias para intervención/secretaría.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Tiempo medio de tramitación | -20-35% |
+| Trazabilidad de expediente crítico | +40-60% |
+| Dependencia operativa de proveedor único | -15-25% |
 
 ## Banca y finanzas reguladas
 
-- **Audiencia**: comités de riesgo, compliance, direcciones de operaciones, CIO/CISO y auditoría interna.  
-- **Narrativa**: automatización gobernada con evidencia continua para escalar IA sin exposición regulatoria.  
-- **Oferta inicial**: agentes auditables para backoffice/contratos/reporting + factory de evidencia (AI Act, GDPR, NIS2, DORA, CRA).  
-- **Valor**: menor riesgo sancionador, auditorías más rápidas y eficiencia operativa medible.
+[Ver detalle del sector](./regulated-banking.md)
+
+### Problema a resolver
+Presión por automatizar con IA sin elevar exposición regulatoria ni complejidad de auditoría.
+
+### Resultado esperado
+IA que pasa auditorías con evidencia continua, menor fricción con supervisores y eficiencia operacional medible.
+
+### Despliegue inicial
+Piloto de 6 semanas en backoffice/contratos/reporting con agentes auditables, logging completo y controles de aprobación.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Tiempo de preparación de auditoría | -25-40% |
+| Incidencias de cumplimiento operativo | -15-30% |
+| Productividad en procesos documentales | +20-35% |
 
 ## Salud y hospitales
 
-- **Audiencia**: direcciones médicas, direcciones de sistemas, delegados de protección de datos y calidad asistencial.  
-- **Narrativa**: IA asistida (no autónoma) con trazabilidad clínica completa y control estricto del dato sanitario.  
-- **Oferta inicial**: piloto modular para documentación/operación clínica + arquitectura DPIA-ready y residencia on-prem.  
-- **Valor**: menor riesgo ético-legal, adopción segura y mejora de tiempos administrativos en entorno clínico.
+[Ver detalle del sector](./healthcare.md)
+
+### Problema a resolver
+Sobrecarga administrativa clínica, riesgo de fuga de datos y baja confianza en modelos no trazables.
+
+### Resultado esperado
+IA asistida segura para entornos críticos, con control on-prem del dato clínico y supervisión humana obligatoria.
+
+### Despliegue inicial
+Piloto de 6-8 semanas para documentación clínica y operación administrativa con arquitectura DPIA-ready.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Carga administrativa por caso | -15-30% |
+| Tiempo de respuesta documental | -20-35% |
+| Cobertura de trazabilidad de decisión asistida | +40-60% |
 
 ## PYMES multisector (ticket basico)
 
-- **Audiencia**: gerencia, operaciones y administracion con recursos limitados y necesidad de resultados rapidos.  
-- **Narrativa**: automatizacion util desde semana 1 sin depender de stacks complejos ni aumentar riesgo regulatorio.  
-- **Oferta inicial**: paquete "ticket basico" con agente documental, evidencias de cumplimiento y cuadro de mandos operativo.  
-- **Valor**: ahorro de tiempo administrativo, mejor control de datos y coste mensual predecible.
+[Ver detalle del sector](./smbs.md)
+
+### Problema a resolver
+Equipos pequeños con alta carga administrativa y poca capacidad para integrar tecnología compleja.
+
+### Resultado esperado
+Automatización útil desde semana 1, con control documental y coste mensual predecible.
+
+### Despliegue inicial
+Ticket básico en 2-4 semanas con agente documental, plantillas de operación y cuadro de mandos base.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Tiempo invertido en gestión administrativa | -20-35% |
+| Tareas repetitivas automatizadas | +30-50% |
+| Incidencias por errores de proceso | -10-25% |
 
 ## Autonomos y microequipos
 
-- **Audiencia**: profesionales independientes que necesitan productividad sin complejidad tecnica.  
-- **Narrativa**: IA local/hibrida para tareas repetitivas (propuestas, facturas, seguimiento) manteniendo control documental.  
-- **Oferta inicial**: playbook de trabajo + asistente operativo + plantillas de evidencia y respaldo.  
-- **Valor**: mas tiempo facturable, menos carga operativa y trazabilidad para clientes y auditorias.
+[Ver detalle del sector](./freelancers.md)
+
+### Problema a resolver
+Poco tiempo facturable por tareas operativas repetitivas y baja estandarización documental.
+
+### Resultado esperado
+Más producción comercial con menos fricción operativa y evidencias trazables para clientes.
+
+### Despliegue inicial
+Playbook de 2-3 semanas para propuestas, facturación, seguimiento y repositorio de respaldo.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Horas facturables recuperadas | +15-30% |
+| Tiempo de elaboración de propuestas | -20-35% |
+| Reutilización de plantillas operativas | +40-60% |
 
 ## Asesorias legales, fiscales y contables
 
-- **Audiencia**: socios/directores, responsables de calidad y equipos de despacho.  
-- **Narrativa**: automatizacion gobernada de expedientes y flujo normativo sin comprometer secreto profesional ni custodia de datos.  
-- **Oferta inicial**: agentes para documentacion, checklist de cumplimiento y repositorio de evidencia por cliente.  
-- **Valor**: menor riesgo de error, tiempos de respuesta mas cortos y estandarizacion del servicio.
+[Ver detalle del sector](./advisory-firms.md)
+
+### Problema a resolver
+Expedientes complejos, presión de plazos y riesgo de error en procesos normativos multi-cliente.
+
+### Resultado esperado
+Operación de despacho más predecible, con secreto profesional protegido y evidencia por cliente.
+
+### Despliegue inicial
+Piloto de 4-6 semanas con agentes documentales, checklist normativo y repositorio auditable por cartera.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Tiempo de gestión por expediente | -20-35% |
+| Reprocesos por error documental | -15-30% |
+| Cobertura de expediente con evidencia | +40-60% |
 
 ## Administraciones publicas y entes instrumentales
 
-- **Audiencia**: secretarias generales, intervencion, contratacion, direccion TIC y oficinas de transformacion.  
-- **Narrativa**: capacidad institucional propia para digitalizar con trazabilidad, cumplimiento y control presupuestario.  
-- **Oferta inicial**: nodo soberano + catalogo de casos de uso administrativos + marco de despliegue y compra publica.  
-- **Valor**: continuidad operativa, menor dependencia de proveedor y evidencia auditable para control interno/externo.
+[Ver detalle del sector](./public-administration.md)
+
+### Problema a resolver
+Modernización fragmentada, escasa capacidad interna y dificultad para demostrar impacto ante órganos de control.
+
+### Resultado esperado
+Capacidad institucional propia para digitalizar con trazabilidad, cumplimiento y control de coste.
+
+### Despliegue inicial
+Piloto de 6-8 semanas con nodo soberano, dos casos de uso administrativos y cuadro de evidencias de ejecución.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Tiempo de respuesta a requerimientos internos | -20-35% |
+| Cobertura de procesos con trazabilidad completa | +35-55% |
+| Dependencia de proveedor único en procesos críticos | -15-30% |
 
 ## Cooperativas y economia social
 
-- **Audiencia**: consejos rectores, gerencias y equipos de gestion cooperativa.  
-- **Narrativa**: tecnologia alineada con gobernanza participativa, datos bajo control colectivo y escalado sostenible.  
-- **Oferta inicial**: stack colaborativo local-first, automatizacion de procesos internos y panel de indicadores comunitarios.  
-- **Valor**: eficiencia operativa sin perder identidad organizativa ni soberania sobre conocimiento compartido.
+[Ver detalle del sector](./cooperatives.md)
+
+### Problema a resolver
+Procesos dispersos, datos compartidos sin gobernanza clara y baja visibilidad de impacto operativo.
+
+### Resultado esperado
+Eficiencia operativa con control colectivo del dato y gobernanza alineada con la identidad cooperativa.
+
+### Despliegue inicial
+Piloto de 4-6 semanas con stack colaborativo local-first, automatizaciones internas y panel de indicadores.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Tiempo en tareas de coordinación interna | -15-30% |
+| Visibilidad de indicadores comunitarios | +40-60% |
+| Madurez de gobernanza documental | +25-45% |
 
 ## Otros sectores regulados
 
-- **Audiencia**: utilities, energía, transporte, industria regulada y sector público central.  
-- **Narrativa**: control operativo y compliance continuo en procesos críticos con alta presión regulatoria.  
-- **Oferta inicial**: automatizaciones gobernadas + evidencia técnica-jurídica + squads TaaS por dominio sectorial.  
-- **Valor**: resiliencia operativa, reducción de riesgo sistémico y estandarización de gobierno del dato.
+[Ver detalle del sector](./other-regulated.md)
+
+### Problema a resolver
+Procesos críticos bajo regulación estricta, múltiples sistemas legacy y alto coste de incumplimiento.
+
+### Resultado esperado
+Control operativo continuo con evidencia regulatoria y menor riesgo sistémico en operaciones críticas.
+
+### Despliegue inicial
+Piloto de 6 semanas en un flujo crítico con automatizaciones gobernadas, integración legacy y reporte de evidencia.
+
+### Impacto esperado (90 dias)
+| KPI | Esperado |
+| --- | --- |
+| Tiempo de preparación para supervisión/auditoría | -25-40% |
+| Incidentes operativos de alto impacto | -10-20% |
+| Procesos críticos con evidencia continua | +30-50% |
+
+---
+
+## Señales de validacion y traccion
+
+- Mismo framework para sector publico, regulados y pymes: reduce friccion de adopcion entre areas no tecnicas y equipos de operaciones.
+- Evidencia desde el dia 1: contratos de vista, taxonomia ontologica y trazabilidad de decisiones en cada piloto.
+- Artefactos listos para comites de riesgo, compras y legal: one-pagers, trust pack, pricing modular y roadmap de despliegue.
+- Modelo orientado a RFP: alcance por sector, KPIs esperados, hitos de validacion y entregables auditables.
 
 ---
 
@@ -85,12 +226,15 @@ ATLANTYQA une integración local-first, gobernanza y compliance para que cada in
 - Modelo de pricing y contratación: [one-pagers y propuesta comercial](../sales/one-pagers.md).  
 - Narrativa de liderazgo y objeciones: [leadership narrative](../sales/leadership-narrative.md), [argumentario](../sales/objection-playbook.md).
 
-📩 **Solicita el Trust Pack y agenda un piloto institucional / RFP.**
+📩 **Solicita el Trust Pack y activa un piloto estrategico de 90 dias.**
 
 ---
 
 ## CTA único
 
-1. Solicita un piloto institucional (90 días) con evidencia desde el primer día.  
-2. Alinea compliance, compras y legal con el plan de pricing modulable.  
-3. Escala según valor demostrado y transfórmalo en capacidad permanente.
+Agenda tu piloto estrategico de 90 dias: crea evidencia, demuestra impacto y reduce riesgo desde el primer dia.
+
+<div class="hero-cta" markdown="1">
+  <a href="../trust/overview.md" class="btn-primary">Quiero una demo ejecutiva</a>
+  <a href="../sales/one-pagers.md" class="btn-secondary">Quiero cotizacion para mi sector</a>
+</div>
