@@ -2,9 +2,11 @@
 
 ## Sovereign cognitive infrastructure for regulated decision-making
 
+
 Infrastructure that deploys AI with control, compliance, and measurable outcomes, ready for your sector.
 This hub guides decision-makers through use cases, expected impact, and deployment models across universities, municipalities, regulated finance, healthcare, SMBs, advisory firms, and cooperatives.
 Displayed KPIs are pilot reference ranges and are calibrated by sector and baseline maturity.
+
 
 ---
 
