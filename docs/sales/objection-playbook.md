@@ -7,7 +7,7 @@ Documento listo para presentar en comités y propuestas; cada bloque responde co
 **Respuesta:**  
 Hay una diferencia entre gastar en tecnología y construir capacidad soberana. ATLANTYQA transforma el cumplimiento en un activo productivo, reduciendo el coste de auditoría y sanciones. Nuestros despliegues (ver `release-on-merge.yml`, `release-draft.yml`) generan artefactos versionados y evidencia desde el día 1, lo que minimiza retrabajo y justifica retorno rápido de inversión.  
 **Apoyo:** dashboards de impacto (`docs/portal/metrics.md`, `metrics/users/*.json`), loop de evidencia en `outputs/ci-evidence`.  
-**Cierre:** proponemos un piloto de 90 días con métricas de coste/beneficio (= XP/badges ganados por squads) que luego escala a ciclo presupuestario completo.
+**Cierre:** proponemos un programa mínimo de implantación de 180 días (con 30 días de contingencia) con métricas de coste/beneficio (= XP/badges ganados por squads) y gates de calidad por fase.
 
 ## Objeción 2 — “Ya tenemos proveedor cloud/licenciado”
 
@@ -33,6 +33,6 @@ La soberanía ATLANTYQA se construye con eficiencia energética y reutilización
 ## Objeción 5 — “Soberanía vs velocidad/incertidumbre”
 
 **Respuesta:**  
-No es uno u otro: soberanía bien ejecutada acelera despliegue (“ready-to-run”). La red de microCPDs y squads ATLANTYQA permite pilotar en 30 días y escalar en 90, sin esperar implementaciones globales.  
+No es uno u otro: soberanía bien ejecutada acelera despliegues con control. La red de microCPDs y squads ATLANTYQA permite arrancar resultados tempranos, manteniendo como estándar un ciclo mínimo de 180 días para absorber incidencias y asegurar calidad de producto.  
 **Apoyo:** `docs/sales/one-pagers/*.md` + script `docs/sales/scripts/generate_one_pagers.py` para replicar versiones personalizadas en minutos.  
-**Cierre:** proponemos un programa “Fase 0 / Fase 1 / Fase 2” con entregables y checklists listos (podemos exportarlos en zip para el comité).
+**Cierre:** proponemos un programa “Fase 0 / Fase 1 / Fase 2” de 180 días mínimos + contingencia, con entregables y checklists de calidad listos (podemos exportarlos en zip para el comité).

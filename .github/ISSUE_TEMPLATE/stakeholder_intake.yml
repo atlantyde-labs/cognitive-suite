@@ -56,8 +56,8 @@ body:
   - type: textarea
     id: expected_outcome
     attributes:
-      label: "Resultado esperado en 30-90 dias"
-      placeholder: "Que resultado tangible consideras exito."
+      label: "Resultado esperado en 180-240 dias"
+      placeholder: "Que resultado tangible consideras exito al cierre de un ciclo minimo de implantacion (180 dias)."
     validations:
       required: true
 

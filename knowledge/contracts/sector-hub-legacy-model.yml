@@ -24,6 +24,15 @@ model:
     - despliegue_inicial
     - impacto_esperado
 
+implementation_policy:
+  minimum_days: 180
+  contingency_buffer_days: 30
+  quality_gates:
+    - uat
+    - security
+    - compliance
+    - operational_readiness
+
 access_governance:
   roles_allowed:
     - executive

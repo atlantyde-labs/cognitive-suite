@@ -7,7 +7,7 @@ Usa esta plantilla en el primer comentario tecnico tras el intake.
 - Segmento/audiencia:
 - Urgencia (SLA):
 - Problema principal:
-- Resultado esperado (30-90 dias):
+- Resultado esperado (180-240 dias):
 
 ## 2) Respuesta inicial ATLANTYQA
 - Diagnostico breve:
@@ -16,8 +16,8 @@ Usa esta plantilla en el primer comentario tecnico tras el intake.
 
 ## 3) Propuesta de plan rapido
 - Accion 1 (24-72h):
-- Accion 2 (1-2 semanas):
-- Accion 3 (2-6 semanas):
+- Accion 2 (Semanas 1-4, estabilizacion inicial):
+- Accion 3 (Meses 2-6, implantacion minima + buffer de incidencias):
 
 ## 4) Artefactos a compartir
 - [ ] Sector hub relevante
@@ -36,3 +36,4 @@ Usa esta plantilla en el primer comentario tecnico tras el intake.
 - [ ] Respuesta inicial entregada
 - [ ] Alcance validado con stakeholder
 - [ ] Proximo hito acordado
+- [ ] Plan minimo de implantacion (180 dias) confirmado con reserva de contingencia

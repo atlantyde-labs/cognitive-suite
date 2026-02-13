@@ -26,3 +26,8 @@ El hub publico (`docs/sectors/sector-hub.md` y `docs/sectors/sector-hub.en.md`) 
 
 El contrato legacy mantiene la correspondencia y bindings de taxonomia por sector para preservar trazabilidad historica y reutilizacion interna por rol.
 
+## Politica minima de implantacion asociada al modelo
+
+- Implantacion minima de referencia: **180 dias**.
+- Buffer obligatorio para incidencias inesperadas: **30 dias**.
+- Gates de calidad exigidos en cada fase: **UAT**, seguridad, compliance y readiness operativa.

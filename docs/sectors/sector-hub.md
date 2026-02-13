@@ -4,7 +4,7 @@
 
 Infraestructura cognitiva que despliega IA con control, cumplimiento y resultados medibles, lista para tu sector.
 Este hub te guía por casos de uso, beneficios y modelos de despliegue para cada audiencia: desde universidades y municipios hasta banca regulada, salud, pymes, asesorias y cooperativas.
-Los KPI mostrados son rangos de referencia para fase piloto y se calibran por sector y madurez inicial.
+Los KPI mostrados son rangos de referencia para un programa minimo de implantacion de 180 dias y se calibran por sector, madurez inicial y contingencias operativas.
 
 ---
 
@@ -19,9 +19,9 @@ Datos sensibles, ciclos lentos de validación ética/GDPR y dependencia de cloud
 Control institucional del dato científico, mayor reproducibilidad y operación académica con gobernanza verificable.
 
 ### Despliegue inicial
-Piloto de 4-6 semanas con stack local/híbrido, evidencias DPIA y entorno reproducible para docencia e investigación.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Reducción de ciclo ético/GDPR | 30-40% |
@@ -39,9 +39,9 @@ Tramitación lenta, baja trazabilidad para control interno y riesgo de lock-in e
 Servicios municipales con IA gobernada, trazabilidad de expediente y capacidad digital que permanece en territorio.
 
 ### Despliegue inicial
-Piloto de 6-8 semanas con nodo soberano, dos procesos administrativos priorizados y evidencias para intervención/secretaría.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Tiempo medio de tramitación | -20-35% |
@@ -59,9 +59,9 @@ Presión por automatizar con IA sin elevar exposición regulatoria ni complejida
 IA que pasa auditorías con evidencia continua, menor fricción con supervisores y eficiencia operacional medible.
 
 ### Despliegue inicial
-Piloto de 6 semanas en backoffice/contratos/reporting con agentes auditables, logging completo y controles de aprobación.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Tiempo de preparación de auditoría | -25-40% |
@@ -79,9 +79,9 @@ Sobrecarga administrativa clínica, riesgo de fuga de datos y baja confianza en 
 IA asistida segura para entornos críticos, con control on-prem del dato clínico y supervisión humana obligatoria.
 
 ### Despliegue inicial
-Piloto de 6-8 semanas para documentación clínica y operación administrativa con arquitectura DPIA-ready.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Carga administrativa por caso | -15-30% |
@@ -99,9 +99,9 @@ Equipos pequeños con alta carga administrativa y poca capacidad para integrar t
 Automatización útil desde semana 1, con control documental y coste mensual predecible.
 
 ### Despliegue inicial
-Ticket básico en 2-4 semanas con agente documental, plantillas de operación y cuadro de mandos base.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Tiempo invertido en gestión administrativa | -20-35% |
@@ -119,9 +119,9 @@ Poco tiempo facturable por tareas operativas repetitivas y baja estandarización
 Más producción comercial con menos fricción operativa y evidencias trazables para clientes.
 
 ### Despliegue inicial
-Playbook de 2-3 semanas para propuestas, facturación, seguimiento y repositorio de respaldo.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Horas facturables recuperadas | +15-30% |
@@ -139,9 +139,9 @@ Expedientes complejos, presión de plazos y riesgo de error en procesos normativ
 Operación de despacho más predecible, con secreto profesional protegido y evidencia por cliente.
 
 ### Despliegue inicial
-Piloto de 4-6 semanas con agentes documentales, checklist normativo y repositorio auditable por cartera.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Tiempo de gestión por expediente | -20-35% |
@@ -159,9 +159,9 @@ Modernización fragmentada, escasa capacidad interna y dificultad para demostrar
 Capacidad institucional propia para digitalizar con trazabilidad, cumplimiento y control de coste.
 
 ### Despliegue inicial
-Piloto de 6-8 semanas con nodo soberano, dos casos de uso administrativos y cuadro de evidencias de ejecución.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Tiempo de respuesta a requerimientos internos | -20-35% |
@@ -179,9 +179,9 @@ Procesos dispersos, datos compartidos sin gobernanza clara y baja visibilidad de
 Eficiencia operativa con control colectivo del dato y gobernanza alineada con la identidad cooperativa.
 
 ### Despliegue inicial
-Piloto de 4-6 semanas con stack colaborativo local-first, automatizaciones internas y panel de indicadores.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Tiempo en tareas de coordinación interna | -15-30% |
@@ -199,9 +199,9 @@ Procesos críticos bajo regulación estricta, múltiples sistemas legacy y alto 
 Control operativo continuo con evidencia regulatoria y menor riesgo sistémico en operaciones críticas.
 
 ### Despliegue inicial
-Piloto de 6 semanas en un flujo crítico con automatizaciones gobernadas, integración legacy y reporte de evidencia.
+Programa minimo de implantacion de 180 dias (6 meses), con una reserva operativa adicional de 30 dias para incidencias inesperadas y gates de calidad por fase (UAT, seguridad, compliance y operacion).
 
-### Impacto esperado (90 dias)
+### Impacto esperado (180 dias)
 | KPI | Esperado |
 | --- | --- |
 | Tiempo de preparación para supervisión/auditoría | -25-40% |
@@ -226,13 +226,13 @@ Piloto de 6 semanas en un flujo crítico con automatizaciones gobernadas, integr
 - Modelo de pricing y contratación: [one-pagers y propuesta comercial](../sales/one-pagers.md).  
 - Narrativa de liderazgo y objeciones: [leadership narrative](../sales/leadership-narrative.md), [argumentario](../sales/objection-playbook.md).
 
-📩 **Solicita el Trust Pack y activa un piloto estrategico de 90 dias.**
+📩 **Solicita el Trust Pack y activa un programa minimo de implantacion de 180 dias (con buffer de incidencias y control de calidad).**
 
 ---
 
 ## CTA único
 
-Agenda tu piloto estrategico de 90 dias: crea evidencia, demuestra impacto y reduce riesgo desde el primer dia.
+Agenda tu programa minimo de implantacion de 180 dias: crea evidencia, absorbe incidencias sin degradar el servicio y valida calidad de extremo a extremo.
 
 <div class="hero-cta" markdown="1">
   <a href="../trust/overview.md" class="btn-primary">Quiero una demo ejecutiva</a>

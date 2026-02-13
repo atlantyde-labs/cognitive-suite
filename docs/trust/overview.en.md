@@ -9,4 +9,10 @@ ATLANTYQA demonstrates governance in every deployment: clear controls, continuou
 3. Deployment models for micro-CPDs and edge nodes.  
 4. Use cases with audit and operational KPIs.
 
+## Implementation and quality commitment
+
+- Every public-offer implementation is defined with a minimum timeline of **180 days**.
+- A **30-day** operational contingency buffer is reserved for unexpected incidents.
+- Each phase closes with quality gates: UAT, security, compliance, and traceable evidence.
+
 Share the Trust Pack with committees, RFPs, and procurement squads.

@@ -71,7 +71,7 @@ jobs:
             const stakeholder = section("Tipo de stakeholder");
             const urgency = section("Urgencia de respuesta inicial");
             const need = section("Necesidad principal");
-            const outcome = section("Resultado esperado en 30-90 dias");
+            const outcome = section("Resultado esperado en 180-240 dias") || section("Resultado esperado en 30-90 dias");
 
             const labels = new Set(["intake-stakeholder", "contrib-review", "level-beta"]);
 
@@ -117,7 +117,7 @@ jobs:
               "",
               "### Siguiente paso del equipo tecnico",
               "- [ ] Validar alcance y restricciones en primera revision",
-              "- [ ] Proponer respuesta inicial y plan 30-90 dias",
+              "- [ ] Proponer respuesta inicial y plan minimo 180 dias (con buffer de incidencias)",
               "- [ ] Asociar artefactos (trust pack / one-pager / piloto) y responsables",
               "",
               "Si necesitas acelerar la coordinacion, abre ademas un issue con plantilla **Rapid response task (equipo tecnico)**.",

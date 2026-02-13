@@ -196,6 +196,34 @@ def _check_legacy_sector_model(legacy_model: dict, ontology: dict):
                 "legacy_sector_model: model.legacy_fields missing markers: " + ", ".join(missing)
             )
 
+    impl_policy = legacy_model.get("implementation_policy", {})
+    if not isinstance(impl_policy, dict):
+        errors.append("legacy_sector_model: 'implementation_policy' must be an object")
+    else:
+        minimum_days = impl_policy.get("minimum_days")
+        contingency_days = impl_policy.get("contingency_buffer_days")
+        quality_gates = impl_policy.get("quality_gates")
+
+        if not isinstance(minimum_days, int) or minimum_days < 180:
+            errors.append(
+                "legacy_sector_model: implementation_policy.minimum_days must be an integer >= 180"
+            )
+        if not isinstance(contingency_days, int) or contingency_days < 30:
+            errors.append(
+                "legacy_sector_model: implementation_policy.contingency_buffer_days must be an integer >= 30"
+            )
+        if not isinstance(quality_gates, list):
+            errors.append("legacy_sector_model: implementation_policy.quality_gates must be a list")
+        else:
+            required_gates = {"uat", "security", "compliance", "operational_readiness"}
+            configured_gates = {str(gate).strip() for gate in quality_gates if str(gate).strip()}
+            missing_gates = sorted(required_gates - configured_gates)
+            if missing_gates:
+                errors.append(
+                    "legacy_sector_model: implementation_policy.quality_gates missing: "
+                    + ", ".join(missing_gates)
+                )
+
     sectors = legacy_model.get("sectors", [])
     if not isinstance(sectors, list) or not sectors:
         return errors + ["legacy_sector_model: 'sectors' must be a non-empty list"]

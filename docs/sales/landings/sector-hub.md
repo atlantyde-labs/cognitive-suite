@@ -45,12 +45,12 @@ ATLANTYQA une integración local-first, gobernanza y compliance para que cada in
 - Modelo de pricing y contratación (Sovereign Cognitive Starter, Regulated Operations Pack, nodos municipales, Academy).  
 - Leadership Narrative y argumentario de objeciones para equipos políticos, compliance y risk.
 
-📩 **Solicita el Trust Pack y agenda un piloto institucional / RFP.**
+📩 **Solicita el Trust Pack y agenda un programa mínimo de implantación de 180 días / RFP.**
 
 ---
 
 ## CTA único
 
-1. Solicita un piloto institucional (90 días) con evidencia desde el primer día.  
-2. Alinea compliance, compras y legal con el plan de pricing modulable.  
+1. Solicita un programa mínimo de implantación (180 días) con evidencia y control de calidad desde el primer día.  
+2. Alinea compliance, compras y legal con el plan de calidad y contingencia de incidencias.  
 3. Escala según valor demostrado y transfórmalo en capacidad permanente.

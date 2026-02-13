@@ -51,6 +51,6 @@ ATLANTYQA combines local-first integration, governance, and compliance so every 
 
 ## Unified CTA
 
-1. Kick off a 90-day institutional pilot with evidence from day one.  
-2. Align compliance, procurement, and legal via the modular pricing plan.  
+1. Kick off a minimum 180-day implementation program with evidence and quality controls from day one.  
+2. Align compliance, procurement, and legal with an incident-contingency and quality-gate plan.  
 3. Scale based on proven value and convert it into lasting capacity.

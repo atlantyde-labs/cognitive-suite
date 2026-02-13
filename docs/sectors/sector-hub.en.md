@@ -4,7 +4,7 @@
 
 Infrastructure that deploys AI with control, compliance, and measurable outcomes, ready for your sector.
 This hub guides decision-makers through use cases, expected impact, and deployment models across universities, municipalities, regulated finance, healthcare, SMBs, advisory firms, and cooperatives.
-Displayed KPIs are pilot reference ranges and are calibrated by sector and baseline maturity.
+Displayed KPIs are reference ranges for a minimum 180-day implementation program and are calibrated by sector, baseline maturity, and operational contingencies.
 
 ---
 
@@ -19,9 +19,9 @@ Sensitive data handling, long ethics/GDPR approval cycles, and external cloud de
 Institutional control of research data, stronger reproducibility, and governance-ready academic operations.
 
 ### How we deploy
-4-6 week pilot with local/hybrid stack, DPIA-ready evidence, and reproducible environments for teaching and research.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Ethics/GDPR approval cycle time | -30% to -40% |
@@ -39,9 +39,9 @@ Slow administrative cycles, limited traceability for oversight, and lock-in risk
 Governed municipal AI services with full case traceability and digital capacity that remains in territory.
 
 ### How we deploy
-6-8 week pilot with a sovereign municipal node, two prioritized administrative processes, and oversight evidence.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Administrative cycle time | -20% to -35% |
@@ -59,9 +59,9 @@ Need to accelerate AI automation without increasing regulatory exposure or audit
 AI that passes audits with continuous evidence, lower supervisory friction, and measurable process efficiency.
 
 ### How we deploy
-6-week pilot in backoffice/legal/reporting with auditable agents, full logs, and approval controls.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Audit preparation time | -25% to -40% |
@@ -79,9 +79,9 @@ High clinical admin burden, sensitive data risk, and low trust in non-traceable 
 Safe assistant AI for critical environments with on-prem data control and mandatory human oversight.
 
 ### How we deploy
-6-8 week pilot for clinical documentation and administrative workflows with DPIA-ready architecture.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Admin workload per case | -15% to -30% |
@@ -99,9 +99,9 @@ Small teams with heavy admin load and limited capacity to adopt complex technolo
 Practical automation from week one with document control and predictable operating cost.
 
 ### How we deploy
-2-4 week basic-tier rollout with document agent, operational templates, and baseline dashboard.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Time spent on administration | -20% to -35% |
@@ -119,9 +119,9 @@ Too much non-billable operational work and low standardization in recurring clie
 More billable output with lower admin drag and stronger delivery traceability for clients.
 
 ### How we deploy
-2-3 week playbook rollout for proposals, billing, follow-up, and evidence-ready records.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Recovered billable hours | +15% to +30% |
@@ -139,9 +139,9 @@ Complex multi-client cases, strict deadlines, and error risk in compliance-heavy
 More predictable advisory operations with protected professional secrecy and per-client evidence.
 
 ### How we deploy
-4-6 week pilot with document agents, compliance checklists, and auditable client repositories.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Case handling cycle time | -20% to -35% |
@@ -159,9 +159,9 @@ Fragmented modernization initiatives and weak visibility of impact for oversight
 In-house institutional digital capacity with traceability, compliance, and controllable delivery cost.
 
 ### How we deploy
-6-8 week pilot with sovereign node, two administrative use cases, and evidence-based execution dashboard.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Response time to oversight requests | -20% to -35% |
@@ -179,9 +179,9 @@ Distributed internal processes, weak shared data governance, and limited operati
 Higher efficiency with collective data control and governance aligned to cooperative identity.
 
 ### How we deploy
-4-6 week pilot with local-first collaborative stack, internal automations, and community KPI dashboard.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Internal coordination workload | -15% to -30% |
@@ -199,9 +199,9 @@ Critical regulated operations with legacy constraints and high cost of non-compl
 Continuous operational control with regulatory evidence and lower systemic risk in critical workflows.
 
 ### How we deploy
-6-week pilot on one critical flow with governed automation, legacy integration, and evidence reporting.
+Minimum implementation program of 180 days (6 months), with an additional 30-day operational contingency buffer for unexpected incidents and quality gates per phase (UAT, security, compliance, and operations).
 
-### Expected impact (90 days)
+### Expected impact (180 days)
 | KPI | Expected |
 | --- | --- |
 | Audit/supervision preparation time | -25% to -40% |
@@ -226,13 +226,13 @@ Continuous operational control with regulatory evidence and lower systemic risk 
 - Pricing and contracting model: [commercial one-pagers](../sales/one-pagers.md).  
 - Leadership narrative and objection playbook: [leadership narrative](../sales/leadership-narrative.md), [objection playbook](../sales/objection-playbook.md).
 
-📩 **Request the Trust Pack and start a 90-day strategic pilot.**
+📩 **Request the Trust Pack and start a minimum 180-day implementation program (with incident buffer and quality controls).**
 
 ---
 
 ## Unified CTA
 
-Book your 90-day strategic pilot: build evidence, prove impact, and reduce risk from day one.
+Book your minimum 180-day implementation program: build evidence, absorb incidents without service degradation, and validate end-to-end quality.
 
 <div class="hero-cta" markdown="1">
   <a href="../trust/overview.en.md" class="btn-primary">I want an executive demo</a>

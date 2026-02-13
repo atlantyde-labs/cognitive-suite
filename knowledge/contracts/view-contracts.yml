@@ -39,7 +39,7 @@ views:
         - "### Problema a resolver"
         - "### Resultado esperado"
         - "### Despliegue inicial"
-        - "### Impacto esperado (90 dias)"
+        - "### Impacto esperado (180 dias)"
       min_occurrences: 10
     taxonomy_bindings:
       domain: atlantyqa
@@ -84,7 +84,7 @@ views:
         - "### The challenge"
         - "### What you gain"
         - "### How we deploy"
-        - "### Expected impact (90 days)"
+        - "### Expected impact (180 days)"
       min_occurrences: 10
     taxonomy_bindings:
       domain: atlantyqa
