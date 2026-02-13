@@ -8,12 +8,16 @@ ATLANTYQA combines local-first integration, governance, and compliance so every 
 
 ## Universities & Research
 
+[View detailed page](./universities.en.md)
+
 - **Audience**: rectorates, CIO offices, research leads, and postgraduate program directors.  
 - **Narrative**: scientific data sovereignty to reduce hyperscaler dependency and protect sensitive EU-funded research.  
 - **Starter offer**: reproducible research/teaching stack + GDPR/DPIA compliance layer + applied Academy squads.  
 - **Value**: institutional control of knowledge assets, faster ethics approvals, and verifiable operational talent.
 
 ## Municipalities & ITI territories
+
+[View detailed page](./municipalities-iti.en.md)
 
 - **Audience**: mayor offices, city secretariat, internal control, procurement, and digital transformation units.  
 - **Narrative**: public digital infrastructure that stays in territory and avoids lock-in for critical services.  
@@ -22,12 +26,16 @@ ATLANTYQA combines local-first integration, governance, and compliance so every 
 
 ## Banking & Regulated Finance
 
+[View detailed page](./regulated-banking.en.md)
+
 - **Audience**: risk committees, compliance, operations leadership, CIO/CISO, and internal audit.  
 - **Narrative**: governed automation with continuous evidence so AI can scale without regulatory exposure.  
 - **Starter offer**: auditable agents for backoffice/legal/reporting + evidence factory (AI Act, GDPR, NIS2, DORA, CRA).  
 - **Value**: lower sanction risk, faster audits, and measurable operational efficiency.
 
 ## Healthcare & Hospitals
+
+[View detailed page](./healthcare.en.md)
 
 - **Audience**: medical leadership, hospital IT, DPO teams, and care quality offices.  
 - **Narrative**: assistant AI (not autonomous AI) with full clinical traceability and strict health-data control.  
@@ -36,12 +44,16 @@ ATLANTYQA combines local-first integration, governance, and compliance so every 
 
 ## SMBs across sectors (basic tier)
 
+[View detailed page](./smbs.en.md)
+
 - **Audience**: management, operations, and admin teams with limited resources and clear ROI pressure.  
 - **Narrative**: practical automation from week one without adding technical complexity or compliance exposure.  
 - **Starter offer**: "basic tier" package with document agent, compliance evidence, and an operations dashboard.  
 - **Value**: lower admin workload, stronger data control, and predictable monthly cost.
 
 ## Freelancers and micro-teams
+
+[View detailed page](./freelancers.en.md)
 
 - **Audience**: independent professionals who need productivity without infrastructure overhead.  
 - **Narrative**: local/hybrid AI for repetitive tasks (proposals, billing, follow-up) with controlled documentation.  
@@ -50,12 +62,16 @@ ATLANTYQA combines local-first integration, governance, and compliance so every 
 
 ## Legal, tax, and accounting firms
 
+[View detailed page](./advisory-firms.en.md)
+
 - **Audience**: partners, quality leads, and delivery teams in advisory practices.  
 - **Narrative**: governed automation for cases and compliance workflows without compromising professional secrecy.  
 - **Starter offer**: document agents, compliance checklists, and per-client evidence repository.  
 - **Value**: lower error risk, faster turnaround, and standardized service quality.
 
 ## Public administrations and public agencies
+
+[View detailed page](./public-administration.en.md)
 
 - **Audience**: secretariat, internal control, procurement, CIO offices, and transformation units.  
 - **Narrative**: institutional digital capacity with traceability, compliance, and budget control by design.  
@@ -64,12 +80,16 @@ ATLANTYQA combines local-first integration, governance, and compliance so every 
 
 ## Cooperatives and social economy organizations
 
+[View detailed page](./cooperatives.en.md)
+
 - **Audience**: boards, cooperative management, and shared-services teams.  
 - **Narrative**: technology aligned with participatory governance and collective control of strategic data.  
 - **Starter offer**: local-first collaborative stack, process automation, and community KPI dashboard.  
 - **Value**: better efficiency without losing organizational identity or shared knowledge sovereignty.
 
 ## Other regulated sectors
+
+[View detailed page](./other-regulated.en.md)
 
 - **Audience**: utilities, energy, transport, regulated industry, and central public bodies.  
 - **Narrative**: operational control and continuous compliance for critical processes under strict regulation.  

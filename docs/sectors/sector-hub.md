@@ -8,12 +8,16 @@ ATLANTYQA une integración local-first, gobernanza y compliance para que cada in
 
 ## Universidades e investigación
 
+[Ver detalle del sector](./universities.md)
+
 - **Audiencia**: rectorados, vicerrectorados, direcciones TI, grupos de investigación y escuelas de posgrado.  
 - **Narrativa**: soberanía del dato científico para reducir dependencia externa y proteger proyectos europeos sensibles.  
 - **Oferta inicial**: infraestructura reproducible para investigación/docencia + compliance GDPR/DPIA + programa Academy aplicado.  
 - **Valor**: control institucional del conocimiento, aprobación más rápida en comités éticos y talento operativo verificable.
 
 ## Ayuntamientos y territorios ITI
+
+[Ver detalle del sector](./municipalities-iti.md)
 
 - **Audiencia**: alcaldías, secretarías generales, intervención, contratación y oficinas de modernización.  
 - **Narrativa**: infraestructura pública digital que permanece en territorio y evita lock-in en servicios críticos.  
@@ -22,12 +26,16 @@ ATLANTYQA une integración local-first, gobernanza y compliance para que cada in
 
 ## Banca y finanzas reguladas
 
+[Ver detalle del sector](./regulated-banking.md)
+
 - **Audiencia**: comités de riesgo, compliance, direcciones de operaciones, CIO/CISO y auditoría interna.  
 - **Narrativa**: automatización gobernada con evidencia continua para escalar IA sin exposición regulatoria.  
 - **Oferta inicial**: agentes auditables para backoffice/contratos/reporting + factory de evidencia (AI Act, GDPR, NIS2, DORA, CRA).  
 - **Valor**: menor riesgo sancionador, auditorías más rápidas y eficiencia operativa medible.
 
 ## Salud y hospitales
+
+[Ver detalle del sector](./healthcare.md)
 
 - **Audiencia**: direcciones médicas, direcciones de sistemas, delegados de protección de datos y calidad asistencial.  
 - **Narrativa**: IA asistida (no autónoma) con trazabilidad clínica completa y control estricto del dato sanitario.  
@@ -36,12 +44,16 @@ ATLANTYQA une integración local-first, gobernanza y compliance para que cada in
 
 ## PYMES multisector (ticket basico)
 
+[Ver detalle del sector](./smbs.md)
+
 - **Audiencia**: gerencia, operaciones y administracion con recursos limitados y necesidad de resultados rapidos.  
 - **Narrativa**: automatizacion util desde semana 1 sin depender de stacks complejos ni aumentar riesgo regulatorio.  
 - **Oferta inicial**: paquete "ticket basico" con agente documental, evidencias de cumplimiento y cuadro de mandos operativo.  
 - **Valor**: ahorro de tiempo administrativo, mejor control de datos y coste mensual predecible.
 
 ## Autonomos y microequipos
+
+[Ver detalle del sector](./freelancers.md)
 
 - **Audiencia**: profesionales independientes que necesitan productividad sin complejidad tecnica.  
 - **Narrativa**: IA local/hibrida para tareas repetitivas (propuestas, facturas, seguimiento) manteniendo control documental.  
@@ -50,12 +62,16 @@ ATLANTYQA une integración local-first, gobernanza y compliance para que cada in
 
 ## Asesorias legales, fiscales y contables
 
+[Ver detalle del sector](./advisory-firms.md)
+
 - **Audiencia**: socios/directores, responsables de calidad y equipos de despacho.  
 - **Narrativa**: automatizacion gobernada de expedientes y flujo normativo sin comprometer secreto profesional ni custodia de datos.  
 - **Oferta inicial**: agentes para documentacion, checklist de cumplimiento y repositorio de evidencia por cliente.  
 - **Valor**: menor riesgo de error, tiempos de respuesta mas cortos y estandarizacion del servicio.
 
 ## Administraciones publicas y entes instrumentales
+
+[Ver detalle del sector](./public-administration.md)
 
 - **Audiencia**: secretarias generales, intervencion, contratacion, direccion TIC y oficinas de transformacion.  
 - **Narrativa**: capacidad institucional propia para digitalizar con trazabilidad, cumplimiento y control presupuestario.  
@@ -64,12 +80,16 @@ ATLANTYQA une integración local-first, gobernanza y compliance para que cada in
 
 ## Cooperativas y economia social
 
+[Ver detalle del sector](./cooperatives.md)
+
 - **Audiencia**: consejos rectores, gerencias y equipos de gestion cooperativa.  
 - **Narrativa**: tecnologia alineada con gobernanza participativa, datos bajo control colectivo y escalado sostenible.  
 - **Oferta inicial**: stack colaborativo local-first, automatizacion de procesos internos y panel de indicadores comunitarios.  
 - **Valor**: eficiencia operativa sin perder identidad organizativa ni soberania sobre conocimiento compartido.
 
 ## Otros sectores regulados
+
+[Ver detalle del sector](./other-regulated.md)
 
 - **Audiencia**: utilities, energía, transporte, industria regulada y sector público central.  
 - **Narrativa**: control operativo y compliance continuo en procesos críticos con alta presión regulatoria.  
