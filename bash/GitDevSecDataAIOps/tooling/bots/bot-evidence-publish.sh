@@ -23,16 +23,17 @@ if [[ -n "${CONFIG_PATH}" ]]; then
   cs_load_env_chain "${CONFIG_PATH}" "${ENV_EXAMPLE}" "${CS_STRICT_CONFIG:-false}"
 fi
 
-DRY_RUN=${DRY_RUN:-"true"}
-EVIDENCE_SOURCE_DIR=${EVIDENCE_SOURCE_DIR:-""}
-EVIDENCE_SUBDIR=${EVIDENCE_SUBDIR:-""}
-EVIDENCE_COMMIT_MESSAGE=${EVIDENCE_COMMIT_MESSAGE:-"chore(evidence): publish bot evidence"}
-INTERACTIVE=${INTERACTIVE:-"false"}
+# Apply defaults after config loading so values from ENV files are not masked.
+DRY_RUN="${DRY_RUN:-true}"
+EVIDENCE_SOURCE_DIR="${EVIDENCE_SOURCE_DIR:-}"
+EVIDENCE_SUBDIR="${EVIDENCE_SUBDIR:-}"
+EVIDENCE_COMMIT_MESSAGE="${EVIDENCE_COMMIT_MESSAGE:-chore(evidence): publish bot evidence}"
+INTERACTIVE="${INTERACTIVE:-false}"
 
-GITEA_URL=${GITEA_URL:-""}
-GITEA_EVIDENCE_REPO=${GITEA_EVIDENCE_REPO:-"founders/evidence"} # placeholder
-GITEA_EVIDENCE_USER=${GITEA_EVIDENCE_USER:-"bot"}
-GITEA_EVIDENCE_TOKEN=${GITEA_EVIDENCE_TOKEN:-""}
+GITEA_URL="${GITEA_URL:-}"
+GITEA_EVIDENCE_REPO="${GITEA_EVIDENCE_REPO:-founders/evidence}" # placeholder
+GITEA_EVIDENCE_USER="${GITEA_EVIDENCE_USER:-bot}"
+GITEA_EVIDENCE_TOKEN="${GITEA_EVIDENCE_TOKEN:-}"
 
 require_cmd() {
   cs_require_cmd "$1"
