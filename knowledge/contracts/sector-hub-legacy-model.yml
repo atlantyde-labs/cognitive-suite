@@ -1,0 +1,234 @@
+version: "1.0"
+metadata:
+  owner: "Atlantyqa Knowledge Office"
+  status: "active"
+  confidentiality: "internal"
+  source_snapshot_commit: "f66d66b"
+  source_snapshot_files:
+    - "docs/sectors/sector-hub.md"
+    - "docs/sectors/sector-hub.en.md"
+  intent:
+    - "preserve legacy semantic framework"
+    - "support role-based messaging"
+    - "retain ontological/taxonomic continuity"
+
+model:
+  legacy_fields:
+    - audiencia
+    - narrativa
+    - oferta_inicial
+    - valor
+  public_fields:
+    - problema_a_resolver
+    - resultado_esperado
+    - despliegue_inicial
+    - impacto_esperado
+
+access_governance:
+  roles_allowed:
+    - executive
+    - sales_ops
+    - compliance_risk
+    - procurement
+    - product_marketing
+    - knowledge_office
+  scope:
+    - internal_enablement
+    - rfp_preparation
+    - stakeholder_response
+    - content_governance
+  handling_rules:
+    - "Do not publish legacy blocks in public landing pages"
+    - "Use public_fields in external web copy"
+    - "Keep taxonomy bindings synchronized with ontology"
+
+sectors:
+  - id: universities
+    taxonomy_bindings:
+      domain: atlantyqa
+      sector: universities
+    public_sections:
+      es: "docs/sectors/sector-hub.md#universidades-e-investigacion"
+      en: "docs/sectors/sector-hub.en.md#universities-research"
+    legacy:
+      es:
+        audiencia: "rectorados, vicerrectorados, direcciones TI, grupos de investigacion y escuelas de posgrado"
+        narrativa: "soberania del dato cientifico para reducir dependencia externa y proteger proyectos europeos sensibles"
+        oferta_inicial: "infraestructura reproducible para investigacion/docencia + compliance GDPR/DPIA + programa Academy aplicado"
+        valor: "control institucional del conocimiento, aprobacion mas rapida en comites eticos y talento operativo verificable"
+      en:
+        audience: "rectorates, CIO offices, research leads, and postgraduate program directors"
+        narrative: "scientific data sovereignty to reduce hyperscaler dependency and protect sensitive EU-funded research"
+        starter_offer: "reproducible research/teaching stack + GDPR/DPIA compliance layer + applied Academy squads"
+        value: "institutional control of knowledge assets, faster ethics approvals, and verifiable operational talent"
+
+  - id: municipalities
+    taxonomy_bindings:
+      domain: atlantyqa
+      sector: municipalities
+    public_sections:
+      es: "docs/sectors/sector-hub.md#ayuntamientos-y-territorios-iti"
+      en: "docs/sectors/sector-hub.en.md#municipalities-iti-territories"
+    legacy:
+      es:
+        audiencia: "alcaldias, secretarias generales, intervencion, contratacion y oficinas de modernizacion"
+        narrativa: "infraestructura publica digital que permanece en territorio y evita lock-in en servicios criticos"
+        oferta_inicial: "nodo municipal/ITI + catalogo de casos de uso administrativos + marco de compra publica replicable"
+        valor: "continuidad operativa, trazabilidad para control interno/externo y mejora de coste total a medio plazo"
+      en:
+        audience: "mayor offices, city secretariat, internal control, procurement, and digital transformation units"
+        narrative: "public digital infrastructure that stays in territory and avoids lock-in for critical services"
+        starter_offer: "municipal/ITI sovereign node + administrative use-case catalog + procurement-ready rollout model"
+        value: "operational continuity, auditable traceability, and improved medium-term total cost"
+
+  - id: regulated_finance
+    taxonomy_bindings:
+      domain: cognitive_suite
+      sector: regulated_finance
+    public_sections:
+      es: "docs/sectors/sector-hub.md#banca-y-finanzas-reguladas"
+      en: "docs/sectors/sector-hub.en.md#banking-regulated-finance"
+    legacy:
+      es:
+        audiencia: "comites de riesgo, compliance, direcciones de operaciones, CIO/CISO y auditoria interna"
+        narrativa: "automatizacion gobernada con evidencia continua para escalar IA sin exposicion regulatoria"
+        oferta_inicial: "agentes auditables para backoffice/contratos/reporting + factory de evidencia (AI Act, GDPR, NIS2, DORA, CRA)"
+        valor: "menor riesgo sancionador, auditorias mas rapidas y eficiencia operativa medible"
+      en:
+        audience: "risk committees, compliance, operations leadership, CIO/CISO, and internal audit"
+        narrative: "governed automation with continuous evidence so AI can scale without regulatory exposure"
+        starter_offer: "auditable agents for backoffice/legal/reporting + evidence factory (AI Act, GDPR, NIS2, DORA, CRA)"
+        value: "lower sanction risk, faster audits, and measurable operational efficiency"
+
+  - id: healthcare
+    taxonomy_bindings:
+      domain: cognitive_suite
+      sector: healthcare
+    public_sections:
+      es: "docs/sectors/sector-hub.md#salud-y-hospitales"
+      en: "docs/sectors/sector-hub.en.md#healthcare-hospitals"
+    legacy:
+      es:
+        audiencia: "direcciones medicas, direcciones de sistemas, delegados de proteccion de datos y calidad asistencial"
+        narrativa: "IA asistida (no autonoma) con trazabilidad clinica completa y control estricto del dato sanitario"
+        oferta_inicial: "piloto modular para documentacion/operacion clinica + arquitectura DPIA-ready y residencia on-prem"
+        valor: "menor riesgo etico-legal, adopcion segura y mejora de tiempos administrativos en entorno clinico"
+      en:
+        audience: "medical leadership, hospital IT, DPO teams, and care quality offices"
+        narrative: "assistant AI (not autonomous AI) with full clinical traceability and strict health-data control"
+        starter_offer: "modular pilot for clinical/admin workflows + DPIA-ready architecture and on-prem residency"
+        value: "reduced legal/ethical risk, safer adoption, and better administrative cycle times"
+
+  - id: smb_multisector
+    taxonomy_bindings:
+      domain: atlantyqa
+      sector: smb_multisector
+    public_sections:
+      es: "docs/sectors/sector-hub.md#pymes-multisector-ticket-basico"
+      en: "docs/sectors/sector-hub.en.md#smbs-across-sectors-basic-tier"
+    legacy:
+      es:
+        audiencia: "gerencia, operaciones y administracion con recursos limitados y necesidad de resultados rapidos"
+        narrativa: "automatizacion util desde semana 1 sin depender de stacks complejos ni aumentar riesgo regulatorio"
+        oferta_inicial: "paquete ticket basico con agente documental, evidencias de cumplimiento y cuadro de mandos operativo"
+        valor: "ahorro de tiempo administrativo, mejor control de datos y coste mensual predecible"
+      en:
+        audience: "management, operations, and admin teams with limited resources and clear ROI pressure"
+        narrative: "practical automation from week one without adding technical complexity or compliance exposure"
+        starter_offer: "basic tier package with document agent, compliance evidence, and an operations dashboard"
+        value: "lower admin workload, stronger data control, and predictable monthly cost"
+
+  - id: freelancers
+    taxonomy_bindings:
+      domain: atlantyqa
+      sector: freelancers
+    public_sections:
+      es: "docs/sectors/sector-hub.md#autonomos-y-microequipos"
+      en: "docs/sectors/sector-hub.en.md#freelancers-and-micro-teams"
+    legacy:
+      es:
+        audiencia: "profesionales independientes que necesitan productividad sin complejidad tecnica"
+        narrativa: "IA local/hibrida para tareas repetitivas manteniendo control documental"
+        oferta_inicial: "playbook de trabajo + asistente operativo + plantillas de evidencia y respaldo"
+        valor: "mas tiempo facturable, menos carga operativa y trazabilidad para clientes y auditorias"
+      en:
+        audience: "independent professionals who need productivity without infrastructure overhead"
+        narrative: "local/hybrid AI for repetitive tasks with controlled documentation"
+        starter_offer: "operational playbook + assistant workflows + evidence and backup templates"
+        value: "more billable time, less operational drag, and better traceability for clients"
+
+  - id: advisory_firms
+    taxonomy_bindings:
+      domain: cognitive_suite
+      sector: advisory_firms
+    public_sections:
+      es: "docs/sectors/sector-hub.md#asesorias-legales-fiscales-y-contables"
+      en: "docs/sectors/sector-hub.en.md#legal-tax-and-accounting-firms"
+    legacy:
+      es:
+        audiencia: "socios/directores, responsables de calidad y equipos de despacho"
+        narrativa: "automatizacion gobernada de expedientes y flujo normativo sin comprometer secreto profesional"
+        oferta_inicial: "agentes para documentacion, checklist de cumplimiento y repositorio de evidencia por cliente"
+        valor: "menor riesgo de error, tiempos de respuesta mas cortos y estandarizacion del servicio"
+      en:
+        audience: "partners, quality leads, and delivery teams in advisory practices"
+        narrative: "governed automation for cases and compliance workflows without compromising professional secrecy"
+        starter_offer: "document agents, compliance checklists, and per-client evidence repository"
+        value: "lower error risk, faster turnaround, and standardized service quality"
+
+  - id: public_administration
+    taxonomy_bindings:
+      domain: atlantyqa
+      sector: public_administration
+    public_sections:
+      es: "docs/sectors/sector-hub.md#administraciones-publicas-y-entes-instrumentales"
+      en: "docs/sectors/sector-hub.en.md#public-administrations-and-public-agencies"
+    legacy:
+      es:
+        audiencia: "secretarias generales, intervencion, contratacion, direccion TIC y oficinas de transformacion"
+        narrativa: "capacidad institucional propia para digitalizar con trazabilidad, cumplimiento y control presupuestario"
+        oferta_inicial: "nodo soberano + catalogo de casos de uso administrativos + marco de despliegue y compra publica"
+        valor: "continuidad operativa, menor dependencia de proveedor y evidencia auditable para control interno/externo"
+      en:
+        audience: "secretariat, internal control, procurement, CIO offices, and transformation units"
+        narrative: "institutional digital capacity with traceability, compliance, and budget control by design"
+        starter_offer: "sovereign node + administrative use-case catalog + public procurement deployment framework"
+        value: "operational continuity, reduced lock-in, and auditable evidence for oversight bodies"
+
+  - id: cooperatives
+    taxonomy_bindings:
+      domain: coop_model
+      sector: cooperatives
+    public_sections:
+      es: "docs/sectors/sector-hub.md#cooperativas-y-economia-social"
+      en: "docs/sectors/sector-hub.en.md#cooperatives-and-social-economy-organizations"
+    legacy:
+      es:
+        audiencia: "consejos rectores, gerencias y equipos de gestion cooperativa"
+        narrativa: "tecnologia alineada con gobernanza participativa, datos bajo control colectivo y escalado sostenible"
+        oferta_inicial: "stack colaborativo local-first, automatizacion de procesos internos y panel de indicadores comunitarios"
+        valor: "eficiencia operativa sin perder identidad organizativa ni soberania sobre conocimiento compartido"
+      en:
+        audience: "boards, cooperative management, and shared-services teams"
+        narrative: "technology aligned with participatory governance and collective control of strategic data"
+        starter_offer: "local-first collaborative stack, process automation, and community KPI dashboard"
+        value: "better efficiency without losing organizational identity or shared knowledge sovereignty"
+
+  - id: other_regulated
+    taxonomy_bindings:
+      domain: cognitive_suite
+      sector: utilities_transport
+    public_sections:
+      es: "docs/sectors/sector-hub.md#otros-sectores-regulados"
+      en: "docs/sectors/sector-hub.en.md#other-regulated-sectors"
+    legacy:
+      es:
+        audiencia: "utilities, energia, transporte, industria regulada y sector publico central"
+        narrativa: "control operativo y compliance continuo en procesos criticos con alta presion regulatoria"
+        oferta_inicial: "automatizaciones gobernadas + evidencia tecnica-juridica + squads TaaS por dominio sectorial"
+        valor: "resiliencia operativa, reduccion de riesgo sistemico y estandarizacion de gobierno del dato"
+      en:
+        audience: "utilities, energy, transport, regulated industry, and central public bodies"
+        narrative: "operational control and continuous compliance for critical processes under strict regulation"
+        starter_offer: "governed automation + legal-technical evidence + domain-specific TaaS squads"
+        value: "stronger resilience, lower systemic risk, and standardized data governance execution"

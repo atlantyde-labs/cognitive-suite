@@ -445,6 +445,11 @@ EOF
 run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/secrets/gitea-onboard-contributors.sh" "${ONBOARD_ENV}"
 
 # Bot review (dry-run)
+# Avoid global evidence env collisions: this harness itself may run with EVIDENCE_DIR
+# and that can mask per-script config values loaded from env files.
+HARNESS_EVIDENCE_DIR="${EVIDENCE_DIR:-}"
+unset EVIDENCE_DIR EVIDENCE_SOURCE_DIR
+
 BOT_REVIEW_ENV="${TMP_DIR}/bot-review.env"
 cat <<EOF > "${BOT_REVIEW_ENV}"
 PLATFORM="gitea"
@@ -473,6 +478,12 @@ BOT_NAME="ops-bot"
 BOT_EMAIL="ops-bot@example.local"
 EOF
 run_script "${ROOT_DIR}/bash/GitDevSecDataAIOps/tooling/bots/bot-evidence-publish.sh" "${BOT_EVIDENCE_ENV}"
+
+# Restore harness-level evidence path for artifact export below.
+if [[ -n "${HARNESS_EVIDENCE_DIR}" ]]; then
+  EVIDENCE_DIR="${HARNESS_EVIDENCE_DIR}"
+  export EVIDENCE_DIR
+fi
 
 if [[ -n "${EVIDENCE_DIR:-}" ]]; then
   mkdir -p "${EVIDENCE_DIR}"
